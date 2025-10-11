@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>🐶 Lista de Pacientes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-card *ngFor="let paciente of pacientes">
+    <ion-card-header>
+      <ion-card-title>{{ paciente.nombreMascota }}</ion-card-title>
+      <ion-card-subtitle>Especie: {{ paciente.especie }} | Raza: {{ paciente.raza }}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      Edad: {{ paciente.edad }} años <br>
+      Historial médico: {{ paciente.historialMedico }} <br>
+      ID Propietario: {{ paciente.idPropietario }}
+    </ion-card-content>
+  </ion-card>
+
+  <ion-text color="medium" *ngIf="pacientes.length === 0">
+    <p class="ion-text-center">No hay pacientes registrados 😿</p>
+  </ion-text>
+</ion-content>

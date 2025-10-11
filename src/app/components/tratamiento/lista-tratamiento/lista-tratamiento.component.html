@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-toolbar color="warning">
+    <ion-title>💊 Lista de Tratamientos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-card *ngFor="let tratamiento of tratamientos">
+    <ion-card-header>
+      <ion-card-title>{{ tratamiento.descripcion }}</ion-card-title>
+      <ion-card-subtitle>Tipo: {{ tratamiento.tipo }}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      Fecha: {{ tratamiento.fecha }} <br>
+      Paciente ID: {{ tratamiento.idPaciente }} <br>
+      ID Tratamiento: {{ tratamiento.idTratamiento }}
+    </ion-card-content>
+  </ion-card>
+
+  <ion-text color="medium" *ngIf="tratamientos.length === 0">
+    <p class="ion-text-center">No hay tratamientos registrados 😿</p>
+  </ion-text>
+</ion-content>

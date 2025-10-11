@@ -1,0 +1,22 @@
+<ion-header>
+  <ion-toolbar color="secondary">
+    <ion-title>🏠 Lista de Propietarios</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-card *ngFor="let prop of propietarios">
+    <ion-card-header>
+      <ion-card-title>{{ prop.nombre }}</ion-card-title>
+      <ion-card-subtitle>Teléfono: {{ prop.telefono }}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      Dirección: {{ prop.direccion }} <br>
+      ID: {{ prop.idPropietario }}
+    </ion-card-content>
+  </ion-card>
+
+  <ion-text color="medium" *ngIf="propietarios.length === 0">
+    <p class="ion-text-center">No hay propietarios registrados 😿</p>
+  </ion-text>
+</ion-content>

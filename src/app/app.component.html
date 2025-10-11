@@ -1,3 +1,38 @@
 <ion-app>
-  <ion-router-outlet></ion-router-outlet>
+  <ion-tabs>
+
+    <ion-tab-bar slot="bottom">
+
+      <ion-tab-button [routerLink]="['/citas']">
+        <ion-label>Citas</ion-label>
+      </ion-tab-button>
+
+      <ion-tab-button [routerLink]="['/controlAcceso']">
+        <ion-label>Usuarios</ion-label>
+      </ion-tab-button>
+
+      <ion-tab-button [routerLink]="['/facturacion']">
+        <ion-label>Facturación</ion-label>
+      </ion-tab-button>
+
+      <ion-tab-button [routerLink]="['/inventario']">
+        <ion-label>Inventario</ion-label>
+      </ion-tab-button>
+
+      <ion-tab-button [routerLink]="['/paciente']">
+        <ion-label>Pacientes</ion-label>
+      </ion-tab-button>
+
+      <ion-tab-button [routerLink]="['/propetario']">
+        <ion-label>Propietarios</ion-label>
+      </ion-tab-button>
+
+      <ion-tab-button [routerLink]="['/tratamiento']">
+        <ion-label>Tratamientos</ion-label>
+      </ion-tab-button>
+
+    </ion-tab-bar>
+
+    <ion-router-outlet></ion-router-outlet>
+  </ion-tabs>
 </ion-app>
