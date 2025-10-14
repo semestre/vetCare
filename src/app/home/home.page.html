@@ -13,18 +13,18 @@
     </ion-toolbar>
   </ion-header>
 
-   <div id="container">
+  <div id="container">
     <ion-item>
       <ion-label position="floating">Username</ion-label>
-      <ion-input type="text"></ion-input>
+      <ion-input type="text" [(ngModel)]="username"></ion-input>
     </ion-item>
 
     <ion-item>
       <ion-label position="floating">Password</ion-label>
-      <ion-input type="password"></ion-input>
+      <ion-input type="password" [(ngModel)]="password"></ion-input>
     </ion-item>
 
-    <ion-button expand="full" class="ion-margin-top">
+    <ion-button expand="full" class="ion-margin-top" (click)="login()">
       Log In
     </ion-button>
   </div>

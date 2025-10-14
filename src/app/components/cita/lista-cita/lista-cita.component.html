@@ -1,22 +1,131 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Lista de Citas</ion-title>
+<ion-header class="header-gradient">
+  <ion-toolbar color="transparent">
+    <ion-title class="title">
+      <ion-icon name="paw-outline" aria-hidden="true"></ion-icon>
+      Citas de Veterinaria
+    </ion-title>
   </ion-toolbar>
+
+  <div class="subheader">
+    <ion-searchbar
+      placeholder="Buscar por motivo, fecha, vet, paciente..."
+      (ionInput)="onSearchChange($event)"
+      show-clear-button="focus"
+      animated="true">
+    </ion-searchbar>
+  </div>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-card *ngFor="let cita of citas">
+<ion-content [fullscreen]="true" class="ion-padding content-bg">
+
+  <!-- Pull to refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)">
+    <ion-refresher-content pullingText="Desliza para refrescar"></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Skeleton de carga -->
+  <ng-container *ngIf="loading">
+    <ion-grid fixed>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4,5,6]">
+          <ion-card class="card glass">
+            <ion-card-header>
+              <ion-card-title>
+                <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+              </ion-card-title>
+              <ion-card-subtitle>
+                <ion-skeleton-text animated style="width: 40%"></ion-skeleton-text>
+              </ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-skeleton-text animated style="width: 90%"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ng-container>
+
+  <!-- Error -->
+  <ion-card *ngIf="!loading && error" class="card error-card">
     <ion-card-header>
-      <ion-card-title>
-        Fecha: {{ cita.fecha }} - Hora: {{ cita.hora }}
-      </ion-card-title>
-      <ion-card-subtitle>
-        Motivo: {{ cita.motivo }}
-      </ion-card-subtitle>
+      <ion-card-title>Ups</ion-card-title>
+      <ion-card-subtitle>{{ error }}</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
-      ID Veterinario: {{ cita.idVeterinario }} <br>
-      ID Paciente: {{ cita.idPaciente }}
+      <ion-button fill="outline" (click)="load()">Reintentar</ion-button>
     </ion-card-content>
   </ion-card>
+
+  <!-- Vacío -->
+  <div *ngIf="!loading && !filteredCitas().length" class="empty">
+    <div class="emoji">🐾</div>
+    <h3>Sin citas por ahora</h3>
+    <p>Cuando registres una cita aparecerá aquí.</p>
+    <ion-button (click)="nuevaCita()">Nueva cita</ion-button>
+  </div>
+
+  <!-- Grid de tarjetas -->
+  <ion-grid fixed *ngIf="!loading && filteredCitas().length">
+    <ion-row>
+      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let cita of filteredCitas()">
+        <ion-card class="card glass hover">
+          <ion-card-header>
+            <div class="header-row">
+              <div class="chips">
+                <ion-chip color="light">
+                  <ion-icon name="calendar-outline"></ion-icon>
+                  <ion-label>{{ cita.fecha }}</ion-label>
+                </ion-chip>
+                <ion-chip color="light">
+                  <ion-icon name="time-outline"></ion-icon>
+                  <ion-label>{{ cita.hora }}</ion-label>
+                </ion-chip>
+              </div>
+            </div>
+
+            <ion-card-title class="motivo">
+              <ion-icon name="medkit-outline"></ion-icon>
+              {{ cita.motivo }}
+            </ion-card-title>
+            <ion-card-subtitle class="ids">
+              <ion-chip class="soft">
+                <ion-icon name="person-outline"></ion-icon>
+                <ion-label>Vet #{{ cita.idVeterinario }}</ion-label>
+              </ion-chip>
+              <ion-chip class="soft">
+                <ion-icon name="paw-outline"></ion-icon>
+                <ion-label>Paciente #{{ cita.idPaciente }}</ion-label>
+              </ion-chip>
+            </ion-card-subtitle>
+          </ion-card-header>
+
+          <ion-card-content>
+            <div class="meta">
+              <div class="meta-item">
+                <span class="meta-k">Fecha</span>
+                <span class="meta-v">{{ cita.fecha }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-k">Hora</span>
+                <span class="meta-v">{{ cita.hora }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-k">Motivo</span>
+                <span class="meta-v">{{ cita.motivo }}</span>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- Botón flotante -->
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="nuevaCita()">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

@@ -8,7 +8,7 @@ import { ControlAcceso } from 'src/app/models/controlAcceso.model';
 })
 export class ControlAccesoService {
 
-  private apiURL = ''; // <-- put your API URL here
+  private apiURL = 'https://blog-notes-wedding-ppm.trycloudflare.com/VetCare/api/usuarios/getAll';
 
   constructor(private http: HttpClient) {}
 

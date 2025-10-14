@@ -8,7 +8,7 @@ import { Cita } from 'src/app/models/cita.model';
 })
 export class CitaService {
 
-  private apiURL = ''; 
+  private apiURL = 'https://blog-notes-wedding-ppm.trycloudflare.com/VetCare/api/citas/getAll'; 
 
   constructor(private http: HttpClient) {}
 
