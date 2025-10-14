@@ -1,23 +1,133 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>🐶 Lista de Pacientes</ion-title>
+<ion-header class="header-gradient">
+  <ion-toolbar color="transparent">
+    <ion-title class="title">
+      <ion-icon name="paw-outline" aria-hidden="true"></ion-icon>
+      Lista de Pacientes
+    </ion-title>
   </ion-toolbar>
+
+  <div class="subheader">
+    <ion-searchbar
+      placeholder="Buscar por nombre, especie, raza, ID…"
+      [(ngModel)]="searchTerm"
+      show-clear-button="focus"
+      animated="true">
+    </ion-searchbar>
+
+    <ion-segment [(ngModel)]="especieFiltro" value="Todas" mode="md" scrollable="true">
+      <ion-segment-button *ngFor="let e of especies" [value]="e">
+        <ion-label>{{ e }}</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-card *ngFor="let paciente of pacientes">
+<ion-content class="ion-padding content-bg" [fullscreen]="true">
+
+  <!-- Pull to refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)">
+    <ion-refresher-content pullingText="Desliza para refrescar"></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Skeleton -->
+  <ng-container *ngIf="loading">
+    <ion-grid fixed>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4,5,6]">
+          <ion-card class="pet-card sk">
+            <ion-card-header class="pet-header">
+              <div class="pet-avatar sk"></div>
+              <div class="sk-lines">
+                <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 40%"></ion-skeleton-text>
+              </div>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-skeleton-text animated style="width: 90%"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ng-container>
+
+  <!-- Error -->
+  <ion-card *ngIf="!loading && error" class="pet-card error-card">
     <ion-card-header>
-      <ion-card-title>{{ paciente.nombreMascota }}</ion-card-title>
-      <ion-card-subtitle>Especie: {{ paciente.especie }} | Raza: {{ paciente.raza }}</ion-card-subtitle>
+      <ion-card-title>Ups</ion-card-title>
+      <ion-card-subtitle>{{ error }}</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
-      Edad: {{ paciente.edad }} años <br>
-      Historial médico: {{ paciente.historialMedico }} <br>
-      ID Propietario: {{ paciente.idPropietario }}
+      <ion-button fill="outline" (click)="load()">Reintentar</ion-button>
     </ion-card-content>
   </ion-card>
 
-  <ion-text color="medium" *ngIf="pacientes.length === 0">
-    <p class="ion-text-center">No hay pacientes registrados 😿</p>
-  </ion-text>
+  <!-- Vacío -->
+  <div *ngIf="!loading && !filtered.length" class="empty">
+    <div class="emoji">🐾</div>
+    <h3>Sin pacientes</h3>
+    <p>Registra tu primer paciente para comenzar.</p>
+  </div>
+
+  <!-- Grid -->
+  <ion-grid fixed *ngIf="!loading && filtered.length">
+    <ion-row>
+      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let paciente of filtered">
+        <ion-card class="pet-card hover">
+          <ion-card-header class="pet-header">
+            <div class="pet-avatar">{{ petEmoji(paciente.especie) }}</div>
+
+            <div class="title-wrap">
+              <ion-card-title class="name">{{ paciente.nombreMascota }}</ion-card-title>
+              <div class="badges">
+                <ion-chip class="chip soft">
+                  <ion-icon name="paw-outline"></ion-icon>
+                  <ion-label>{{ paciente.especie }}</ion-label>
+                </ion-chip>
+                <ion-chip class="chip soft">
+                  <ion-icon name="id-card-outline"></ion-icon>
+                  <ion-label>{{ paciente.raza || '—' }}</ion-label>
+                </ion-chip>
+                <ion-chip class="chip age">
+                  <ion-icon name="time-outline"></ion-icon>
+                  <ion-label>{{ paciente.edad }} año{{ paciente.edad === 1 ? '' : 's' }}</ion-label>
+                </ion-chip>
+              </div>
+            </div>
+
+            <ion-buttons>
+              <ion-button fill="clear" (click)="ver(paciente)" aria-label="Ver">
+                <ion-icon slot="icon-only" name="eye-outline"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" (click)="editar(paciente)" aria-label="Editar">
+                <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" color="danger" (click)="eliminar(paciente)" aria-label="Eliminar">
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-card-header>
+
+          <ion-card-content>
+            <div class="meta">
+              <div class="meta-item">
+                <span class="meta-k">ID Paciente</span>
+                <span class="meta-v">#{{ paciente.idPaciente }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-k">ID Propietario</span>
+                <span class="meta-v">#{{ paciente.idPropietario }}</span>
+              </div>
+            </div>
+
+            <div class="history">
+              <span class="meta-k">Historial médico</span>
+              <p class="history-text">{{ paciente.historialMedico || '—' }}</p>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

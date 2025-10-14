@@ -8,18 +8,17 @@ import { Paciente } from 'src/app/models/paciente.model';
 })
 export class PacienteService {
 
-  private apiURL = ''; // <-- put your API URL here
-
+  private apiURL = 'https://blog-notes-wedding-ppm.trycloudflare.com/VetCare/api/pacientes'; 
   constructor(private http: HttpClient) {}
 
   // Get all pacientes
   getAllPacientes(): Observable<Paciente[]> {
-    return this.http.get<Paciente[]>(`${this.apiURL}`);
+    return this.http.get<Paciente[]>(`${this.apiURL}/getAll`);
   }
 
   // Create a new paciente
   createPaciente(paciente: Paciente): Observable<Paciente> {
-    return this.http.post<Paciente>(`${this.apiURL}`, paciente);
+    return this.http.post<Paciente>(`${this.apiURL}/save`, paciente);
   }
 
 }
