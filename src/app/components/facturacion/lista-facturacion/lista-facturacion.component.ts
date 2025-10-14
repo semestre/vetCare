@@ -4,6 +4,9 @@ import { IonicModule, ToastController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { Facturacion } from 'src/app/models/facturacion.model';
 import { FacturacionService } from 'src/app/services/facturacion/facturacion.service';
+import { ModalController } from '@ionic/angular';
+import { FacturacionModalComponent } from 'src/app/components/facturacion-modal/facturacion-modal.component';
+
 
 @Component({
   selector: 'app-lista-facturacion',
@@ -16,6 +19,7 @@ export class ListaFacturacionComponent implements OnInit {
 
   private factService = inject(FacturacionService);
   private toast = inject(ToastController);
+  private modalCtrl = inject(ModalController);
 
   facturas: Facturacion[] = [
     { idFactura: 1, idPaciente: 201, servicios: 'Consulta general', medicamentos: 'Vacuna antirrábica', total: 500,  fecha: '2025-10-12', metodoPago: 'Efectivo' },
@@ -84,5 +88,18 @@ export class ListaFacturacionComponent implements OnInit {
     if (k.includes('efectivo')) return 'mp-efectivo';
     if (k.includes('transfer')) return 'mp-transfer';
     return 'mp-generic';
+  }
+
+  async nuevoRegistro() {
+    const modal = await this.modalCtrl.create({
+      component: FacturacionModalComponent,
+      breakpoints: [0, 0.6, 1],
+      initialBreakpoint: 0.6,
+      cssClass: 'rounded-modal'
+    });
+    await modal.present();
+
+    const { role } = await modal.onDidDismiss();
+    if (role === 'created') this.load();
   }
 }
