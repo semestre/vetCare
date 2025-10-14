@@ -1,42 +1,77 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { IonicModule, ToastController } from '@ionic/angular';
+import { FormsModule } from '@angular/forms';
 import { Propietario } from 'src/app/models/propetario.model';
 import { PropietarioService } from 'src/app/services/propetario/propetario.service';
-import { IonicModule } from '@ionic/angular';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-lista-propetario',
+  standalone: true,
+  imports: [IonicModule, CommonModule, FormsModule],
   templateUrl: './lista-propetario.component.html',
   styleUrls: ['./lista-propetario.component.scss'],
-  imports: [IonicModule, CommonModule]
 })
 export class ListaPropetarioComponent implements OnInit {
+  private service = inject(PropietarioService);
+  private toast = inject(ToastController);
 
   propietarios: Propietario[] = [
-    {
-      idPropietario: 101,
-      nombre: 'Juan Pérez',
-      telefono: '555-1234',
-      direccion: 'Calle Falsa 123, Ciudad'
-    },
-    {
-      idPropietario: 102,
-      nombre: 'María López',
-      telefono: '555-5678',
-      direccion: 'Av. Siempre Viva 456, Ciudad'
-    }
+    { idPropietario: 101, nombre: 'Juan Pérez',  telefono: '555-1234', direccion: 'Calle Falsa 123, Ciudad' },
+    { idPropietario: 102, nombre: 'María López', telefono: '555-5678', direccion: 'Av. Siempre Viva 456, Ciudad' }
   ];
 
-  constructor(private propietarioService: PropietarioService) {}
+  // UI state
+  loading = true;
+  error: string | null = null;
 
-  ngOnInit(): void {
-    this.propietarioService.getAllPropietarios().subscribe({
+  // búsqueda
+  searchTerm = '';
+
+  ngOnInit(): void { this.load(); }
+
+  load(event?: CustomEvent) {
+    this.loading = !event;
+    this.error = null;
+
+    this.service.getAllPropietarios().subscribe({
       next: (data) => {
-        this.propietarios = data;
-        console.log('Propietarios cargados:', data);
+        if (Array.isArray(data) && data.length) this.propietarios = data;
+        this.loading = false;
+        event?.detail.complete();
       },
-      error: (error) => console.error('Error al cargar propietarios:', error)
+      error: async (err) => {
+        console.error('Error al cargar propietarios:', err);
+        this.error = 'No se pudieron cargar los propietarios.';
+        this.loading = false;
+        event?.detail.complete();
+        (await this.toast.create({ message: 'No se pudieron cargar los propietarios.', duration: 1800, color: 'danger' })).present();
+      }
     });
   }
 
+  get filtered(): Propietario[] {
+    const q = this.searchTerm.trim().toLowerCase();
+    if (!q) return this.propietarios;
+    return this.propietarios.filter(p =>
+      String(p.idPropietario).includes(q) ||
+      (p.nombre ?? '').toLowerCase().includes(q) ||
+      (p.telefono ?? '').toLowerCase().includes(q) ||
+      (p.direccion ?? '').toLowerCase().includes(q)
+    );
+  }
+
+  initial(name?: string) {
+    return (name?.trim()?.charAt(0) || '?').toUpperCase();
+  }
+
+  telHref(t?: string) {
+    if (!t) return '#';
+    return 'tel:' + t.replace(/[^\d+]/g, '');
+  }
+
+  nuevoPropietario() { console.log('Nuevo propietario'); }
+  ver(p: Propietario) { console.log('Ver', p); }
+  editar(p: Propietario) { console.log('Editar', p); }
+  eliminar(p: Propietario) { console.log('Eliminar', p); }
 }

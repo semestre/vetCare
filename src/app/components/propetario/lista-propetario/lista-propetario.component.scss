@@ -1,0 +1,96 @@
+:host {
+  --amber-start: #fbbf24; /* amber */
+  --amber-end:   #f59e0b; /* darker amber */
+  --paper: #ffffff;
+  --ink: #0f172a;
+  --line: #f6efe3;
+  --shadow: 0 14px 30px rgba(245, 158, 11, 0.15);
+  --shadow-hover: 0 18px 46px rgba(245, 158, 11, 0.22);
+}
+
+.header-gradient-amber {
+  --background: transparent;
+  background: linear-gradient(135deg, var(--amber-start), var(--amber-end));
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.25);
+}
+
+.title {
+  display: flex; gap: .5rem; align-items: center; color: #fff; font-weight: 800;
+  ion-icon { font-size: 1.3rem; }
+}
+
+.subheader {
+  padding: 0 .75rem .75rem .75rem;
+  background: linear-gradient(135deg, var(--amber-start), var(--amber-end));
+}
+
+.content-bg { --background: linear-gradient(180deg, #fffbf3 0%, #ffffff 100%); }
+
+/* Card */
+.owner-card {
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  position: relative;
+}
+.owner-card.hover:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
+  border-color: #fdecc9;
+}
+
+.owner-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: .8rem;
+  padding-right: .4rem;
+}
+
+.avatar {
+  width: 48px; height: 48px; border-radius: 12px;
+  display: grid; place-items: center; font-weight: 800; color: #5b3a00;
+  background: radial-gradient(120% 120% at 0% 0%, #fff4e1 0%, #ffe8bf 100%);
+  border: 1px solid #ffe0a6;
+}
+.avatar.sk { background: #f5efe5; border: 0; }
+
+.title-wrap { display: grid; gap: .25rem; }
+.name { font-weight: 800; color: #0b172f; }
+
+.badges { display: flex; flex-wrap: wrap; gap: .35rem; }
+.chip {
+  border-radius: 999px;
+  width: fit-content;
+}
+.chip.id {
+  --background: #fffaf0;
+  --color: #7a4b05;
+  border: 1px solid #fdecc9;
+}
+.chip.tel {
+  --background: #fff5f0;
+  --color: #7a2f05;
+  border: 1px solid #ffd9cc;
+}
+
+.addr {
+  display: flex; align-items: center; gap: .45rem;
+  color: #27364d;
+  background: #fffaf4;
+  border: 1px solid #fdebd7;
+  border-radius: 14px;
+  padding: .65rem .8rem;
+}
+.addr ion-icon { color: #b45309; }
+
+/* Empty & error */
+.empty { text-align: center; padding: 2.5rem 1rem; }
+.empty .emoji { font-size: 3rem; margin-bottom: .5rem; }
+.error-card { border-left: 4px solid #eb445a; }
+
+.sk-lines { display: grid; gap: .35rem; }

@@ -1,22 +1,122 @@
-<ion-header>
-  <ion-toolbar color="secondary">
-    <ion-title>🏠 Lista de Propietarios</ion-title>
+<ion-header class="header-gradient-amber">
+  <ion-toolbar color="transparent">
+    <ion-title class="title">
+      <ion-icon name="home-outline" aria-hidden="true"></ion-icon>
+      Propietarios
+    </ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button fill="solid" color="light" (click)="nuevoPropietario()">
+        <ion-icon slot="start" name="add-outline"></ion-icon>
+        Nuevo propietario
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
+
+  <div class="subheader">
+    <ion-searchbar
+      placeholder="Buscar por nombre, teléfono, dirección o ID…"
+      [(ngModel)]="searchTerm"
+      show-clear-button="focus"
+      animated="true">
+    </ion-searchbar>
+  </div>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-card *ngFor="let prop of propietarios">
+<ion-content class="ion-padding content-bg" [fullscreen]="true">
+
+  <!-- Pull to refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)">
+    <ion-refresher-content pullingText="Desliza para refrescar"></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Skeleton -->
+  <ng-container *ngIf="loading">
+    <ion-grid fixed>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4,5,6]">
+          <ion-card class="owner-card sk">
+            <ion-card-header class="owner-header">
+              <div class="avatar sk"></div>
+              <div class="sk-lines">
+                <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 40%"></ion-skeleton-text>
+              </div>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-skeleton-text animated style="width: 90%"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ng-container>
+
+  <!-- Error -->
+  <ion-card *ngIf="!loading && error" class="owner-card error-card">
     <ion-card-header>
-      <ion-card-title>{{ prop.nombre }}</ion-card-title>
-      <ion-card-subtitle>Teléfono: {{ prop.telefono }}</ion-card-subtitle>
+      <ion-card-title>Ups</ion-card-title>
+      <ion-card-subtitle>{{ error }}</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
-      Dirección: {{ prop.direccion }} <br>
-      ID: {{ prop.idPropietario }}
+      <ion-button fill="outline" (click)="load()">Reintentar</ion-button>
     </ion-card-content>
   </ion-card>
 
-  <ion-text color="medium" *ngIf="propietarios.length === 0">
-    <p class="ion-text-center">No hay propietarios registrados 😿</p>
-  </ion-text>
+  <!-- Vacío -->
+  <div *ngIf="!loading && !filtered.length" class="empty">
+    <div class="emoji">🏠</div>
+    <h3>Sin propietarios</h3>
+    <p>Agrega tu primer propietario para comenzar.</p>
+    <ion-button (click)="nuevoPropietario()">Nuevo propietario</ion-button>
+  </div>
+
+  <!-- Grid de tarjetas -->
+  <ion-grid fixed *ngIf="!loading && filtered.length">
+    <ion-row>
+      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let prop of filtered">
+        <ion-card class="owner-card hover">
+          <ion-card-header class="owner-header">
+            <div class="avatar">{{ initial(prop.nombre) }}</div>
+
+            <div class="title-wrap">
+              <ion-card-title class="name">{{ prop.nombre }}</ion-card-title>
+              <div class="badges">
+                <ion-chip class="chip id">
+                  <ion-icon name="finger-print-outline"></ion-icon>
+                  <ion-label>#{{ prop.idPropietario }}</ion-label>
+                </ion-chip>
+                <a [href]="telHref(prop.telefono)" (click)="$event.stopPropagation()">
+                  <ion-chip class="chip tel">
+                    <ion-icon name="call-outline"></ion-icon>
+                    <ion-label>{{ prop.telefono || '—' }}</ion-label>
+                  </ion-chip>
+                </a>
+              </div>
+            </div>
+
+            <ion-buttons>
+              <ion-button fill="clear" (click)="ver(prop)" aria-label="Ver">
+                <ion-icon slot="icon-only" name="eye-outline"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" (click)="editar(prop)" aria-label="Editar">
+                <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" color="danger" (click)="eliminar(prop)" aria-label="Eliminar">
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-card-header>
+
+          <ion-card-content>
+            <div class="addr">
+              <ion-icon name="location-outline"></ion-icon>
+              <span>{{ prop.direccion || '—' }}</span>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

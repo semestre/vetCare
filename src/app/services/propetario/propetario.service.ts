@@ -8,18 +8,17 @@ import { Propietario } from 'src/app/models/propetario.model';
 })
 export class PropietarioService {
 
-  private apiURL = ''; // <-- put your API URL here
-
+  private apiURL = 'https://blog-notes-wedding-ppm.trycloudflare.com/VetCare/api/propietarios';
   constructor(private http: HttpClient) {}
 
   // Get all propietarios
   getAllPropietarios(): Observable<Propietario[]> {
-    return this.http.get<Propietario[]>(`${this.apiURL}`);
+    return this.http.get<Propietario[]>(`${this.apiURL}/getAll`);
   }
 
   // Create a new propietario
   createPropietario(propietario: Propietario): Observable<Propietario> {
-    return this.http.post<Propietario>(`${this.apiURL}`, propietario);
+    return this.http.post<Propietario>(`${this.apiURL}/save`, propietario);
   }
 
 }
