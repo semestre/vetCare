@@ -1,22 +1,138 @@
-<ion-header>
-  <ion-toolbar color="success">
-    <ion-title>📦 Inventario</ion-title>
+<ion-header class="header-gradient-green">
+  <ion-toolbar color="transparent">
+    <ion-title class="title">
+      <ion-icon name="cube-outline" aria-hidden="true"></ion-icon>
+      Inventario
+    </ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button fill="solid" color="light" (click)="nuevoItem()">
+        <ion-icon slot="start" name="add-outline"></ion-icon>
+        Nuevo ítem
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
+
+  <div class="subheader">
+    <ion-searchbar
+      placeholder="Buscar por nombre, categoría o ID…"
+      [(ngModel)]="searchTerm"
+      show-clear-button="focus"
+      animated="true">
+    </ion-searchbar>
+
+    <div class="filters">
+      <ion-segment [(ngModel)]="categoria" value="Todas" mode="md" scrollable="true">
+        <ion-segment-button *ngFor="let c of categorias" [value]="c">
+          <ion-label>{{ c }}</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </div>
+  </div>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-card *ngFor="let item of items">
+<ion-content class="ion-padding content-bg" [fullscreen]="true">
+
+  <!-- Pull to refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)">
+    <ion-refresher-content pullingText="Desliza para refrescar"></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Skeleton -->
+  <ng-container *ngIf="loading">
+    <ion-grid fixed>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4,5,6]">
+          <ion-card class="inv-card sk">
+            <ion-card-header class="inv-header">
+              <div class="icon sk"></div>
+              <div class="sk-lines">
+                <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 40%"></ion-skeleton-text>
+              </div>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-skeleton-text animated style="width: 90%"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ng-container>
+
+  <!-- Error -->
+  <ion-card *ngIf="!loading && error" class="inv-card error-card">
     <ion-card-header>
-      <ion-card-title>{{ item.nombreItem }}</ion-card-title>
-      <ion-card-subtitle>Categoria: {{ item.categoria }}</ion-card-subtitle>
+      <ion-card-title>Ups</ion-card-title>
+      <ion-card-subtitle>{{ error }}</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
-      Cantidad: {{ item.cantidad }} <br>
-      Última actualización: {{ item.fechaActualizacion }}
+      <ion-button fill="outline" (click)="load()">Reintentar</ion-button>
     </ion-card-content>
   </ion-card>
 
-  <ion-text color="medium" *ngIf="items.length === 0">
-    <p class="ion-text-center">No hay items en inventario 😿</p>
-  </ion-text>
+  <!-- Vacío -->
+  <div *ngIf="!loading && !filtered().length" class="empty">
+    <div class="emoji">📦</div>
+    <h3>Inventario vacío</h3>
+    <p>Agrega tu primer ítem para comenzar.</p>
+    <ion-button (click)="nuevoItem()">Nuevo ítem</ion-button>
+  </div>
+
+  <!-- Grid de tarjetas -->
+  <ion-grid fixed *ngIf="!loading && filtered().length">
+    <ion-row>
+      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let item of filtered()">
+        <ion-card class="inv-card hover" [ngClass]="stockState(item)">
+          <ion-card-header class="inv-header">
+            <div class="icon">
+              <ion-icon [name]="iconForState(item)"></ion-icon>
+            </div>
+
+            <div class="title-wrap">
+              <ion-card-title class="name">{{ item.nombreItem }}</ion-card-title>
+              <ion-chip class="cat">
+                <ion-icon name="pricetag-outline"></ion-icon>
+                <ion-label>{{ item.categoria || '—' }}</ion-label>
+              </ion-chip>
+            </div>
+
+            <ion-buttons>
+              <ion-button fill="clear" (click)="ver(item)" aria-label="Ver">
+                <ion-icon slot="icon-only" name="eye-outline"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" (click)="editar(item)" aria-label="Editar">
+                <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" color="danger" (click)="eliminar(item)" aria-label="Eliminar">
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-card-header>
+
+          <ion-card-content>
+            <div class="qty-row">
+              <div class="qty">
+                <span class="k">Cantidad</span>
+                <span class="v">{{ item.cantidad }}</span>
+              </div>
+              <div class="last">
+                <ion-icon name="time-outline"></ion-icon>
+                <span>{{ item.fechaActualizacion }}</span>
+              </div>
+            </div>
+
+            <!-- Barra de stock (relativa al máximo observado) -->
+            <div class="bar-wrap">
+              <div class="bar">
+                <div class="fill" [style.width.%]="stockPercent(item)"></div>
+              </div>
+              <span class="percent">{{ stockPercent(item) }}%</span>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
