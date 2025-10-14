@@ -1,0 +1,83 @@
+<ion-header class="sheet-header">
+  <ion-toolbar color="light">
+    <ion-title>Nueva cita</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()" fill="clear" aria-label="Cerrar">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="sheet-content" [fullscreen]="true">
+  <form [formGroup]="form" (ngSubmit)="save()" class="form-body" novalidate>
+    <ion-list inset="true" class="group">
+      <ion-item>
+        <ion-icon name="calendar-outline" slot="start"></ion-icon>
+        <ion-input type="date" label="Fecha" labelPlacement="stacked" formControlName="fecha"></ion-input>
+      </ion-item>
+      <ion-note color="danger" *ngIf="form.get('fecha')?.touched && form.get('fecha')?.invalid">
+        La fecha es obligatoria.
+      </ion-note>
+
+      <ion-item>
+        <ion-icon name="time-outline" slot="start"></ion-icon>
+        <ion-input type="time" label="Hora" labelPlacement="stacked" formControlName="hora"></ion-input>
+      </ion-item>
+      <ion-note color="danger" *ngIf="form.get('hora')?.touched && form.get('hora')?.invalid">
+        La hora es obligatoria.
+      </ion-note>
+    </ion-list>
+
+    <ion-list inset="true" class="group">
+      <ion-item>
+        <ion-icon name="medkit-outline" slot="start"></ion-icon>
+        <ion-textarea
+          label="Motivo"
+          labelPlacement="stacked"
+          auto-grow="true"
+          placeholder="Vacunación, Chequeo general, etc."
+          formControlName="motivo">
+        </ion-textarea>
+      </ion-item>
+      <ion-note color="danger" *ngIf="form.get('motivo')?.touched && form.get('motivo')?.invalid">
+        Escribe al menos 3 caracteres.
+      </ion-note>
+    </ion-list>
+
+    <ion-list inset="true" class="group">
+      <ion-item>
+        <ion-icon name="person-outline" slot="start"></ion-icon>
+        <ion-input inputmode="numeric" type="number" label="ID Veterinario" labelPlacement="stacked" formControlName="idVeterinario"></ion-input>
+      </ion-item>
+      <ion-note color="danger" *ngIf="form.get('idVeterinario')?.touched && form.get('idVeterinario')?.invalid">
+        Ingresa un ID de veterinario válido.
+      </ion-note>
+
+      <ion-item>
+        <ion-icon name="paw-outline" slot="start"></ion-icon>
+        <ion-input inputmode="numeric" type="number" label="ID Paciente" labelPlacement="stacked" formControlName="idPaciente"></ion-input>
+      </ion-item>
+      <ion-note color="danger" *ngIf="form.get('idPaciente')?.touched && form.get('idPaciente')?.invalid">
+        Ingresa un ID de paciente válido.
+      </ion-note>
+    </ion-list>
+
+    <!-- Espaciador para que el último control no choque con el footer -->
+    <div class="bottom-space"></div>
+  </form>
+</ion-content>
+
+<ion-footer class="sheet-footer">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button fill="outline" color="medium" (click)="close()">Cancelar</ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button type="submit" (click)="save()">
+        <ion-icon slot="start" name="save-outline"></ion-icon>
+        Guardar
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

@@ -1,0 +1,47 @@
+.sheet-header {
+  --background: #ffffff;
+  --color: #0f172a;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.sheet-content {
+  --background: #f5f8fc;
+}
+
+.form-body {
+  padding: 12px 12px 0;
+}
+
+.group {
+  background: #fff !important;
+  border-radius: 14px;
+  margin: 12px 0;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+  border: 1px solid #eef2f7;
+}
+
+ion-item {
+  --background: #fff;
+  --color: #0f172a;
+  --highlight-color-focused: #2193b0;
+  border-radius: 12px;
+  margin: 2px 8px;
+}
+
+ion-item ion-icon {
+  color: #2193b0;
+}
+
+ion-note {
+  margin: 0 16px 8px;
+}
+
+.sheet-footer {
+  --background: #ffffff;
+  border-top: 1px solid #eef2f7;
+  padding-bottom: max(env(safe-area-inset-bottom), 8px);
+}
+
+.bottom-space {
+  height: 72px; /* deja espacio para el footer fijo */
+}

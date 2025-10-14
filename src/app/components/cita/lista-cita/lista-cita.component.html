@@ -4,6 +4,14 @@
       <ion-icon name="paw-outline" aria-hidden="true"></ion-icon>
       Citas de Veterinaria
     </ion-title>
+
+    <!-- 👉 Botón para abrir el modal -->
+    <ion-buttons slot="end">
+      <ion-button fill="solid" color="light" (click)="nuevaCita()">
+        <ion-icon slot="start" name="add-outline"></ion-icon>
+        Nueva cita
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 
   <div class="subheader">
@@ -16,12 +24,8 @@
   </div>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding content-bg">
 
-  <!-- Pull to refresh -->
-  <ion-refresher slot="fixed" (ionRefresh)="load($event)">
-    <ion-refresher-content pullingText="Desliza para refrescar"></ion-refresher-content>
-  </ion-refresher>
+<ion-content [fullscreen]="true" class="ion-padding content-bg">
 
   <!-- Skeleton de carga -->
   <ng-container *ngIf="loading">
