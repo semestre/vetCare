@@ -1,22 +1,119 @@
-<ion-header>
-  <ion-toolbar color="secondary">
-    <ion-title>🔐 Lista de Usuarios</ion-title>
+<ion-header class="header-gradient">
+  <ion-toolbar color="transparent">
+    <ion-title class="title">
+      <ion-icon name="shield-checkmark-outline" aria-hidden="true"></ion-icon>
+      Control de Acceso
+    </ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button fill="solid" color="light" (click)="nuevoUsuario()">
+        <ion-icon slot="start" name="add-outline"></ion-icon>
+        Nuevo usuario
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
+
+  <div class="subheader">
+    <ion-searchbar
+      placeholder="Buscar por nombre, rol o ID..."
+      [(ngModel)]="searchTerm"
+      show-clear-button="focus"
+      animated="true">
+    </ion-searchbar>
+  </div>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-card *ngFor="let user of usuarios">
+<ion-content class="ion-padding content-bg" [fullscreen]="true">
+
+  <!-- Pull to refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)">
+    <ion-refresher-content pullingText="Desliza para refrescar"></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Skeleton -->
+  <ng-container *ngIf="loading">
+    <ion-grid fixed>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4,5,6]">
+          <ion-card class="card glass">
+            <ion-card-header class="card-header">
+              <div class="avatar sk"></div>
+              <div class="sk-lines">
+                <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 40%"></ion-skeleton-text>
+              </div>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-skeleton-text animated style="width: 90%"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ng-container>
+
+  <!-- Error -->
+  <ion-card *ngIf="!loading && error" class="card error-card">
     <ion-card-header>
-      <ion-card-title>{{ user.nombreUsuario }}</ion-card-title>
-      <ion-card-subtitle>Rol: {{ user.rol }}</ion-card-subtitle>
+      <ion-card-title>Ups</ion-card-title>
+      <ion-card-subtitle>{{ error }}</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
-      ID: {{ user.idUsuario }} <br>
-      Contraseña: {{ user.password }}
+      <ion-button fill="outline" (click)="load()">Reintentar</ion-button>
     </ion-card-content>
   </ion-card>
 
-  <ion-text color="medium" *ngIf="usuarios.length === 0">
-    <p class="ion-text-center">No hay usuarios registrados 🫥</p>
-  </ion-text>
+  <!-- Vacío -->
+  <div *ngIf="!loading && !filteredUsuarios.length" class="empty">
+    <div class="emoji">🧑‍⚕️</div>
+    <h3>Sin usuarios</h3>
+    <p>Agrega tu primer usuario para comenzar.</p>
+    <ion-button (click)="nuevoUsuario()">Nuevo usuario</ion-button>
+  </div>
+
+  <!-- Grid de tarjetas -->
+  <ion-grid fixed *ngIf="!loading && filteredUsuarios.length">
+    <ion-row>
+      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let user of filteredUsuarios">
+        <ion-card class="card glass hover">
+          <ion-card-header class="card-header">
+            <div class="avatar">{{ initial(user.nombreUsuario) }}</div>
+            <div class="title-wrap">
+              <ion-card-title class="name">{{ user.nombreUsuario }}</ion-card-title>
+              <div class="role-badge" [ngClass]="roleClass(user.rol)">
+                <ion-icon name="ribbon-outline"></ion-icon>
+                <span>{{ user.rol }}</span>
+              </div>
+            </div>
+            <ion-buttons>
+              <ion-button fill="clear" (click)="ver(user)" aria-label="Ver">
+                <ion-icon slot="icon-only" name="eye-outline"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" (click)="editar(user)" aria-label="Editar">
+                <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" color="danger" (click)="eliminar(user)" aria-label="Eliminar">
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-card-header>
+
+          <ion-card-content>
+            <div class="meta">
+              <div class="meta-item">
+                <span class="meta-k">ID</span>
+                <span class="meta-v">#{{ user.idUsuario }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-k">Contraseña</span>
+                <span class="meta-v">••••••</span>
+              </div>
+            </div>
+            <div class="note">Por seguridad no se muestran contraseñas en texto plano.</div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
