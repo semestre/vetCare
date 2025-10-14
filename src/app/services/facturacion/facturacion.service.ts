@@ -8,18 +8,18 @@ import { Facturacion } from 'src/app/models/facturacion.model';
 })
 export class FacturacionService {
 
-  private apiURL = ''; // <-- put your API URL here
+  private apiURL = 'https://blog-notes-wedding-ppm.trycloudflare.com/VetCare/api/facturacion'; 
 
   constructor(private http: HttpClient) {}
 
   // Get all facturas
   getAllFacturas(): Observable<Facturacion[]> {
-    return this.http.get<Facturacion[]>(`${this.apiURL}`);
+    return this.http.get<Facturacion[]>(`${this.apiURL}/getAll`);
   }
 
   // Create a new factura
   createFactura(factura: Facturacion): Observable<Facturacion> {
-    return this.http.post<Facturacion>(`${this.apiURL}`, factura);
+    return this.http.post<Facturacion>(`${this.apiURL}/save`, factura);
   }
 
 }

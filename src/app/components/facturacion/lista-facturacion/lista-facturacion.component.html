@@ -1,25 +1,135 @@
-<ion-header>
-  <ion-toolbar color="tertiary">
-    <ion-title>💳 Lista de Facturas</ion-title>
+<ion-header class="header-gradient-alt">
+  <ion-toolbar color="transparent">
+    <ion-title class="title">
+      <ion-icon name="receipt-outline" aria-hidden="true"></ion-icon>
+      Lista de Facturas
+    </ion-title>
   </ion-toolbar>
+
+  <div class="subheader">
+    <ion-searchbar
+      placeholder="Buscar por #Factura, paciente, servicio, método..."
+      [(ngModel)]="searchTerm"
+      show-clear-button="focus"
+      animated="true">
+    </ion-searchbar>
+
+    <ion-segment [(ngModel)]="metodo" value="Todos" mode="md">
+      <ion-segment-button value="Todos">
+        <ion-label>Todos</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="Efectivo">
+        <ion-label>Efectivo</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="Tarjeta">
+        <ion-label>Tarjeta</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="Transferencia">
+        <ion-label>Transferencia</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-card *ngFor="let factura of facturas">
-    <ion-card-header>
-      <ion-card-title>Factura #{{ factura.idFactura }}</ion-card-title>
-      <ion-card-subtitle>Paciente ID: {{ factura.idPaciente }}</ion-card-subtitle>
+<ion-content class="ion-padding content-bg" [fullscreen]="true">
+
+  <!-- Pull to refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)">
+    <ion-refresher-content pullingText="Desliza para refrescar"></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Skeleton -->
+  <ng-container *ngIf="loading">
+    <ion-grid fixed>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4,5,6]">
+          <ion-card class="ticket sk">
+            <div class="ticket-edge top"></div>
+            <ion-card-header class="ticket-head">
+              <ion-skeleton-text animated style="width: 55%"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 35%"></ion-skeleton-text>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-skeleton-text animated style="width: 90%"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+            </ion-card-content>
+            <div class="ticket-edge bottom"></div>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ng-container>
+
+  <!-- Error -->
+  <ion-card *ngIf="!loading && error" class="ticket error-card">
+    <div class="ticket-edge top"></div>
+    <ion-card-header class="ticket-head">
+      <ion-card-title>Ups</ion-card-title>
+      <ion-card-subtitle>{{ error }}</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
-      Servicios: {{ factura.servicios }} <br>
-      Medicamentos: {{ factura.medicamentos }} <br>
-      Total: ${{ factura.total }} <br>
-      Fecha: {{ factura.fecha }} <br>
-      Método de pago: {{ factura.metodoPago }}
+      <ion-button fill="outline" (click)="load()">Reintentar</ion-button>
     </ion-card-content>
+    <div class="ticket-edge bottom"></div>
   </ion-card>
 
-  <ion-text color="medium" *ngIf="facturas.length === 0">
-    <p class="ion-text-center">No hay facturas registradas 😿</p>
-  </ion-text>
+  <!-- Vacío -->
+  <div *ngIf="!loading && !filtered.length" class="empty">
+    <div class="emoji">🧾</div>
+    <h3>Sin facturas</h3>
+    <p>Cuando registres una factura aparecerá aquí.</p>
+  </div>
+
+  <!-- Grid -->
+  <ion-grid fixed *ngIf="!loading && filtered.length">
+    <ion-row>
+      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let factura of filtered">
+        <ion-card class="ticket hover">
+          <div class="ticket-edge top"></div>
+
+          <ion-card-header class="ticket-head">
+            <div class="left">
+              <div class="k">Factura</div>
+              <div class="v">#{{ factura.idFactura }}</div>
+            </div>
+            <div class="right">
+              <ion-chip class="mp" [ngClass]="badgeClass(factura.metodoPago)">
+                <ion-icon [name]="iconForMetodo(factura.metodoPago)"></ion-icon>
+                <ion-label>{{ factura.metodoPago || '—' }}</ion-label>
+              </ion-chip>
+            </div>
+          </ion-card-header>
+
+          <ion-card-content>
+            <div class="row dotted">
+              <span class="k">Paciente</span>
+              <span class="v">#{{ factura.idPaciente }}</span>
+            </div>
+
+            <div class="row">
+              <span class="k">Servicios</span>
+              <span class="v">{{ factura.servicios || '—' }}</span>
+            </div>
+
+            <div class="row">
+              <span class="k">Medicamentos</span>
+              <span class="v">{{ factura.medicamentos || '—' }}</span>
+            </div>
+
+            <div class="row">
+              <span class="k">Fecha</span>
+              <span class="v">{{ factura.fecha }}</span>
+            </div>
+
+            <div class="total">
+              <span>Total</span>
+              <strong>${{ factura.total | number:'1.2-2' }}</strong>
+            </div>
+          </ion-card-content>
+
+          <div class="ticket-edge bottom"></div>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

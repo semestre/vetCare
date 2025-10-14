@@ -1,0 +1,110 @@
+:host {
+  /* Paleta distinta a Citas/Usuarios */
+  --brand-start-2: #a78bfa; /* violeta suave */
+  --brand-end-2:   #6366f1; /* índigo */
+  --paper: #ffffff;
+  --ink: #0f172a;
+  --line: #e9eef8;
+  --shadow: 0 14px 30px rgba(99, 102, 241, 0.18);
+  --shadow-hover: 0 18px 46px rgba(99, 102, 241, 0.26);
+}
+
+.header-gradient-alt {
+  --background: transparent;
+  background: linear-gradient(135deg, var(--brand-start-2), var(--brand-end-2));
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.25);
+}
+
+.title {
+  display: flex; gap: .5rem; align-items: center; color: #fff; font-weight: 700;
+  ion-icon { font-size: 1.3rem; }
+}
+
+.subheader {
+  padding: 0 .75rem .75rem .75rem;
+  background: linear-gradient(135deg, var(--brand-start-2), var(--brand-end-2));
+  ion-segment {
+    margin-top: .25rem;
+    --background: rgba(255,255,255,0.15);
+    --indicator-color: #fff;
+    --color: #fff;
+  }
+}
+
+.content-bg { --background: linear-gradient(180deg, #f7f8ff 0%, #ffffff 100%); }
+
+/* Ticket card */
+.ticket {
+  position: relative;
+  border-radius: 16px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--line);
+  overflow: hidden;
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+.ticket.hover:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
+  border-color: #cfd8ff;
+}
+
+.ticket-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: .75rem;
+  padding-right: .6rem;
+}
+
+.ticket-head .left .k { font-size: .78rem; color: #6b7280; }
+.ticket-head .left .v { font-weight: 800; font-size: 1.1rem; color: #111827; }
+
+.row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: .75rem;
+  padding: .5rem 0;
+  border-bottom: 1px solid #f1f4fb;
+}
+.row:last-of-type { border-bottom: none; }
+.row.dotted { border-bottom: 1px dashed #dfe6f7; }
+
+.k { color: #62708a; font-size: .85rem; }
+.v { color: #0f172a; font-weight: 600; }
+
+.total {
+  margin-top: .75rem;
+  display: flex; align-items: baseline; justify-content: space-between;
+  span { color: #6b7280; font-weight: 600; }
+  strong { font-size: 1.25rem; color: #111827; }
+}
+
+/* Método de pago badge */
+ion-chip.mp {
+  --background: #f5f7ff;
+  --color: #273372;
+  border: 1px solid #e3e7ff;
+  border-radius: 999px;
+}
+.mp-efectivo   { --background: #eafcf1; --color: #176a3a; border-color: #c7f0d7 !important; }
+.mp-tarjeta    { --background: #eef2ff; --color: #293478; border-color: #dfe3ff !important; }
+.mp-transfer   { --background: #e9fbfe; --color: #0d6672; border-color: #c8f1f6 !important; }
+.mp-generic    {}
+
+/* Perforado decorativo */
+.ticket-edge {
+  position: absolute; left: 0; right: 0; height: 10px;
+  background: radial-gradient(circle at 10px 5px, transparent 6px, var(--paper) 6px) repeat-x;
+  background-size: 20px 10px;
+  z-index: 1;
+}
+.ticket-edge.top    { top: -1px;  border-bottom: 1px dashed #e5e9f6; }
+.ticket-edge.bottom { bottom: -1px; border-top:    1px dashed #e5e9f6; }
+
+/* Empty & error */
+.empty { text-align: center; padding: 2.5rem 1rem; }
+.empty .emoji { font-size: 3rem; margin-bottom: .5rem; }
+.error-card { border-left: 4px solid #eb445a; }
