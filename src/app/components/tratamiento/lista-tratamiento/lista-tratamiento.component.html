@@ -1,23 +1,110 @@
-<ion-header>
-  <ion-toolbar color="warning">
-    <ion-title>💊 Lista de Tratamientos</ion-title>
+<ion-header class="header-gradient-warn">
+  <ion-toolbar color="transparent">
+    <ion-title class="title">
+      <ion-icon name="medical-outline" aria-hidden="true"></ion-icon>
+      Tratamientos
+    </ion-title>
   </ion-toolbar>
+
+  <div class="subheader">
+    <ion-searchbar
+      placeholder="Buscar por descripción, tipo, fecha, #paciente o #tratamiento…"
+      [(ngModel)]="searchTerm"
+      show-clear-button="focus"
+      animated="true">
+    </ion-searchbar>
+
+    <ion-segment [(ngModel)]="tipoFiltro" value="Todos" mode="md" scrollable="true">
+      <ion-segment-button *ngFor="let t of tipos" [value]="t">
+        <ion-label>{{ t }}</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-card *ngFor="let tratamiento of tratamientos">
+<ion-content class="ion-padding content-bg" [fullscreen]="true">
+
+  <!-- Pull to refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)">
+    <ion-refresher-content pullingText="Desliza para refrescar"></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Skeleton -->
+  <ng-container *ngIf="loading">
+    <ion-grid fixed>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let s of [1,2,3,4,5,6]">
+          <ion-card class="t-card sk">
+            <div class="timeline-dot sk"></div>
+            <ion-card-header class="t-header">
+              <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 35%"></ion-skeleton-text>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-skeleton-text animated style="width: 90%"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ng-container>
+
+  <!-- Error -->
+  <ion-card *ngIf="!loading && error" class="t-card error-card">
     <ion-card-header>
-      <ion-card-title>{{ tratamiento.descripcion }}</ion-card-title>
-      <ion-card-subtitle>Tipo: {{ tratamiento.tipo }}</ion-card-subtitle>
+      <ion-card-title>Ups</ion-card-title>
+      <ion-card-subtitle>{{ error }}</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
-      Fecha: {{ tratamiento.fecha }} <br>
-      Paciente ID: {{ tratamiento.idPaciente }} <br>
-      ID Tratamiento: {{ tratamiento.idTratamiento }}
+      <ion-button fill="outline" (click)="load()">Reintentar</ion-button>
     </ion-card-content>
   </ion-card>
 
-  <ion-text color="medium" *ngIf="tratamientos.length === 0">
-    <p class="ion-text-center">No hay tratamientos registrados 😿</p>
-  </ion-text>
+  <!-- Vacío -->
+  <div *ngIf="!loading && !filtered.length" class="empty">
+    <div class="emoji">💊</div>
+    <h3>Sin tratamientos</h3>
+    <p>Cuando registres un tratamiento aparecerá aquí.</p>
+  </div>
+
+  <!-- Grid -->
+  <ion-grid fixed *ngIf="!loading && filtered.length">
+    <ion-row>
+      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let t of filtered">
+        <ion-card class="t-card hover" [ngClass]="statusByFecha(t.fecha)">
+          <!-- Línea/Timeline sutil -->
+          <div class="timeline-dot" [ngClass]="statusByFecha(t.fecha)"></div>
+
+          <ion-card-header class="t-header">
+            <div class="left">
+              <ion-chip class="tipo" [ngClass]="tipoClass(t.tipo)">
+                <ion-icon [name]="iconForTipo(t.tipo)"></ion-icon>
+                <ion-label>{{ t.tipo || '—' }}</ion-label>
+              </ion-chip>
+              <ion-card-title class="desc">{{ t.descripcion }}</ion-card-title>
+            </div>
+
+            <div class="date">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <span>{{ t.fecha }}</span>
+            </div>
+          </ion-card-header>
+
+          <ion-card-content>
+            <div class="rows">
+              <div class="row">
+                <span class="k">Paciente</span>
+                <span class="v">#{{ t.idPaciente }}</span>
+              </div>
+              <div class="row">
+                <span class="k">ID Tratamiento</span>
+                <span class="v">#{{ t.idTratamiento }}</span>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

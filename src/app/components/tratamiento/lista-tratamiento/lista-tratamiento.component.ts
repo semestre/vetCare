@@ -1,44 +1,115 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { IonicModule, ToastController } from '@ionic/angular';
+import { FormsModule } from '@angular/forms';
 import { Tratamiento } from 'src/app/models/tratamiento.model';
 import { TratamientoService } from 'src/app/services/tratamiento/tratamiento.service';
-import { IonicModule } from '@ionic/angular';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-lista-tratamiento',
+  standalone: true,
+  imports: [IonicModule, CommonModule, FormsModule],
   templateUrl: './lista-tratamiento.component.html',
   styleUrls: ['./lista-tratamiento.component.scss'],
-  imports: [IonicModule, CommonModule]
 })
 export class ListaTratamientoComponent implements OnInit {
+  private service = inject(TratamientoService);
+  private toast = inject(ToastController);
 
   tratamientos: Tratamiento[] = [
-    {
-      idTratamiento: 301,
-      descripcion: 'Vacuna antirrábica',
-      tipo: 'Vacuna',
-      fecha: '2025-10-12',
-      idPaciente: 201
-    },
-    {
-      idTratamiento: 302,
-      descripcion: 'Limpieza dental',
-      tipo: 'Higiene',
-      fecha: '2025-10-13',
-      idPaciente: 202
-    }
+    { idTratamiento: 301, descripcion: 'Vacuna antirrábica', tipo: 'Vacuna',  fecha: '2025-10-12', idPaciente: 201 },
+    { idTratamiento: 302, descripcion: 'Limpieza dental',     tipo: 'Higiene', fecha: '2025-10-13', idPaciente: 202 },
   ];
 
-  constructor(private tratamientoService: TratamientoService) {}
+  // UI
+  loading = true;
+  error: string | null = null;
 
-  ngOnInit(): void {
-    this.tratamientoService.getAllTratamientos().subscribe({
+  // búsqueda + filtro por tipo
+  searchTerm = '';
+  tipoFiltro = 'Todos'; // Todos | Vacuna | Higiene | Cirugía | Desparasitación | Control | Otro
+  tipos: string[] = ['Todos'];
+
+  ngOnInit(): void { this.load(); }
+
+  load(event?: CustomEvent) {
+    this.loading = !event;
+    this.error = null;
+
+    this.service.getAllTratamientos().subscribe({
       next: (data) => {
-        this.tratamientos = data;
-        console.log('Tratamientos cargados:', data);
+        if (Array.isArray(data) && data.length) {
+          // ordena por fecha DESC (más reciente primero)
+          this.tratamientos = [...data].sort((a, b) => this.dateNum(b.fecha) - this.dateNum(a.fecha));
+        }
+        this.refreshTipos();
+        this.loading = false;
+        event?.detail.complete();
       },
-      error: (error) => console.error('Error al cargar tratamientos:', error)
+      error: async (err) => {
+        console.error('Error al cargar tratamientos:', err);
+        this.error = 'No se pudieron cargar los tratamientos.';
+        this.refreshTipos();
+        this.loading = false;
+        event?.detail.complete();
+        (await this.toast.create({ message: 'No se pudieron cargar los tratamientos.', duration: 1800, color: 'danger' })).present();
+      }
     });
   }
 
+  refreshTipos() {
+    const set = new Set(this.tratamientos.map(t => t.tipo).filter(Boolean));
+    this.tipos = ['Todos', ...Array.from(set)];
+    if (!this.tipos.includes(this.tipoFiltro)) this.tipoFiltro = 'Todos';
+  }
+
+  get filtered(): Tratamiento[] {
+    const q = this.searchTerm.trim().toLowerCase();
+    return this.tratamientos.filter(t => {
+      const byTipo = this.tipoFiltro === 'Todos' || (t.tipo ?? '') === this.tipoFiltro;
+      const byText =
+        String(t.idTratamiento).includes(q) ||
+        String(t.idPaciente).includes(q) ||
+        (t.descripcion ?? '').toLowerCase().includes(q) ||
+        (t.tipo ?? '').toLowerCase().includes(q) ||
+        (t.fecha ?? '').includes(q);
+      return byTipo && (!q || byText);
+    });
+  }
+
+  // helpers visuales
+  iconForTipo(tipo?: string) {
+    const k = (tipo || '').toLowerCase();
+    if (k.includes('vacuna')) return 'medkit-outline';
+    if (k.includes('higien')) return 'sparkles-outline';
+    if (k.includes('ciru'))   return 'bandage-outline';
+    if (k.includes('despara'))return 'bug-outline';
+    if (k.includes('control'))return 'checkmark-circle-outline';
+    return 'flask-outline';
+  }
+
+  tipoClass(tipo?: string) {
+    const k = (tipo || '').toLowerCase();
+    if (k.includes('vacuna')) return 't-vacuna';
+    if (k.includes('higien')) return 't-higiene';
+    if (k.includes('ciru'))   return 't-cirugia';
+    if (k.includes('despara'))return 't-despara';
+    if (k.includes('control'))return 't-control';
+    return 't-otro';
+  }
+
+  statusByFecha(fecha?: string): 'pasado' | 'hoy' | 'proximo' {
+    const d = this.dateNum(fecha);
+    const today = this.dateNum(new Date().toISOString().slice(0,10));
+    if (!d) return 'pasado';
+    if (d === today) return 'hoy';
+    return d > today ? 'proximo' : 'pasado';
+  }
+
+  dateNum(fecha?: string): number {
+    // convierte 'YYYY-MM-DD' en número comparable (YYYYMMDD)
+    if (!fecha) return 0;
+    const clean = fecha.replace('-', '');
+    return Number(clean) || 0;
+  }
 }

@@ -8,18 +8,18 @@ import { Tratamiento } from 'src/app/models/tratamiento.model';
 })
 export class TratamientoService {
 
-  private apiURL = ''; // <-- put your API URL here
+  private apiURL = 'https://blog-notes-wedding-ppm.trycloudflare.com/VetCare/api/tratamientos';
 
   constructor(private http: HttpClient) {}
 
   // Get all tratamientos
   getAllTratamientos(): Observable<Tratamiento[]> {
-    return this.http.get<Tratamiento[]>(`${this.apiURL}`);
+    return this.http.get<Tratamiento[]>(`${this.apiURL}/getAll`);
   }
 
   // Create a new tratamiento
   createTratamiento(tratamiento: Tratamiento): Observable<Tratamiento> {
-    return this.http.post<Tratamiento>(`${this.apiURL}`, tratamiento);
+    return this.http.post<Tratamiento>(`${this.apiURL}/save`, tratamiento);
   }
 
 }
