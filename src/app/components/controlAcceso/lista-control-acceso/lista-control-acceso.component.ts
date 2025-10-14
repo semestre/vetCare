@@ -4,6 +4,7 @@ import { IonicModule, ToastController, ModalController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { ControlAcceso } from 'src/app/models/controlAcceso.model';
 import { ControlAccesoService } from 'src/app/services/controlAcceso/control-acceso.service';
+import { ControlAccesoModalComponent } from '../../control-acceso-modal/control-acceso-modal.component';
 
 @Component({
   selector: 'app-lista-control-acceso',
@@ -73,15 +74,21 @@ export class ListaControlAccesoComponent implements OnInit {
       (u.rol ?? '').toLowerCase().includes(q)
     );
   }
+  async nuevoUsuario() {
+    const modal = await this.modalCtrl.create({
+      component: ControlAccesoModalComponent,
+      breakpoints: [0, 0.6, 1],
+      initialBreakpoint: 0.6,
+      cssClass: 'rounded-modal'
+    });
 
-  // acciones (placeholders)
-  nuevoUsuario() {
-    // aquí abrirías tu modal o navegación
-    console.log('Nuevo usuario');
+    await modal.present();
+
+    const { role } = await modal.onDidDismiss();
+    if (role === 'created') {
+      this.load(); 
+    }
   }
-  ver(u: ControlAcceso)   { console.log('Ver', u); }
-  editar(u: ControlAcceso){ console.log('Editar', u); }
-  eliminar(u: ControlAcceso){ console.log('Eliminar', u); }
 
   // util para inicial del avatar
   initial(name: string) {

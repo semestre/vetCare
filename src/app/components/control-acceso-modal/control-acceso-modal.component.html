@@ -1,0 +1,73 @@
+<ion-header class="sheet-header">
+  <ion-toolbar color="light">
+    <ion-title>Nuevo usuario</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()" fill="clear" aria-label="Cerrar">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="sheet-content" [fullscreen]="true">
+  <form [formGroup]="form" (ngSubmit)="save()" class="form-body" novalidate>
+    <ion-list inset="true" class="group">
+      <ion-item>
+        <ion-icon name="person-outline" slot="start"></ion-icon>
+        <ion-input
+          label="Nombre de usuario"
+          labelPlacement="stacked"
+          placeholder="ej. admin, vet.juan"
+          formControlName="nombreUsuario">
+        </ion-input>
+      </ion-item>
+      <ion-note color="danger" *ngIf="form.get('nombreUsuario')?.touched && form.get('nombreUsuario')?.invalid">
+        Debe tener al menos 3 caracteres.
+      </ion-note>
+
+      <ion-item>
+        <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+        <ion-input
+          [type]="showPass ? 'text' : 'password'"
+          label="Contraseña"
+          labelPlacement="stacked"
+          placeholder="Mínimo 4 caracteres"
+          formControlName="password">
+        </ion-input>
+        <ion-button fill="clear" slot="end" (click)="showPass = !showPass" aria-label="Mostrar/ocultar contraseña">
+          <ion-icon [name]="showPass ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+        </ion-button>
+      </ion-item>
+      <ion-note color="danger" *ngIf="form.get('password')?.touched && form.get('password')?.invalid">
+        La contraseña es obligatoria (mínimo 4).
+      </ion-note>
+
+      <ion-item>
+        <ion-icon name="ribbon-outline" slot="start"></ion-icon>
+        <ion-select label="Rol" labelPlacement="stacked" formControlName="rol" interface="popover">
+          <ion-select-option value="Administrador">Administrador</ion-select-option>
+          <ion-select-option value="Veterinario">Veterinario</ion-select-option>
+          <ion-select-option value="Recepcionista">Recepcionista</ion-select-option>
+        </ion-select>
+      </ion-item>
+    </ion-list>
+
+    <!-- Espaciador para que el último control no choque con el footer -->
+    <div class="bottom-space"></div>
+  </form>
+</ion-content>
+
+<!-- Footer fijo -->
+<ion-footer class="sheet-footer">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button fill="outline" color="medium" (click)="close()">Cancelar</ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button type="submit" (click)="save()">
+        <ion-icon slot="start" name="save-outline"></ion-icon>
+        Guardar
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>
