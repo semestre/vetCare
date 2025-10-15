@@ -4,6 +4,8 @@ import { IonicModule, ToastController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { Tratamiento } from 'src/app/models/tratamiento.model';
 import { TratamientoService } from 'src/app/services/tratamiento/tratamiento.service';
+import { ModalController } from '@ionic/angular';
+import { TratamientoModalComponent } from 'src/app/components/tratamiento-modal/tratamiento-modal.component';
 
 @Component({
   selector: 'app-lista-tratamiento',
@@ -15,6 +17,7 @@ import { TratamientoService } from 'src/app/services/tratamiento/tratamiento.ser
 export class ListaTratamientoComponent implements OnInit {
   private service = inject(TratamientoService);
   private toast = inject(ToastController);
+  private modalCtrl = inject(ModalController);
 
   tratamientos: Tratamiento[] = [
     { idTratamiento: 301, descripcion: 'Vacuna antirrábica', tipo: 'Vacuna',  fecha: '2025-10-12', idPaciente: 201 },
@@ -107,9 +110,22 @@ export class ListaTratamientoComponent implements OnInit {
   }
 
   dateNum(fecha?: string): number {
-    // convierte 'YYYY-MM-DD' en número comparable (YYYYMMDD)
-    if (!fecha) return 0;
-    const clean = fecha.replace('-', '');
-    return Number(clean) || 0;
-  }
+  if (!fecha) return 0;
+  const clean = fecha.replace(/-/g, '');
+  return Number(clean) || 0;
+}
+
+
+  async nuevoTratamiento() {
+  const modal = await this.modalCtrl.create({
+    component: TratamientoModalComponent,
+    breakpoints: [0, 0.6, 1],
+    initialBreakpoint: 0.6,
+    cssClass: 'rounded-modal'
+  });
+  await modal.present();
+
+  const { role } = await modal.onDidDismiss();
+  if (role === 'created') this.load();
+}
 }

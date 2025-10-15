@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Tratamiento } from 'src/app/models/tratamiento.model';
 
@@ -18,8 +18,23 @@ export class TratamientoService {
   }
 
   // Create a new tratamiento
-  createTratamiento(tratamiento: Tratamiento): Observable<Tratamiento> {
-    return this.http.post<Tratamiento>(`${this.apiURL}/save`, tratamiento);
-  }
+  createTratamiento(tratamiento: Tratamiento): Observable<{ msg: string }> {
+  // Ajusta nombres si tu GET devuelve otros (p.ej. 'id_paciente')
+  const payload: Tratamiento = {
+    idTratamiento: 0,
+    descripcion: String(tratamiento.descripcion),
+    tipo: String(tratamiento.tipo ?? ''),
+    fecha: String(tratamiento.fecha),      // 'YYYY-MM-DD'
+    idPaciente: Number(tratamiento.idPaciente)
+  };
+
+  // Nombre del campo en el form (cámbialo si tu backend usa otro):
+  const FORM_FIELD = 'tratamiento';
+
+  const body = new HttpParams().set(FORM_FIELD, JSON.stringify(payload));
+  const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
+
+  return this.http.post<{ msg: string }>(`${this.apiURL}/save`, body.toString(), { headers });
+}
 
 }
