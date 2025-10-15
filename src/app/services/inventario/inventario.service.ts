@@ -1,25 +1,31 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Inventario } from 'src/app/models/inventario.model'; 
+import { Inventario } from 'src/app/models/inventario.model';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class InventarioService {
-
   private apiURL = 'https://blog-notes-wedding-ppm.trycloudflare.com/VetCare/api/inventario';
 
   constructor(private http: HttpClient) {}
 
-  // Get all items in inventario
   getAllItems(): Observable<Inventario[]> {
     return this.http.get<Inventario[]>(`${this.apiURL}/getAll`);
   }
 
-  // Create a new inventario item
-  createItem(item: Inventario): Observable<Inventario> {
-    return this.http.post<Inventario>(`${this.apiURL}/save`, item);
-  }
+  // POST /inventario/save -> @FormParam("inventario")
+  createItem(item: Inventario): Observable<{ msg: string }> {
+    const payload: Inventario = {
+      idItem: 0, // lo asigna el backend
+      nombreItem: String(item.nombreItem),
+      cantidad: Number(item.cantidad),
+      categoria: String(item.categoria ?? ''),
+      fechaActualizacion: String(item.fechaActualizacion) // 'YYYY-MM-DD'
+    };
 
+    const body = new HttpParams().set('inventario', JSON.stringify(payload));
+    const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
+
+    return this.http.post<{ msg: string }>(`${this.apiURL}/save`, body.toString(), { headers });
+  }
 }

@@ -4,6 +4,8 @@ import { IonicModule, ToastController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { Inventario } from 'src/app/models/inventario.model';
 import { InventarioService } from 'src/app/services/inventario/inventario.service';
+import { ModalController } from '@ionic/angular';
+import { InventarioModalComponent } from 'src/app/components/inventario-modal/inventario-modal.component';
 
 @Component({
   selector: 'app-lista-inventario',
@@ -16,6 +18,7 @@ export class ListaInventarioComponent implements OnInit {
 
   private invService = inject(InventarioService);
   private toast = inject(ToastController);
+  private modalCtrl = inject(ModalController);
 
   items: Inventario[] = [
     { idItem: 1, nombreItem: 'Vacuna antirrábica', cantidad: 20,  categoria: 'Medicamento',         fechaActualizacion: '2025-10-10' },
@@ -99,9 +102,16 @@ export class ListaInventarioComponent implements OnInit {
     return 'cube-outline';
   }
 
-  // acciones (placeholders)
-  nuevoItem() { console.log('Nuevo ítem'); }
-  ver(i: Inventario) { console.log('Ver', i); }
-  editar(i: Inventario) { console.log('Editar', i); }
-  eliminar(i: Inventario) { console.log('Eliminar', i); }
+  async nuevoItem() {
+    const modal = await this.modalCtrl.create({
+      component: InventarioModalComponent,
+      breakpoints: [0, 0.6, 1],
+      initialBreakpoint: 0.6,
+      cssClass: 'rounded-modal'
+    });
+    await modal.present();
+
+    const { role } = await modal.onDidDismiss();
+    if (role === 'created') this.load();
+  }
 }

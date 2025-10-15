@@ -1,0 +1,64 @@
+<ion-header class="sheet-header">
+  <ion-toolbar color="light">
+    <ion-title>Nuevo ítem</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()" fill="clear" aria-label="Cerrar">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="sheet-content" [fullscreen]="true">
+  <form [formGroup]="form" (ngSubmit)="save()" class="form-body" novalidate>
+    <ion-list inset="true" class="group">
+      <ion-item>
+        <ion-icon name="cube-outline" slot="start"></ion-icon>
+        <ion-input label="Nombre del ítem" labelPlacement="stacked" placeholder="p. ej. Guantes de látex" formControlName="nombreItem"></ion-input>
+      </ion-item>
+      <ion-note color="danger" *ngIf="form.get('nombreItem')?.touched && form.get('nombreItem')?.invalid">
+        Mínimo 2 caracteres.
+      </ion-note>
+
+      <ion-item>
+        <ion-icon name="layers-outline" slot="start"></ion-icon>
+        <ion-input type="number" inputmode="numeric" label="Cantidad" labelPlacement="stacked" formControlName="cantidad"></ion-input>
+      </ion-item>
+      <ion-note color="danger" *ngIf="form.get('cantidad')?.touched && form.get('cantidad')?.invalid">
+        Debe ser un número ≥ 0.
+      </ion-note>
+
+      <ion-item>
+        <ion-icon name="pricetag-outline" slot="start"></ion-icon>
+        <ion-select label="Categoría" labelPlacement="stacked" formControlName="categoria" interface="popover">
+          <ion-select-option value="Medicamento">Medicamento</ion-select-option>
+          <ion-select-option value="Material quirúrgico">Material quirúrgico</ion-select-option>
+          <ion-select-option value="Alimento">Alimento</ion-select-option>
+          <ion-select-option value="Higiene">Higiene</ion-select-option>
+          <ion-select-option value="Otro">Otro</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-icon name="calendar-outline" slot="start"></ion-icon>
+        <ion-input type="date" label="Fecha de actualización" labelPlacement="stacked" formControlName="fechaActualizacion"></ion-input>
+      </ion-item>
+    </ion-list>
+
+    <div class="bottom-space"></div>
+  </form>
+</ion-content>
+
+<ion-footer class="sheet-footer">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button fill="outline" color="medium" (click)="close()">Cancelar</ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button type="submit" (click)="save()">
+        <ion-icon slot="start" name="save-outline"></ion-icon>
+        Guardar
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>
