@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Propietario } from 'src/app/models/propetario.model'; 
 
@@ -17,8 +17,18 @@ export class PropietarioService {
   }
 
   // Create a new propietario
-  createPropietario(propietario: Propietario): Observable<Propietario> {
-    return this.http.post<Propietario>(`${this.apiURL}/save`, propietario);
+  createPropietario(propietario: Propietario): Observable<{ msg: string }> {
+    const payload: Propietario = {
+      idPropietario: 0,
+      nombre: String(propietario.nombre),
+      telefono: String(propietario.telefono),
+      direccion: String(propietario.direccion)
+    };
+
+    const body = new HttpParams().set('propietario', JSON.stringify(payload));
+    const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
+
+    return this.http.post<{ msg: string }>(`${this.apiURL}/save`, body.toString(), { headers });
   }
 
 }

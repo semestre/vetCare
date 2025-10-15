@@ -4,6 +4,8 @@ import { IonicModule, ToastController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { Propietario } from 'src/app/models/propetario.model';
 import { PropietarioService } from 'src/app/services/propetario/propetario.service';
+import { ModalController } from '@ionic/angular';
+import { PropietarioModalComponent } from 'src/app/components/propietario-modal/propietario-modal.component';
 
 @Component({
   selector: 'app-lista-propetario',
@@ -15,6 +17,7 @@ import { PropietarioService } from 'src/app/services/propetario/propetario.servi
 export class ListaPropetarioComponent implements OnInit {
   private service = inject(PropietarioService);
   private toast = inject(ToastController);
+  private modalCtrl = inject(ModalController);
 
   propietarios: Propietario[] = [
     { idPropietario: 101, nombre: 'Juan Pérez',  telefono: '555-1234', direccion: 'Calle Falsa 123, Ciudad' },
@@ -70,8 +73,16 @@ export class ListaPropetarioComponent implements OnInit {
     return 'tel:' + t.replace(/[^\d+]/g, '');
   }
 
-  nuevoPropietario() { console.log('Nuevo propietario'); }
-  ver(p: Propietario) { console.log('Ver', p); }
-  editar(p: Propietario) { console.log('Editar', p); }
-  eliminar(p: Propietario) { console.log('Eliminar', p); }
+  async nuevoPropietario() {
+    const modal = await this.modalCtrl.create({
+      component: PropietarioModalComponent,
+      breakpoints: [0, 0.6, 1],
+      initialBreakpoint: 0.6,
+      cssClass: 'rounded-modal'
+    });
+    await modal.present();
+
+    const { role } = await modal.onDidDismiss();
+    if (role === 'created') this.load();
+  }
 }
