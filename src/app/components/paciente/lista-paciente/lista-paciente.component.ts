@@ -4,6 +4,8 @@ import { IonicModule, ToastController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { Paciente } from 'src/app/models/paciente.model';
 import { PacienteService } from 'src/app/services/paciente/paciente.service';
+import { ModalController } from '@ionic/angular';
+import { PacienteModalComponent } from 'src/app/components/paciente-modal/paciente-modal.component';
 
 @Component({
   selector: 'app-lista-paciente',
@@ -16,6 +18,7 @@ export class ListaPacienteComponent implements OnInit {
 
   private pacienteService = inject(PacienteService);
   private toast = inject(ToastController);
+  private modalCtrl = inject(ModalController);
 
   pacientes: Paciente[] = [
     { idPaciente: 201, nombreMascota: 'Firulais', especie: 'Perro', raza: 'Labrador', edad: 3, historialMedico: 'Vacunación completa', idPropietario: 101 },
@@ -86,8 +89,16 @@ export class ListaPacienteComponent implements OnInit {
     return '🐾';
   }
 
-  // acciones (placeholders)
-  ver(p: Paciente) { console.log('Ver', p); }
-  editar(p: Paciente) { console.log('Editar', p); }
-  eliminar(p: Paciente) { console.log('Eliminar', p); }
+  async nuevoPaciente() {
+    const modal = await this.modalCtrl.create({
+      component: PacienteModalComponent,
+      breakpoints: [0, 0.6, 1],
+      initialBreakpoint: 0.6,
+      cssClass: 'rounded-modal'
+    });
+    await modal.present();
+
+    const { role } = await modal.onDidDismiss();
+    if (role === 'created') this.load(); // recarga lista si se creó
+  }
 }

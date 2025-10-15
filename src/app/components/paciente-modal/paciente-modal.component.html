@@ -1,0 +1,51 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Nuevo Paciente</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form (ngSubmit)="guardar()">
+    <ion-item>
+      <ion-label position="floating">Nombre de la mascota</ion-label>
+      <ion-input [(ngModel)]="paciente.nombreMascota" name="nombreMascota" required></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Especie</ion-label>
+      <ion-input [(ngModel)]="paciente.especie" name="especie" required></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Raza</ion-label>
+      <ion-input [(ngModel)]="paciente.raza" name="raza"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Edad</ion-label>
+      <ion-input type="number" [(ngModel)]="paciente.edad" name="edad"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Historial Médico</ion-label>
+      <ion-textarea [(ngModel)]="paciente.historialMedico" name="historialMedico"></ion-textarea>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">ID del Propietario</ion-label>
+      <ion-input type="number" [(ngModel)]="paciente.idPropietario" name="idPropietario"></ion-input>
+    </ion-item>
+
+    <ion-footer class="ion-padding-top">
+      <ion-button expand="block" type="submit" [disabled]="cargando">
+        <ion-spinner *ngIf="cargando" name="crescent"></ion-spinner>
+        <span *ngIf="!cargando">Guardar Paciente</span>
+      </ion-button>
+    </ion-footer>
+  </form>
+</ion-content>

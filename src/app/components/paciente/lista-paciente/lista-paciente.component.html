@@ -4,6 +4,11 @@
       <ion-icon name="paw-outline" aria-hidden="true"></ion-icon>
       Lista de Pacientes
     </ion-title>
+
+    <ion-button fill="solid" color="light" (click)="nuevoPaciente()">
+      <ion-icon slot="start" name="add-outline"></ion-icon>
+      Nuevo paciente
+    </ion-button>
   </ion-toolbar>
 
   <div class="subheader">
@@ -95,18 +100,6 @@
                 </ion-chip>
               </div>
             </div>
-
-            <ion-buttons>
-              <ion-button fill="clear" (click)="ver(paciente)" aria-label="Ver">
-                <ion-icon slot="icon-only" name="eye-outline"></ion-icon>
-              </ion-button>
-              <ion-button fill="clear" (click)="editar(paciente)" aria-label="Editar">
-                <ion-icon slot="icon-only" name="create-outline"></ion-icon>
-              </ion-button>
-              <ion-button fill="clear" color="danger" (click)="eliminar(paciente)" aria-label="Eliminar">
-                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-              </ion-button>
-            </ion-buttons>
           </ion-card-header>
 
           <ion-card-content>
