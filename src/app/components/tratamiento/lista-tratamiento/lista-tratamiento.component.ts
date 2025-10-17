@@ -6,6 +6,8 @@ import { Tratamiento } from 'src/app/models/tratamiento.model';
 import { TratamientoService } from 'src/app/services/tratamiento/tratamiento.service';
 import { ModalController } from '@ionic/angular';
 import { TratamientoModalComponent } from 'src/app/components/tratamiento-modal/tratamiento-modal.component';
+import { forkJoin } from 'rxjs';
+import { PacienteService } from 'src/app/services/paciente/paciente.service';
 
 @Component({
   selector: 'app-lista-tratamiento',
@@ -16,6 +18,7 @@ import { TratamientoModalComponent } from 'src/app/components/tratamiento-modal/
 })
 export class ListaTratamientoComponent implements OnInit {
   private service = inject(TratamientoService);
+  private pacienteService = inject(PacienteService);
   private toast = inject(ToastController);
   private modalCtrl = inject(ModalController);
 
@@ -23,6 +26,7 @@ export class ListaTratamientoComponent implements OnInit {
     { idTratamiento: 301, descripcion: 'Vacuna antirrábica', tipo: 'Vacuna',  fecha: '2025-10-12', idPaciente: 201 },
     { idTratamiento: 302, descripcion: 'Limpieza dental',     tipo: 'Higiene', fecha: '2025-10-13', idPaciente: 202 },
   ];
+  pacientes: any[] = [];
 
   // UI
   loading = true;
@@ -36,29 +40,49 @@ export class ListaTratamientoComponent implements OnInit {
   ngOnInit(): void { this.load(); }
 
   load(event?: CustomEvent) {
-    this.loading = !event;
-    this.error = null;
+  this.loading = !event;
+  this.error = null;
 
-    this.service.getAllTratamientos().subscribe({
-      next: (data) => {
-        if (Array.isArray(data) && data.length) {
-          // ordena por fecha DESC (más reciente primero)
-          this.tratamientos = [...data].sort((a, b) => this.dateNum(b.fecha) - this.dateNum(a.fecha));
-        }
-        this.refreshTipos();
-        this.loading = false;
-        event?.detail.complete();
-      },
-      error: async (err) => {
-        console.error('Error al cargar tratamientos:', err);
-        this.error = 'No se pudieron cargar los tratamientos.';
-        this.refreshTipos();
-        this.loading = false;
-        event?.detail.complete();
-        (await this.toast.create({ message: 'No se pudieron cargar los tratamientos.', duration: 1800, color: 'danger' })).present();
-      }
-    });
-  }
+  forkJoin({
+    tratamientos: this.service.getAllTratamientos(),
+    pacientes: this.pacienteService.getAllPacientes()
+  }).subscribe({
+    next: ({ tratamientos, pacientes }) => {
+      this.pacientes = pacientes;
+
+      // Add pacienteNombre
+      this.tratamientos = tratamientos.map(t => {
+        const paciente = pacientes.find(p => p.idPaciente === t.idPaciente);
+        return {
+          ...t,
+          pacienteNombre: paciente ? paciente.nombreMascota : 'Desconocido'
+        };
+      });
+
+      // Optional: sort by fecha DESC
+      this.tratamientos.sort((a, b) => this.dateNum(b.fecha) - this.dateNum(a.fecha));
+
+      this.refreshTipos();
+      this.loading = false;
+      event?.detail.complete?.();
+    },
+    error: async (err) => {
+      console.error('Error al cargar tratamientos o pacientes:', err);
+      this.error = 'No se pudieron cargar los datos.';
+      this.loading = false;
+      event?.detail.complete?.();
+      (await this.toast.create({
+        message: 'No se pudieron cargar los tratamientos o pacientes.',
+        duration: 1800,
+        color: 'danger'
+      })).present();
+    }
+  });
+}
+  
+
+
+  
 
   refreshTipos() {
     const set = new Set(this.tratamientos.map(t => t.tipo).filter(Boolean));

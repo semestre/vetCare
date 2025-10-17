@@ -6,7 +6,8 @@ import { Facturacion } from 'src/app/models/facturacion.model';
 import { FacturacionService } from 'src/app/services/facturacion/facturacion.service';
 import { ModalController } from '@ionic/angular';
 import { FacturacionModalComponent } from 'src/app/components/facturacion-modal/facturacion-modal.component';
-
+import { forkJoin } from 'rxjs';
+import { PacienteService } from 'src/app/services/paciente/paciente.service';
 
 @Component({
   selector: 'app-lista-facturacion',
@@ -20,12 +21,13 @@ export class ListaFacturacionComponent implements OnInit {
   private factService = inject(FacturacionService);
   private toast = inject(ToastController);
   private modalCtrl = inject(ModalController);
+  private pacienteService = inject(PacienteService);
 
   facturas: Facturacion[] = [
     { idFactura: 1, idPaciente: 201, servicios: 'Consulta general', medicamentos: 'Vacuna antirrábica', total: 500,  fecha: '2025-10-12', metodoPago: 'Efectivo' },
     { idFactura: 2, idPaciente: 202, servicios: 'Cirugía menor',    medicamentos: 'Anestesia local',    total: 1500, fecha: '2025-10-13', metodoPago: 'Tarjeta' }
   ];
-
+  pacientes: any[] = [];
   // estado UI
   loading = true;
   error: string | null = null;
@@ -39,24 +41,39 @@ export class ListaFacturacionComponent implements OnInit {
   }
 
   load(event?: CustomEvent) {
-    this.loading = !event;
-    this.error = null;
+  this.loading = !event;
+  this.error = null;
 
-    // Si aún no tienes API, esto deja la demo y no truena
-    this.factService.getAllFacturas().subscribe({
-      next: (data) => {
-        if (Array.isArray(data) && data.length) this.facturas = data;
-        this.loading = false;
-        event?.detail.complete();
-      },
-      error: async (err) => {
-        console.error('Error al cargar facturas:', err);
-        this.error = 'No se pudieron cargar las facturas.';
-        this.loading = false;
-        event?.detail.complete();
-        (await this.toast.create({ message: 'No se pudieron cargar las facturas.', duration: 1800, color: 'danger' })).present();
-      }
-    });
+  forkJoin({
+    facturas: this.factService.getAllFacturas(),
+    pacientes: this.pacienteService.getAllPacientes()
+  }).subscribe({
+    next: ({ facturas, pacientes }) => {
+      // Add pacienteNombre to each factura
+      this.facturas = facturas.map(f => {
+        const paciente = pacientes.find(p => p.idPaciente === f.idPaciente);
+        return {
+          ...f,
+          pacienteNombre: paciente ? paciente.nombreMascota : 'Desconocido'
+        };
+      });
+
+      this.pacientes = pacientes;
+      this.loading = false;
+      event?.detail.complete?.();
+    },
+    error: async (err) => {
+      console.error('Error al cargar facturas o pacientes:', err);
+      this.error = 'No se pudieron cargar los datos.';
+      this.loading = false;
+      event?.detail.complete?.();
+      (await this.toast.create({
+        message: 'No se pudieron cargar las facturas o pacientes.',
+        duration: 1800,
+        color: 'danger'
+      })).present();
+    }
+  });
   }
 
   get filtered(): Facturacion[] {

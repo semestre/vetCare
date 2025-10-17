@@ -6,5 +6,6 @@ export interface Paciente {
     edad: number;
     historialMedico: string;
     idPropietario: number;
+    propietarioNombre?: string; // 👈 add this line!
 }
 

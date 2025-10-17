@@ -5,4 +5,5 @@ export interface Cita {
     motivo: string;
     idVeterinario: number;
     idPaciente: number;
+    pacienteNombre?: string;
 }

@@ -4,4 +4,5 @@ export interface Tratamiento {
     tipo: string;
     fecha: string;
     idPaciente: number;
+    pacienteNombre?: string; // 👈 add this line!
 }

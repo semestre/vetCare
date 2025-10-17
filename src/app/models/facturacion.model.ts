@@ -6,4 +6,5 @@ export interface Facturacion {
     total: number;
     fecha: string;
     metodoPago: string;
+    pacienteNombre?: string;
 }
