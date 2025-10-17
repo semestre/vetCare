@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Veterinario Dashboard</ion-title>
+    <ion-buttons slot="end">
+      <ion-button [routerLink]="['/']">
+        <ion-icon name="log-out-outline"></ion-icon>
+        <ion-label>Logout</ion-label>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-tabs>
+
+    <ion-tab-bar slot="bottom">
+
+      <ion-tab-button [routerLink]="['paciente']">
+        <ion-label>Pacientes</ion-label>
+      </ion-tab-button>
+
+      <ion-tab-button [routerLink]="['citas']">
+        <ion-label>Citas</ion-label>
+      </ion-tab-button>
+
+      <ion-tab-button [routerLink]="['tratamiento']"> 
+        <ion-label>Tratamientos</ion-label>
+      </ion-tab-button>
+
+      <ion-tab-button [routerLink]="['inventario']">
+        <ion-label>Inventario</ion-label>
+      </ion-tab-button>
+
+    </ion-tab-bar>
+
+    <ion-router-outlet></ion-router-outlet>
+  </ion-tabs>
+</ion-content>

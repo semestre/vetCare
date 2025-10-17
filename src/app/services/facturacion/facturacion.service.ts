@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Facturacion } from 'src/app/models/facturacion.model';
+import { API_CONFIG } from 'src/app/config/api.config';
 
 @Injectable({ providedIn: 'root' })
 export class FacturacionService {
-  private apiURL = 'https://blog-notes-wedding-ppm.trycloudflare.com/VetCare/api/facturacion';
+  private apiURL = `${API_CONFIG.baseURL}/facturacion`;
 
   constructor(private http: HttpClient) {}
 

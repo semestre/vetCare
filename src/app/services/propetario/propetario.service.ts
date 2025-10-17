@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Propietario } from 'src/app/models/propetario.model'; 
+import { API_CONFIG } from 'src/app/config/api.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PropietarioService {
 
-  private apiURL = 'https://blog-notes-wedding-ppm.trycloudflare.com/VetCare/api/propietarios';
+  private apiURL = `${API_CONFIG.baseURL}/propietarios`;
   constructor(private http: HttpClient) {}
 
   // Get all propietarios

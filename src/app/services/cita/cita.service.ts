@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Cita } from 'src/app/models/cita.model'; 
+import { API_CONFIG } from 'src/app/config/api.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CitaService {
 
-  private apiURL = 'https://blog-notes-wedding-ppm.trycloudflare.com/VetCare/api/citas'; 
+  private apiURL = `${API_CONFIG.baseURL}/citas`;
 
   constructor(private http: HttpClient) {}
 

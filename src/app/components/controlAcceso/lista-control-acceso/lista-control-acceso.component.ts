@@ -44,7 +44,7 @@ export class ListaControlAccesoComponent implements OnInit {
         // Enmascaro password si viene del backend
         this.usuarios = (Array.isArray(data) ? data : []).map(u => ({
           ...u,
-          password: '••••••' // nunca mostrar en UI
+
         }));
         if (!this.usuarios.length) this.usuarios = this.fallback;
         this.loading = false;

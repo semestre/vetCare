@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ControlAcceso } from 'src/app/models/controlAcceso.model'; 
+import { API_CONFIG } from 'src/app/config/api.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ControlAccesoService {
 
-  private apiURL = 'https://blog-notes-wedding-ppm.trycloudflare.com/VetCare/api/usuarios';
+  private apiURL = `${API_CONFIG.baseURL}/usuarios`;
 
   constructor(private http: HttpClient) {}
 
