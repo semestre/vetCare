@@ -32,12 +32,8 @@
     <ion-list inset="true" class="group">
       <ion-item>
         <ion-icon name="medkit-outline" slot="start"></ion-icon>
-        <ion-textarea
-          label="Motivo"
-          labelPlacement="stacked"
-          auto-grow="true"
-          placeholder="Vacunación, Chequeo general, etc."
-          formControlName="motivo">
+        <ion-textarea label="Motivo" labelPlacement="stacked" auto-grow="true"
+          placeholder="Vacunación, Chequeo general, etc." formControlName="motivo">
         </ion-textarea>
       </ion-item>
       <ion-note color="danger" *ngIf="form.get('motivo')?.touched && form.get('motivo')?.invalid">
@@ -48,7 +44,8 @@
     <ion-list inset="true" class="group">
       <ion-item>
         <ion-icon name="person-outline" slot="start"></ion-icon>
-        <ion-input inputmode="numeric" type="number" label="ID Veterinario" labelPlacement="stacked" formControlName="idVeterinario"></ion-input>
+        <ion-input inputmode="numeric" type="number" label="ID Veterinario" labelPlacement="stacked"
+          formControlName="idVeterinario"></ion-input>
       </ion-item>
       <ion-note color="danger" *ngIf="form.get('idVeterinario')?.touched && form.get('idVeterinario')?.invalid">
         Ingresa un ID de veterinario válido.
@@ -56,11 +53,18 @@
 
       <ion-item>
         <ion-icon name="paw-outline" slot="start"></ion-icon>
-        <ion-input inputmode="numeric" type="number" label="ID Paciente" labelPlacement="stacked" formControlName="idPaciente"></ion-input>
+        <ion-label position="stacked">Paciente</ion-label>
+        <ion-select formControlName="idPaciente" placeholder="Selecciona un paciente">
+          <ion-select-option *ngFor="let p of pacientes" [value]="p.idPaciente">
+            {{ p.idPaciente }} - {{ p.nombreMascota }}
+          </ion-select-option>
+        </ion-select>
       </ion-item>
+
       <ion-note color="danger" *ngIf="form.get('idPaciente')?.touched && form.get('idPaciente')?.invalid">
-        Ingresa un ID de paciente válido.
+        Ingresa un paciente válido.
       </ion-note>
+
     </ion-list>
 
     <!-- Espaciador para que el último control no choque con el footer -->

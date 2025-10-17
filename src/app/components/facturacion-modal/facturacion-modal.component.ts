@@ -4,6 +4,8 @@ import { IonicModule, ModalController, ToastController, LoadingController } from
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { FacturacionService } from 'src/app/services/facturacion/facturacion.service';
 import { Facturacion } from 'src/app/models/facturacion.model';
+import { Paciente } from 'src/app/models/paciente.model';
+import { PacienteService } from 'src/app/services/paciente/paciente.service';
 
 @Component({
   selector: 'app-facturacion-modal',
@@ -31,6 +33,30 @@ export class FacturacionModalComponent {
   close() {
     this.modalCtrl.dismiss(null, 'cancel');
   }
+
+
+
+
+    pacientes: Paciente[] = []; //added this line
+    constructor(private pacienteService: PacienteService) { } // added this line
+  
+    ngOnInit() {
+      this.loadPacientes();
+    }
+  
+    loadPacientes() {
+      this.pacienteService.getAllPacientes().subscribe({
+        next: (data) => {
+          console.log('✅ Pacientes loaded:', data);
+          this.pacientes = data;
+        },
+        error: (err) => {
+          console.error('❌ Error loading pacientes:', err);
+        }
+      });
+    }
+
+    
 
   async save() {
     if (this.form.invalid) {

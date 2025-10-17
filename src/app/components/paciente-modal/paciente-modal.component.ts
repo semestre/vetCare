@@ -4,6 +4,8 @@ import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { Paciente } from 'src/app/models/paciente.model';
 import { PacienteService } from 'src/app/services/paciente/paciente.service';
+import { Propietario } from 'src/app/models/propetario.model';
+import { PropietarioService } from 'src/app/services/propetario/propetario.service';
 
 @Component({
   selector: 'app-paciente-modal',
@@ -26,6 +28,27 @@ export class PacienteModalComponent {
     historialMedico: '',
     idPropietario: 0
   };
+
+
+
+
+  propietarios: Propietario[] = []; //added this line
+  constructor(private propietarioService: PropietarioService) { } // added this line
+  ngOnInit() {
+    this.loadPropietarios();
+  }
+  loadPropietarios() {
+    this.propietarioService.getAllPropietarios().subscribe({
+      next: (data) => {
+        console.log('✅ Propietarios loaded:', data);
+        this.propietarios = data;
+      },
+      error: (err) => {
+        console.error('❌ Error loading propietarios:', err);
+      }
+    });
+  } // up to here
+
 
   cargando = false;
 
