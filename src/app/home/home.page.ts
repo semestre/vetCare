@@ -1,8 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { IonicModule } from '@ionic/angular'; // all Ionic components here
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; // for [(ngModel)]
-import { Router } from '@angular/router';
+import { Router } from '@angular/router'; 
+import { ControlAccesoService } from 'src/app/services/controlAcceso/control-acceso.service';
+import { ControlAcceso } from 'src/app/models/controlAcceso.model';
+import { ToastController } from '@ionic/angular';
+import { NavController } from '@ionic/angular';
 
 @Component({
   selector: 'app-home',
@@ -11,29 +15,42 @@ import { Router } from '@angular/router';
   standalone: true, 
   imports: [IonicModule, CommonModule, FormsModule]
 })
+
 export class HomePage {
   username = '';
   password = '';
 
-  constructor(private router: Router) {}
+  private router = inject(Router);
+  private controlAccesoService = inject(ControlAccesoService);
+  private toast = inject(ToastController);
 
   login() {
-    const users = [
-      { username: 'dr_juan', password: '12345', route: '/veterinario' },
-      { username: 'ana_asistente', password: 'abcde', route: '/asistente' },
-      { username: 'admin1', password: 'adminpass', route: '/administrador' },
-    ];
+    this.controlAccesoService.getAllUsuarios().subscribe({
+      next: (users: ControlAcceso[]) => {
+        const foundUser = users.find(
+          u => u.nombreUsuario === this.username && u.password === this.password
+        );
 
-    const foundUser = users.find(
-      (u) => u.username === this.username && u.password === this.password
-    );
-
-    if (foundUser) {
-      console.log('✅ Login successful for:', foundUser.username);
-      this.router.navigate([foundUser.route]);
-    } else {
-      console.log('❌ Invalid credentials');
-      alert('Wrong username or password, try again!');
-    }
+        if (foundUser) {
+          console.log('✅ Login successful for:', foundUser.nombreUsuario);
+          this.router.navigate([`/${foundUser.rol}`]);
+        } else {
+          console.log('❌ Invalid credentials');
+          this.toast.create({
+            message: 'Usuario o contraseña incorrectos',
+            duration: 1800,
+            color: 'danger'
+          }).then(t => t.present());
+        }
+      },
+      error: async (err) => {
+        console.error('Error fetching usuarios', err);
+        (await this.toast.create({
+          message: 'No se pudo conectar al servidor',
+          duration: 1800,
+          color: 'danger'
+        })).present();
+      }
+    });
   }
 }
