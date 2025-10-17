@@ -10,41 +10,15 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-tabs>
+<ion-tabs>
+  <ion-tab-bar slot="bottom">
+    <ion-tab-button [routerLink]="['/administrador/citas']"><ion-label>Citas</ion-label></ion-tab-button>
+    <ion-tab-button [routerLink]="['/administrador/controlAcceso']"><ion-label>Usuarios</ion-label></ion-tab-button>
+    <ion-tab-button [routerLink]="['/administrador/facturacion']"><ion-label>Facturación</ion-label></ion-tab-button>
+    <ion-tab-button [routerLink]="['/administrador/inventario']"><ion-label>Inventario</ion-label></ion-tab-button>
+    <ion-tab-button [routerLink]="['/administrador/paciente']"><ion-label>Pacientes</ion-label></ion-tab-button>
+    <ion-tab-button [routerLink]="['/administrador/propietario']"><ion-label>Propietarios</ion-label></ion-tab-button>
+    <ion-tab-button [routerLink]="['/administrador/tratamiento']"><ion-label>Tratamientos</ion-label></ion-tab-button>
+  </ion-tab-bar>
 
-    <ion-tab-bar slot="bottom">
-
-      <ion-tab-button [routerLink]="['citas']">
-        <ion-label>Citas</ion-label>
-      </ion-tab-button>
-
-      <ion-tab-button [routerLink]="['controlAcceso']">
-        <ion-label>Usuarios</ion-label>
-      </ion-tab-button>
-
-      <ion-tab-button [routerLink]="['facturacion']">
-        <ion-label>Facturación</ion-label>
-      </ion-tab-button>
-
-      <ion-tab-button [routerLink]="['inventario']">
-        <ion-label>Inventario</ion-label>
-      </ion-tab-button>
-
-      <ion-tab-button [routerLink]="['paciente']">
-        <ion-label>Pacientes</ion-label>
-      </ion-tab-button>
-
-      <ion-tab-button [routerLink]="['propietario']">
-        <ion-label>Propietarios</ion-label>
-      </ion-tab-button>
-
-      <ion-tab-button [routerLink]="['tratamiento']">
-        <ion-label>Tratamientos</ion-label>
-      </ion-tab-button>
-
-    </ion-tab-bar>
-
-    <ion-router-outlet></ion-router-outlet>
-  </ion-tabs>
-</ion-content>
+</ion-tabs>

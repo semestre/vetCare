@@ -10,29 +10,13 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-tabs>
 
-    <ion-tab-bar slot="bottom">
+<ion-tabs>
+  <ion-tab-bar slot="bottom">
+    <ion-tab-button [routerLink]="['/asistente/citas']"><ion-label>Citas</ion-label></ion-tab-button>
+    <ion-tab-button [routerLink]="['/asistente/facturacion']"><ion-label>Facturación</ion-label></ion-tab-button>
+    <ion-tab-button [routerLink]="['/asistente/paciente']"><ion-label>Pacientes</ion-label></ion-tab-button>
+    <ion-tab-button [routerLink]="['/asistente/propietario']"><ion-label>Propietarios</ion-label></ion-tab-button>
+  </ion-tab-bar>
 
-      <ion-tab-button [routerLink]="['paciente']">
-        <ion-label>Pacientes</ion-label>
-      </ion-tab-button>
-
-      <ion-tab-button [routerLink]="['propietario']">
-        <ion-label>Propietarios</ion-label>
-      </ion-tab-button>
-
-      <ion-tab-button [routerLink]="['citas']">
-        <ion-label>Citas</ion-label>
-      </ion-tab-button>
-
-      <ion-tab-button [routerLink]="['facturacion']">
-        <ion-label>Facturación</ion-label>
-      </ion-tab-button>
-
-    </ion-tab-bar>
-
-    <ion-router-outlet></ion-router-outlet>
-  </ion-tabs>
-</ion-content>
+</ion-tabs>

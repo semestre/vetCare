@@ -10,6 +10,7 @@ import { VeterinarioComponent } from './components/veterinario/veterinario/veter
 import { AsistenteComponent } from './components/asistente/asistente/asistente.component';
 import { AdministradorComponent } from './components/administrador/administrador/administrador.component';
 import { ListaPropetarioComponent } from './components/propetario/lista-propetario/lista-propetario.component';
+
 export const routes: Routes = [
   {
     path: '',
