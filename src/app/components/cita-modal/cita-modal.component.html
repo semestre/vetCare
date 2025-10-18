@@ -44,11 +44,15 @@
     <ion-list inset="true" class="group">
       <ion-item>
         <ion-icon name="person-outline" slot="start"></ion-icon>
-        <ion-input inputmode="numeric" type="number" label="ID Veterinario" labelPlacement="stacked"
-          formControlName="idVeterinario"></ion-input>
+        <ion-select label="Veterinario" labelPlacement="stacked" interface="popover" formControlName="idVeterinario">
+          <ion-select-option *ngFor="let vet of veterinarios" [value]="vet.idUsuario">
+            {{ vet.idUsuario }} - {{ vet.nombreUsuario }}
+          </ion-select-option>
+        </ion-select>
       </ion-item>
+
       <ion-note color="danger" *ngIf="form.get('idVeterinario')?.touched && form.get('idVeterinario')?.invalid">
-        Ingresa un ID de veterinario válido.
+        Ingresa un veterinario válido.
       </ion-note>
 
       <ion-item>

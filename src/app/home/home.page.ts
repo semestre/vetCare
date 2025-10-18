@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { IonicModule } from '@ionic/angular'; // all Ionic components here
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; // for [(ngModel)]
-import { Router } from '@angular/router'; 
+import { Router } from '@angular/router';
 import { ControlAccesoService } from 'src/app/services/controlAcceso/control-acceso.service';
 import { ControlAcceso } from 'src/app/models/controlAcceso.model';
 import { ToastController } from '@ionic/angular';
@@ -12,7 +12,7 @@ import { NavController } from '@ionic/angular';
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
-  standalone: true, 
+  standalone: true,
   imports: [IonicModule, CommonModule, FormsModule]
 })
 
@@ -25,8 +25,13 @@ export class HomePage {
   private toast = inject(ToastController);
 
   login() {
+
     this.controlAccesoService.getAllUsuarios().subscribe({
       next: (users: ControlAcceso[]) => {
+        console.log('🟢 All users fetched from API:', users);
+
+
+        ///// check user
         const foundUser = users.find(
           u => u.nombreUsuario === this.username && u.password === this.password
         );
@@ -52,5 +57,6 @@ export class HomePage {
         })).present();
       }
     });
+
   }
 }

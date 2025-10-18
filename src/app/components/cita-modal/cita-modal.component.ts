@@ -6,6 +6,8 @@ import { CitaService } from 'src/app/services/cita/cita.service';
 import { Cita } from 'src/app/models/cita.model';
 import { Paciente } from 'src/app/models/paciente.model';
 import { PacienteService } from 'src/app/services/paciente/paciente.service';
+import { ControlAcceso } from 'src/app/models/controlAcceso.model';
+import { ControlAccesoService } from 'src/app/services/controlAcceso/control-acceso.service';
 
 @Component({
   selector: 'app-cita-modal',
@@ -36,11 +38,33 @@ export class CitaModalComponent {
 
 
 
-  pacientes: Paciente[] = []; //added this line
-  constructor(private pacienteService: PacienteService) { } // added this line
+
+
+
+  veterinarios: ControlAcceso[] = [];
+  pacientes: Paciente[] = [];
+
+  constructor(
+    private controlAccesoService: ControlAccesoService,
+    private pacienteService: PacienteService
+  ) { }
 
   ngOnInit() {
+    this.loadVeterinarios();
     this.loadPacientes();
+  }
+
+  loadVeterinarios() {
+    this.controlAccesoService.getAllUsuarios().subscribe({
+      next: (data) => {
+        console.log('✅ All users:', data);
+        this.veterinarios = data.filter(u => u.rol.toLowerCase() === 'veterinario');
+        console.log('🩺 Filtered veterinarios:', this.veterinarios);
+      },
+      error: (err) => {
+        console.error('❌ Error loading veterinarios:', err);
+      }
+    });
   }
 
   loadPacientes() {
@@ -60,6 +84,7 @@ export class CitaModalComponent {
 
 
 
+  
 
   async save() {
     if (this.form.invalid) {
