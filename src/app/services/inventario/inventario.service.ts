@@ -14,19 +14,30 @@ export class InventarioService {
     return this.http.get<Inventario[]>(`${this.apiURL}/getAll`);
   }
 
-  // POST /inventario/save -> @FormParam("inventario")
+  // POST /inventario/save -> @FormParam("inventario") Inventario inventario
   createItem(item: Inventario): Observable<{ msg: string }> {
-    const payload: Inventario = {
-      idItem: 0, // lo asigna el backend
-      nombreItem: String(item.nombreItem),
-      cantidad: Number(item.cantidad),
-      categoria: String(item.categoria ?? ''),
-      fechaActualizacion: String(item.fechaActualizacion) // 'YYYY-MM-DD'
-    };
+  const payload: Inventario = {
+    idItem: 0,
+    nombreItem: String(item.nombreItem),
+    cantidad: Number(item.cantidad),
+    categoria: String(item.categoria ?? ''),
+    fechaActualizacion: String(item.fechaActualizacion)
+  };
 
-    const body = new HttpParams().set('inventario', JSON.stringify(payload));
-    const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
+  // 🔹 Generar el body EXACTO que Postman envía
+  const formBody = new URLSearchParams();
+  formBody.set('inventario', JSON.stringify(payload));
 
-    return this.http.post<{ msg: string }>(`${this.apiURL}/save`, body.toString(), { headers });
-  }
+  return this.http.post<{ msg: string }>(
+    `${this.apiURL}/save`,
+    formBody.toString(),
+    {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }),
+      responseType: 'json' as const
+    }
+  );
+}
+
 }
