@@ -1,9 +1,13 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController, ToastController, LoadingController } from '@ionic/angular';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { CitaService } from 'src/app/services/cita/cita.service';
 import { Cita } from 'src/app/models/cita.model';
+import { Paciente } from 'src/app/models/paciente.model';
+import { PacienteService } from 'src/app/services/paciente/paciente.service';
+import { ControlAcceso } from 'src/app/models/controlAcceso.model';
+import { ControlAccesoService } from 'src/app/services/controlAcceso/control-acceso.service';
 
 @Component({
   selector: 'app-cita-modal',
@@ -12,7 +16,7 @@ import { Cita } from 'src/app/models/cita.model';
   templateUrl: './cita-modal.component.html',
   styleUrls: ['./cita-modal.component.scss'],
 })
-export class CitaModalComponent {
+export class CitaModalComponent implements OnInit {
   private fb = inject(FormBuilder);
   private modalCtrl = inject(ModalController);
   private citaService = inject(CitaService);
@@ -27,8 +31,37 @@ export class CitaModalComponent {
     idPaciente: ['', [Validators.required]],
   });
 
+  veterinarios: ControlAcceso[] = [];
+  pacientes: Paciente[] = [];
+
+  constructor(
+    private controlAccesoService: ControlAccesoService,
+    private pacienteService: PacienteService
+  ) {}
+
+  ngOnInit(): void {
+    this.loadVeterinarios();
+    this.loadPacientes();
+  }
+
   close() {
     this.modalCtrl.dismiss(null, 'cancel');
+  }
+
+  loadVeterinarios() {
+    this.controlAccesoService.getAllUsuarios().subscribe({
+      next: (data) => {
+        this.veterinarios = data.filter(u => (u.rol || '').toLowerCase() === 'veterinario');
+      },
+      error: (err) => console.error('❌ Error loading veterinarios:', err)
+    });
+  }
+
+  loadPacientes() {
+    this.pacienteService.getAllPacientes().subscribe({
+      next: (data) => { this.pacientes = data; },
+      error: (err) => console.error('❌ Error loading pacientes:', err)
+    });
   }
 
   async save() {
@@ -66,19 +99,12 @@ export class CitaModalComponent {
           color: 'success',
           icon: 'checkmark-circle-outline'
         })).present();
-        // No regresa la cita, solo el msg -> pedimos a la lista que recargue
-        this.modalCtrl.dismiss(true, 'created'); // true = indicador para recargar
+        this.modalCtrl.dismiss(true, 'created'); // recargar lista en el padre
       },
       error: async (err) => {
         await loading.dismiss();
-        console.error('createCita error:', {
-          status: err?.status,
-          statusText: err?.statusText,
-          body: err?.error
-        });
         const msg = (typeof err?.error === 'string' && err.error.length < 200)
-          ? err.error
-          : 'No se pudo crear la cita.';
+          ? err.error : 'No se pudo crear la cita.';
         (await this.toastCtrl.create({
           message: msg,
           duration: 2500,

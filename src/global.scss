@@ -35,3 +35,47 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+
+
+/* ===== Mini-ventana centrada (no bottom-sheet) ===== */
+/* Mini-ventana centrada */
+ion-modal.dialog-modal {
+  --width: 820px;
+  --height: auto;
+  --max-height: 90vh;
+  --border-radius: 16px;
+  --background: #fff;
+  --box-shadow: 0 20px 48px rgba(15, 23, 42, .28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inset: 0 !important;
+  margin: auto;
+}
+
+/* ✅ Permitir scroll interno en el modal */
+ion-modal.dialog-modal::part(content) {
+  padding: 0 !important;
+  overflow: auto;             /* <— antes estaba hidden */
+}
+
+/* Oculta cualquier “handle” */
+ion-modal.dialog-modal::part(handle) { display: none !important; }
+
+/* Backdrop */
+ion-modal.dialog-modal::part(backdrop) {
+  background: rgba(15, 23, 42, 0.35);
+  opacity: 1;
+}
+
+/* Responsive */
+@media (max-width: 920px) {
+  ion-modal.dialog-modal {
+    --width: calc(100vw - 24px);
+    --max-height: 94vh;
+    --border-radius: 12px;
+    --box-shadow: 0 8px 28px rgba(15, 23, 42, .24);
+  }
+}
+

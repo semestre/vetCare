@@ -39,10 +39,16 @@
 
       <ion-item>
         <ion-icon name="paw-outline" slot="start"></ion-icon>
-        <ion-input type="number" inputmode="numeric" label="ID Paciente" labelPlacement="stacked" formControlName="idPaciente"></ion-input>
+        <ion-label position="stacked">Paciente</ion-label>
+        <ion-select formControlName="idPaciente" placeholder="Selecciona un paciente">
+          <ion-select-option *ngFor="let p of pacientes" [value]="p.idPaciente">
+            {{ p.idPaciente }} - {{ p.nombreMascota }}
+          </ion-select-option>
+        </ion-select>
       </ion-item>
+
       <ion-note color="danger" *ngIf="form.get('idPaciente')?.touched && form.get('idPaciente')?.invalid">
-        Ingresa un ID de paciente válido.
+        Ingresa un paciente válido.
       </ion-note>
     </ion-list>
 

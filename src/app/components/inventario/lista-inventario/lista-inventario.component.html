@@ -1,26 +1,25 @@
-<ion-header class="header-gradient-green">
+<ion-header class="header-white">
   <ion-toolbar color="transparent">
-    <ion-title class="title">
-      <ion-icon name="cube-outline" aria-hidden="true"></ion-icon>
-      Inventario
-    </ion-title>
+    <div class="header-row">
+      <ion-title class="title">
+        <ion-icon name="cube-outline" aria-hidden="true"></ion-icon>
+        Inventario
+      </ion-title>
 
-    <ion-buttons slot="end">
-      <ion-button fill="solid" color="light" (click)="nuevoItem()">
-        <ion-icon slot="start" name="add-outline"></ion-icon>
-        Nuevo ítem
-      </ion-button>
-    </ion-buttons>
+      <!-- 🔎 buscador píldora -->
+      <ion-searchbar
+        placeholder="Buscar por nombre, categoría o ID…"
+        [(ngModel)]="searchTerm"
+        show-clear-button="focus"
+        animated="true">
+      </ion-searchbar>
+    </div>
   </ion-toolbar>
+</ion-header>
 
-  <div class="subheader">
-    <ion-searchbar
-      placeholder="Buscar por nombre, categoría o ID…"
-      [(ngModel)]="searchTerm"
-      show-clear-button="focus"
-      animated="true">
-    </ion-searchbar>
-
+<ion-content class="ion-padding content-bg" [fullscreen]="true">
+  <!-- 🎛️ Filtros + botón (FUERA del header, como Citas) -->
+  <div class="controls container">
     <div class="filters">
       <ion-segment [(ngModel)]="categoria" value="Todas" mode="md" scrollable="true">
         <ion-segment-button *ngFor="let c of categorias" [value]="c">
@@ -28,10 +27,14 @@
         </ion-segment-button>
       </ion-segment>
     </div>
-  </div>
-</ion-header>
 
-<ion-content class="ion-padding content-bg" [fullscreen]="true">
+    <div class="actions">
+      <ion-button fill="solid" color="primary" (click)="nuevoItem()">
+        <ion-icon slot="start" name="add-outline"></ion-icon>
+        Nuevo ítem
+      </ion-button>
+    </div>
+  </div>
 
   <!-- Pull to refresh -->
   <ion-refresher slot="fixed" (ionRefresh)="load($event)">
@@ -80,47 +83,50 @@
     <ion-button (click)="nuevoItem()">Nuevo ítem</ion-button>
   </div>
 
-  <!-- Grid de tarjetas -->
+  <!-- Grid -->
   <ion-grid fixed *ngIf="!loading && filtered().length">
     <ion-row>
-      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let item of filtered()">
-        <ion-card class="inv-card hover" [ngClass]="stockState(item)">
-          <ion-card-header class="inv-header">
-            <div class="icon">
-              <ion-icon [name]="iconForState(item)"></ion-icon>
-            </div>
+      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let item of filtered(); let i = index">
 
-            <div class="title-wrap">
-              <ion-card-title class="name">{{ item.nombreItem }}</ion-card-title>
-              <ion-chip class="cat">
-                <ion-icon name="pricetag-outline"></ion-icon>
-                <ion-label>{{ item.categoria || '—' }}</ion-label>
-              </ion-chip>
-            </div>
+        <div class="card-wrap">
+          <!-- Punto de color / icono -->
+          <div class="card-badge" [ngClass]="'color-' + ((i % 4) + 1)">
+            <ion-icon [name]="iconForState(item)"></ion-icon>
+          </div>
 
-          </ion-card-header>
-
-          <ion-card-content>
-            <div class="qty-row">
-              <div class="qty">
-                <span class="k">Cantidad</span>
-                <span class="v">{{ item.cantidad }}</span>
+          <ion-card class="inv-card hover" [ngClass]="stockState(item)">
+            <ion-card-header class="inv-header">
+              <div class="title-wrap">
+                <ion-card-title class="name">{{ item.nombreItem }}</ion-card-title>
+                <ion-chip class="cat">
+                  <ion-icon name="pricetag-outline"></ion-icon>
+                  <ion-label>{{ item.categoria || '—' }}</ion-label>
+                </ion-chip>
               </div>
-              <div class="last">
-                <ion-icon name="time-outline"></ion-icon>
-                <span>{{ item.fechaActualizacion }}</span>
-              </div>
-            </div>
+            </ion-card-header>
 
-            <!-- Barra de stock (relativa al máximo observado) -->
-            <div class="bar-wrap">
-              <div class="bar">
-                <div class="fill" [style.width.%]="stockPercent(item)"></div>
+            <ion-card-content>
+              <div class="qty-row">
+                <div class="qty">
+                  <span class="k">Cantidad</span>
+                  <span class="v">{{ item.cantidad }}</span>
+                </div>
+                <div class="last">
+                  <ion-icon name="time-outline"></ion-icon>
+                  <span>{{ item.fechaActualizacion }}</span>
+                </div>
               </div>
-              <span class="percent">{{ stockPercent(item) }}%</span>
-            </div>
-          </ion-card-content>
-        </ion-card>
+
+              <div class="bar-wrap">
+                <div class="bar">
+                  <div class="fill" [style.width.%]="stockPercent(item)"></div>
+                </div>
+                <span class="percent">{{ stockPercent(item) }}%</span>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </div>
+
       </ion-col>
     </ion-row>
   </ion-grid>

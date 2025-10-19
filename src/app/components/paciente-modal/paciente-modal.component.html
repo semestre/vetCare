@@ -6,7 +6,7 @@
     </ion-buttons>
   </ion-toolbar>
 
-  
+
 </ion-header>
 
 <ion-content class="ion-padding">
@@ -37,8 +37,12 @@
     </ion-item>
 
     <ion-item>
-      <ion-label position="floating">ID del Propietario</ion-label>
-      <ion-input type="number" [(ngModel)]="paciente.idPropietario" name="idPropietario"></ion-input>
+      <ion-label>ID del Propietario</ion-label>
+      <ion-select [(ngModel)]="paciente.idPropietario" name="idPropietario" placeholder="Selecciona un propietario">
+        <ion-select-option *ngFor="let p of propietarios" [value]="p.idPropietario">
+          {{ p.idPropietario }} - {{ p.nombre }}
+        </ion-select-option>
+      </ion-select>
     </ion-item>
 
     <ion-footer class="ion-padding-top">

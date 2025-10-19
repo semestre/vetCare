@@ -65,7 +65,6 @@ export class ControlAccesoModalComponent {
           color: 'success',
           icon: 'checkmark-circle-outline'
         })).present();
-        // No asumimos que el backend regrese el objeto; avisamos a la lista que recargue
         this.modalCtrl.dismiss(true, 'created');
       },
       error: async (err) => {

@@ -14,15 +14,22 @@
     <ion-list inset="true" class="group">
       <ion-item>
         <ion-icon name="paw-outline" slot="start"></ion-icon>
-        <ion-input type="number" label="ID Paciente" labelPlacement="stacked" formControlName="idPaciente"></ion-input>
+        <ion-label position="stacked">Paciente</ion-label>
+        <ion-select formControlName="idPaciente" placeholder="Selecciona un paciente">
+          <ion-select-option *ngFor="let p of pacientes" [value]="p.idPaciente">
+            {{ p.idPaciente }} - {{ p.nombreMascota }}
+          </ion-select-option>
+        </ion-select>
       </ion-item>
+
       <ion-note color="danger" *ngIf="form.get('idPaciente')?.touched && form.get('idPaciente')?.invalid">
-        El ID de paciente es obligatorio.
+        Ingresa un paciente válido.
       </ion-note>
 
       <ion-item>
         <ion-icon name="medkit-outline" slot="start"></ion-icon>
-        <ion-textarea label="Servicios" labelPlacement="stacked" auto-grow="true" placeholder="Consulta, cirugía, etc." formControlName="servicios"></ion-textarea>
+        <ion-textarea label="Servicios" labelPlacement="stacked" auto-grow="true" placeholder="Consulta, cirugía, etc."
+          formControlName="servicios"></ion-textarea>
       </ion-item>
       <ion-note color="danger" *ngIf="form.get('servicios')?.touched && form.get('servicios')?.invalid">
         Escribe al menos 3 caracteres.
@@ -30,14 +37,16 @@
 
       <ion-item>
         <ion-icon name="flask-outline" slot="start"></ion-icon>
-        <ion-textarea label="Medicamentos" labelPlacement="stacked" auto-grow="true" placeholder="Vacunas, anestesia, etc." formControlName="medicamentos"></ion-textarea>
+        <ion-textarea label="Medicamentos" labelPlacement="stacked" auto-grow="true"
+          placeholder="Vacunas, anestesia, etc." formControlName="medicamentos"></ion-textarea>
       </ion-item>
     </ion-list>
 
     <ion-list inset="true" class="group">
       <ion-item>
         <ion-icon name="pricetag-outline" slot="start"></ion-icon>
-        <ion-input type="number" step="0.01" inputmode="decimal" label="Total" labelPlacement="stacked" formControlName="total"></ion-input>
+        <ion-input type="number" step="0.01" inputmode="decimal" label="Total" labelPlacement="stacked"
+          formControlName="total"></ion-input>
       </ion-item>
       <ion-note color="danger" *ngIf="form.get('total')?.touched && form.get('total')?.invalid">
         Ingresa un monto válido.

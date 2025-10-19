@@ -16,12 +16,11 @@ export class ControlAccesoService {
   getAllUsuarios(): Observable<ControlAcceso[]> {
     return this.http.get<ControlAcceso[]>(`${this.apiURL}/getAll`);
   }
-
   
 createUsuario(usuario: ControlAcceso): Observable<{ msg: string }> {
     // 1) Armamos el JSON que el backend convierte a objeto ControlAcceso
     const json = JSON.stringify({
-      idUsuario: 0, // que lo asigne el backend
+      idUsuario: 0, 
       nombreUsuario: usuario.nombreUsuario,
       password: usuario.password,
       rol: usuario.rol

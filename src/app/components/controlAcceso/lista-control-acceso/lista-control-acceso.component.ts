@@ -123,11 +123,14 @@ export class ListaControlAccesoComponent implements OnInit {
     return (name?.trim()?.charAt(0) || '?').toUpperCase();
   }
 
-  roleClass(rol: string | undefined) {
-    const r = (rol || '').toLowerCase();
-    if (r.includes('admin')) return 'role-admin';
-    if (r.includes('vet')) return 'role-vet';
-    if (r.includes('asis')) return 'role-asistente';
-    return 'role-generic';
-  }
+  roleEmoji(rol?: string): string {
+  const r = (rol || '').toLowerCase().trim();
+
+  if (r.includes('admin')) return '👑';       // Administrador
+  if (r.includes('vet')) return '🐾';         // Veterinario
+  if (r.includes('asis')) return '🧑‍💼';      // Asistente (también podrías usar 🧑‍⚕️)
+
+  return ''; // fallback
+}
+
 }
