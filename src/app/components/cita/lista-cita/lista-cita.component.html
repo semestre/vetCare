@@ -1,31 +1,42 @@
-<ion-header class="header-gradient">
+<ion-header class="header-white no-translucent">
   <ion-toolbar color="transparent">
-    <ion-title class="title">
-      <ion-icon name="paw-outline" aria-hidden="true"></ion-icon>
-      Citas de Veterinaria
-    </ion-title>
+    <div class="header-row">
+      <ion-title class="title">
+        <ion-icon name="paw-outline" aria-hidden="true"></ion-icon>
+        Citas de Veterinaria
+      </ion-title>
 
-    <!-- 👉 Botón para abrir el modal -->
-    <ion-buttons slot="end">
-      <ion-button fill="solid" color="light" (click)="nuevaCita()">
+      <ion-searchbar
+        placeholder="Buscar por motivo, fecha, vet, paciente..."
+        (ionInput)="onSearchChange($event)"
+        show-clear-button="focus"
+        animated="true">
+      </ion-searchbar>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding content-bg">
+
+  <!-- 🎛️ Controles (Filtros + Nueva cita) -->
+  <div class="controls container">
+    <div class="filters">
+      <ion-segment value="todos" mode="md"
+                   (ionChange)="onSearchChange({ detail: { value: ($event.detail.value==='todos' ? '' : $event.detail.value) } })">
+        <ion-segment-button value="todos"><ion-label>All</ion-label></ion-segment-button>
+        <ion-segment-button value="started"><ion-label>Started</ion-label></ion-segment-button>
+        <ion-segment-button value="approval"><ion-label>Approval</ion-label></ion-segment-button>
+        <ion-segment-button value="completed"><ion-label>Completed</ion-label></ion-segment-button>
+      </ion-segment>
+    </div>
+
+    <div class="actions">
+      <ion-button fill="solid" color="primary" (click)="nuevaCita()">
         <ion-icon slot="start" name="add-outline"></ion-icon>
         Nueva cita
       </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-
-  <div class="subheader">
-    <ion-searchbar
-      placeholder="Buscar por motivo, fecha, vet, paciente..."
-      (ionInput)="onSearchChange($event)"
-      show-clear-button="focus"
-      animated="true">
-    </ion-searchbar>
+    </div>
   </div>
-</ion-header>
-
-
-<ion-content [fullscreen]="true" class="ion-padding content-bg">
 
   <!-- Skeleton de carga -->
   <ng-container *ngIf="loading">
@@ -73,63 +84,53 @@
   <!-- Grid de tarjetas -->
   <ion-grid fixed *ngIf="!loading && filteredCitas().length">
     <ion-row>
-      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let cita of filteredCitas()">
-        <ion-card class="card glass hover">
-          <ion-card-header>
-            <div class="header-row">
-              <div class="chips">
-                <ion-chip color="light">
-                  <ion-icon name="calendar-outline"></ion-icon>
-                  <ion-label>{{ cita.fecha }}</ion-label>
-                </ion-chip>
-                <ion-chip color="light">
-                  <ion-icon name="time-outline"></ion-icon>
-                  <ion-label>{{ cita.hora }}</ion-label>
-                </ion-chip>
-              </div>
-            </div>
+      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let cita of filteredCitas(); let i = index">
 
-            <ion-card-title class="motivo">
-              <ion-icon name="medkit-outline"></ion-icon>
-              {{ cita.motivo }}
-            </ion-card-title>
-            <ion-card-subtitle class="ids">
-              <ion-chip class="soft">
-                <ion-icon name="person-outline"></ion-icon>
-                <ion-label>Vet #{{ cita.idVeterinario }}</ion-label>
-              </ion-chip>
-              <ion-chip class="soft">
+        <div class="card-wrap">
+          <!-- Circulito color + icono -->
+          <div class="card-badge" [ngClass]="'color-' + ((i % 4) + 1)">
+            <ion-icon name="medkit-outline"></ion-icon>
+          </div>
+
+          <ion-card class="card glass hover">
+            <ion-card-header>
+              <ion-card-title class="motivo">
                 <ion-icon name="paw-outline"></ion-icon>
-                <ion-label>Paciente #{{ cita.idPaciente }} {{ cita.pacienteNombre }}</ion-label>
-              </ion-chip>
-            </ion-card-subtitle>
-          </ion-card-header>
+                {{ cita.motivo }}
+              </ion-card-title>
 
-          <ion-card-content>
-            <div class="meta">
-              <div class="meta-item">
-                <span class="meta-k">Fecha</span>
-                <span class="meta-v">{{ cita.fecha }}</span>
+              <ion-card-subtitle class="ids">
+                <ion-chip class="soft">
+                  <ion-icon name="person-outline"></ion-icon>
+                  <ion-label>Vet #{{ cita.idVeterinario }}</ion-label>
+                </ion-chip>
+                <ion-chip class="soft">
+                  <ion-icon name="paw-outline"></ion-icon>
+                  <ion-label>Paciente #{{ cita.idPaciente }} {{ cita.pacienteNombre }}</ion-label>
+                </ion-chip>
+              </ion-card-subtitle>
+            </ion-card-header>
+
+            <ion-card-content>
+              <div class="meta">
+                <div class="meta-item">
+                  <span class="meta-k">Fecha: </span>
+                  <span class="meta-v">{{ cita.fecha }}</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-k">Hora: </span>
+                  <span class="meta-v">{{ cita.hora }}</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-k">Motivo: </span>
+                  <span class="meta-v">{{ cita.motivo }}</span>
+                </div>
               </div>
-              <div class="meta-item">
-                <span class="meta-k">Hora</span>
-                <span class="meta-v">{{ cita.hora }}</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-k">Motivo</span>
-                <span class="meta-v">{{ cita.motivo }}</span>
-              </div>
-            </div>
-          </ion-card-content>
-        </ion-card>
+            </ion-card-content>
+          </ion-card>
+        </div>
+
       </ion-col>
     </ion-row>
   </ion-grid>
-
-  <!-- Botón flotante -->
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="nuevaCita()">
-      <ion-icon name="add-outline"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
 </ion-content>

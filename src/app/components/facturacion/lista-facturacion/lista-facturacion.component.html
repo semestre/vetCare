@@ -1,43 +1,50 @@
-<ion-header class="header-gradient-alt">
+<!-- HEADER: sólo título + buscador -->
+<ion-header class="header-white">
   <ion-toolbar color="transparent">
-    <ion-title class="title">
-      <ion-icon name="receipt-outline" aria-hidden="true"></ion-icon>
-      Lista de Facturas
-    </ion-title>
-    <ion-buttons slot="end">
-      <ion-button fill="solid" color="light" (click)="nuevoRegistro()">
+    <div class="header-row">
+      <ion-title class="title">
+        <ion-icon name="receipt-outline" aria-hidden="true"></ion-icon>
+        Lista de Facturas
+      </ion-title>
+
+      <ion-searchbar
+        placeholder="Buscar por #Factura, paciente, servicio, método..."
+        [(ngModel)]="searchTerm"
+        show-clear-button="focus"
+        animated="true">
+      </ion-searchbar>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<!-- CONTENIDO -->
+<ion-content class="ion-padding content-bg" [fullscreen]="true">
+  <!-- 🎛️ Filtros + botón (ahora FUERA del header) -->
+  <div class="controls container">
+    <div class="filters">
+      <ion-segment [(ngModel)]="metodo" value="Todos" mode="md">
+        <ion-segment-button value="Todos">
+          <ion-label>Todos</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="Efectivo">
+          <ion-label>Efectivo</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="Tarjeta">
+          <ion-label>Tarjeta</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="Transferencia">
+          <ion-label>Transferencia</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </div>
+
+    <div class="actions">
+      <ion-button fill="solid" color="primary" (click)="nuevoRegistro()">
         <ion-icon slot="start" name="add-outline"></ion-icon>
         Nueva factura
       </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-
-  <div class="subheader">
-    <ion-searchbar
-      placeholder="Buscar por #Factura, paciente, servicio, método..."
-      [(ngModel)]="searchTerm"
-      show-clear-button="focus"
-      animated="true">
-    </ion-searchbar>
-
-    <ion-segment [(ngModel)]="metodo" value="Todos" mode="md">
-      <ion-segment-button value="Todos">
-        <ion-label>Todos</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="Efectivo">
-        <ion-label>Efectivo</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="Tarjeta">
-        <ion-label>Tarjeta</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="Transferencia">
-        <ion-label>Transferencia</ion-label>
-      </ion-segment-button>
-    </ion-segment>
+    </div>
   </div>
-</ion-header>
-
-<ion-content class="ion-padding content-bg" [fullscreen]="true">
 
   <!-- Pull to refresh -->
   <ion-refresher slot="fixed" (ionRefresh)="load($event)">
@@ -89,52 +96,53 @@
   <!-- Grid -->
   <ion-grid fixed *ngIf="!loading && filtered.length">
     <ion-row>
-      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let factura of filtered">
-        <ion-card class="ticket hover">
-          <div class="ticket-edge top"></div>
+      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let factura of filtered; let i = index">
+        <div class="ticket-wrap">
+          <div class="ticket-badge" [ngClass]="'color-' + ((i % 4) + 1)">
+            <ion-icon [name]="iconForMetodo(factura.metodoPago)"></ion-icon>
+          </div>
 
-          <ion-card-header class="ticket-head">
-            <div class="left">
-              <div class="k">Factura</div>
-              <div class="v">#{{ factura.idFactura }}</div>
-            </div>
-            <div class="right">
-              <ion-chip class="mp" [ngClass]="badgeClass(factura.metodoPago)">
-                <ion-icon [name]="iconForMetodo(factura.metodoPago)"></ion-icon>
-                <ion-label>{{ factura.metodoPago || '—' }}</ion-label>
-              </ion-chip>
-            </div>
-          </ion-card-header>
+          <ion-card class="ticket hover">
+            <div class="ticket-edge top"></div>
+            <ion-card-header class="ticket-head">
+              <div class="left">
+                <div class="k">Factura</div>
+                <div class="v">#{{ factura.idFactura }}</div>
+              </div>
+              <div class="right">
+                <ion-chip class="mp" [ngClass]="badgeClass(factura.metodoPago)">
+                  <ion-icon [name]="iconForMetodo(factura.metodoPago)"></ion-icon>
+                  <ion-label>{{ factura.metodoPago || '—' }}</ion-label>
+                </ion-chip>
+              </div>
+            </ion-card-header>
 
-          <ion-card-content>
-            <div class="row dotted">
-              <span class="k">Paciente</span>
-              <span class="v">#{{ factura.idPaciente }} {{ factura.pacienteNombre }}</span>
-            </div>
+            <ion-card-content>
+              <div class="row dotted">
+                <span class="k">Paciente</span>
+                <span class="v">#{{ factura.idPaciente }} {{ factura.pacienteNombre }}</span>
+              </div>
+              <div class="row">
+                <span class="k">Servicios</span>
+                <span class="v">{{ factura.servicios || '—' }}</span>
+              </div>
+              <div class="row">
+                <span class="k">Medicamentos</span>
+                <span class="v">{{ factura.medicamentos || '—' }}</span>
+              </div>
+              <div class="row">
+                <span class="k">Fecha</span>
+                <span class="v">{{ factura.fecha }}</span>
+              </div>
+              <div class="total">
+                <span>Total</span>
+                <strong>${{ factura.total | number:'1.2-2' }}</strong>
+              </div>
+            </ion-card-content>
 
-            <div class="row">
-              <span class="k">Servicios</span>
-              <span class="v">{{ factura.servicios || '—' }}</span>
-            </div>
-
-            <div class="row">
-              <span class="k">Medicamentos</span>
-              <span class="v">{{ factura.medicamentos || '—' }}</span>
-            </div>
-
-            <div class="row">
-              <span class="k">Fecha</span>
-              <span class="v">{{ factura.fecha }}</span>
-            </div>
-
-            <div class="total">
-              <span>Total</span>
-              <strong>${{ factura.total | number:'1.2-2' }}</strong>
-            </div>
-          </ion-card-content>
-
-          <div class="ticket-edge bottom"></div>
-        </ion-card>
+            <div class="ticket-edge bottom"></div>
+          </ion-card>
+        </div>
       </ion-col>
     </ion-row>
   </ion-grid>

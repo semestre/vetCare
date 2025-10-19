@@ -1,25 +1,41 @@
-<ion-header class="header-gradient">
+<ion-header class="header-white">
   <ion-toolbar color="transparent">
-    <ion-title class="title">
-      <ion-icon name="shield-checkmark-outline" aria-hidden="true"></ion-icon>
-      Control de Acceso
-    </ion-title>
+    <div class="header-row">
+      <!-- Título como en Citas -->
+      <ion-title class="title">
+        <ion-icon name="shield-checkmark-outline" aria-hidden="true"></ion-icon>
+        Usuarios
+      </ion-title>
 
-    <ion-buttons slot="end">
-      <ion-button fill="solid" color="light" (click)="nuevoUsuario()">
+      <!-- Buscador píldora en el header -->
+      <ion-searchbar
+        placeholder="Buscar por nombre, rol o ID..."
+        [(ngModel)]="searchTerm"
+        show-clear-button="focus"
+        animated="true">
+      </ion-searchbar>
+    </div>
+  </ion-toolbar>
+
+  <!-- Filtros + botón (misma franja de Citas) -->
+  <div class="controls container">
+    <div class="filters">
+      <!-- Si no usas este ngModel en TS no pasa nada; puedes leerlo después -->
+      <ion-segment [(ngModel)]="rol" value="Todos" mode="md">
+        <ion-segment-button value="Todos"><ion-label>Todos</ion-label></ion-segment-button>
+        <ion-segment-button value="Administrador"><ion-label>Administrador</ion-label></ion-segment-button>
+        <ion-segment-button value="Veterinario"><ion-label>Veterinario</ion-label></ion-segment-button>
+        <ion-segment-button value="Recepcionista"><ion-label>Asistente</ion-label></ion-segment-button>
+      </ion-segment>
+
+    </div>
+
+    <div class="actions">
+      <ion-button fill="solid" color="primary" (click)="nuevoUsuario()">
         <ion-icon slot="start" name="add-outline"></ion-icon>
         Nuevo usuario
       </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-
-  <div class="subheader">
-    <ion-searchbar
-      placeholder="Buscar por nombre, rol o ID..."
-      [(ngModel)]="searchTerm"
-      show-clear-button="focus"
-      animated="true">
-    </ion-searchbar>
+    </div>
   </div>
 </ion-header>
 
@@ -91,11 +107,11 @@
           <ion-card-content>
             <div class="meta">
               <div class="meta-item">
-                <span class="meta-k">ID</span>
+                <span class="meta-k">ID:</span>
                 <span class="meta-v">#{{ user.idUsuario }}</span>
               </div>
               <div class="meta-item">
-                <span class="meta-k">Contraseña</span>
+                <span class="meta-k">Contraseña:</span>
                 <span class="meta-v">#{{ user.password }}</span>
               </div>
             </div>
