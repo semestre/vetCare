@@ -15,29 +15,26 @@ export class InventarioService {
   }
 
   // POST /inventario/save -> @FormParam("inventario") Inventario inventario
-  createItem(item: Inventario): Observable<{ msg: string }> {
-  const payload: Inventario = {
+createItem(item: Inventario): Observable<{ msg: string }> {
+  const json = JSON.stringify({
     idItem: 0,
     nombreItem: String(item.nombreItem),
     cantidad: Number(item.cantidad),
     categoria: String(item.categoria ?? ''),
     fechaActualizacion: String(item.fechaActualizacion)
-  };
+  });
 
-  // 🔹 Generar el body EXACTO que Postman envía
-  const formBody = new URLSearchParams();
-  formBody.set('inventario', JSON.stringify(payload));
+  // ✅ Igual que en Usuarios: HttpParams de Angular
+  const body = new HttpParams().set('inventario', json);
 
-  return this.http.post<{ msg: string }>(
-    `${this.apiURL}/save`,
-    formBody.toString(),
-    {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }),
-      responseType: 'json' as const
-    }
-  );
+  // ✅ Headers mínimos, sin charset ni responseType extra
+  const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
+
+  console.log('POST URL =>', `${this.apiURL}/save`);
+  console.log('FORM (HttpParams).toString() =>', body.toString()); // debe ser inventario={...}
+
+  return this.http.post<{ msg: string }>(`${this.apiURL}/save`, body.toString(), { headers });
 }
+
 
 }

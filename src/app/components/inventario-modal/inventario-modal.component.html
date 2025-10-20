@@ -10,7 +10,7 @@
 </ion-header>
 
 <ion-content class="sheet-content" [fullscreen]="true">
-  <form [formGroup]="form" (ngSubmit)="save()" class="form-body" novalidate>
+  <form [formGroup]="form" class="form-body" novalidate>
     <ion-list inset="true" class="group">
       <ion-item>
         <ion-icon name="cube-outline" slot="start"></ion-icon>
@@ -31,11 +31,10 @@
       <ion-item>
         <ion-icon name="pricetag-outline" slot="start"></ion-icon>
         <ion-select label="Categoría" labelPlacement="stacked" formControlName="categoria" interface="popover">
-          <ion-select-option value="Medicamento">Medicamento</ion-select-option>
-          <ion-select-option value="Material quirúrgico">Material quirúrgico</ion-select-option>
-          <ion-select-option value="Alimento">Alimento</ion-select-option>
-          <ion-select-option value="Higiene">Higiene</ion-select-option>
-          <ion-select-option value="Otro">Otro</ion-select-option>
+          <ion-select-option value="medicina">Medicamento</ion-select-option>
+          <ion-select-option value="material medico">Material quirúrgico</ion-select-option>
+          <ion-select-option value="medicina">Higiene</ion-select-option>
+          <ion-select-option value="medicina">Otro</ion-select-option>
         </ion-select>
       </ion-item>
 
