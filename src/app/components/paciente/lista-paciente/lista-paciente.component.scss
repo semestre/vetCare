@@ -1,122 +1,172 @@
-:host {
-  --brand-start: #6dd5ed; /* azul suave */
-  --brand-end:   #22c1c3; /* turquesa */
-  --paper: #ffffff;
-  --ink: #0f172a;
-  --line: #e7f3f7;
-  --shadow: 0 14px 30px rgba(34, 193, 195, 0.16);
-  --shadow-hover: 0 18px 46px rgba(34, 193, 195, 0.24);
+/* =========================
+   LISTA DE PACIENTES – SCSS
+   (mismos nombres y lógica)
+========================= */
+
+/* Header blanco y buscador redondeado */
+.vc-header-white{
+  margin-top:55px;
+  background:#fff !important;
+  box-shadow:0 2px 8px rgba(15,23,42,.06);
+  border-bottom:1px solid rgba(0,0,0,.05);
+  z-index:10;
+}
+.vc-header-row{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:16px; padding:8px 16px;
+}
+.vc-title{
+  display:flex; align-items:center; gap:.5rem; font-weight:700; color:#1e293b;
+}
+.vc-title ion-icon{ color:#2193b0; font-size:1.4rem; }
+
+.vc-header-white ion-searchbar{
+  flex:1; max-width:560px; height:48px;
+  --background:#fff; --color:#0f172a; --placeholder-color:#64748b; --icon-color:#64748b;
+}
+.vc-header-white ion-searchbar::part(container){
+  border-radius:999px; border:1px solid rgba(226,232,240,.9);
+  box-shadow:0 4px 12px rgba(2,6,23,.08); background:#fff; padding-inline:12px;
+}
+:host ::ng-deep ion-searchbar .searchbar-input-container,
+:host ::ng-deep ion-searchbar .searchbar-input{ border-radius:999px !important; }
+
+/* Fondo de contenido */
+.vc-content-bg{ --background:linear-gradient(180deg,#f7fbff 0%,#fff 100%); }
+.content-bg{ --background:linear-gradient(180deg,#f7fbff 0%,#fff 100%); }
+
+/* ===============================
+   Barra de controles (FUERA header)
+   Distribución horizontal limpia
+================================ */
+.vc-controls{
+  display:flex; align-items:stretch; justify-content:space-between;
+  gap:12px; margin:12px 8px 20px;
 }
 
-.header-gradient {
-  margin-top: 2.8%;
+/* filtros ocupan ancho disponible */
+.vc-controls .filters{
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Segment como barra fluida */
+.vc-controls .filters ion-segment{
+  display:flex;            /* fuerza layout horizontal */
+  width:100%;
+  padding:6px;
+  border-radius:999px;
+  background:#f3f7fb;
+  overflow:hidden;         /* sin scroll en desktop */
+  column-gap:8px;
+}
+
+/* Botones repartidos uniformemente en desktop */
+.vc-controls .filters ion-segment-button{
+  flex: 1 1 0;
+  min-width: 0;
   --background: transparent;
-  background: linear-gradient(135deg, var(--brand-start), var(--brand-end));
-  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.25);
+  --background-checked:#ffffff;
+  --color:#0f172a;
+  --color-checked:#0f172a;
+  --indicator-box-shadow:none;
+  border-radius:999px;
+  text-transform:uppercase;
+  letter-spacing:.5px;
 }
 
-.title {
-  display: flex; gap: .5rem; align-items: center; color: #fff; font-weight: 800;
-  ion-icon { font-size: 1.3rem; }
+/* Botón “Nuevo paciente” */
+.vc-controls .actions{
+  display:flex; align-items:center; justify-content:flex-end;
+}
+.vc-controls .actions ion-button{
+  --border-radius:9999px; --box-shadow:none;
+  --background:#3b82f6; --background-hover:#2563eb; --color:#fff;
+  height:42px; min-width:160px; padding:0 26px; font-weight:700; text-transform:uppercase;
+  display:flex; align-items:center; justify-content:center; line-height:normal;
 }
 
-.subheader {
-  padding: 0 .75rem .75rem .75rem;
-  background: linear-gradient(135deg, var(--brand-start), var(--brand-end));
+/* —— Responsivo —— */
+/* En móvil: filtros con scroll horizontal y “píldoras” cómodas */
+@media (max-width: 768px){
+  .vc-controls{ flex-direction:column; align-items:stretch; gap:10px; }
+
+  .vc-controls .filters ion-segment{
+    overflow-x:auto;                 /* scroll horizontal */
+    scrollbar-width:none;            /* Firefox */
+  }
+  .vc-controls .filters ion-segment::-webkit-scrollbar{ display:none; }
+
+  .vc-controls .filters ion-segment-button{
+    flex: 0 0 auto;                  /* tamaño natural */
+    min-width: 110px;                /* píldoras cómodas */
+  }
 }
 
-.content-bg { --background: linear-gradient(180deg, #f7fbff 0%, #ffffff 100%); }
-
-/* Card */
-.pet-card {
-  border-radius: 20px;
-  overflow: hidden;
-  background: var(--paper);
-  color: var(--ink);
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow);
-  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
-  position: relative;
+/* ===============================
+   Cards + badge circular
+================================ */
+.vc-card-wrap{ position:relative; }
+.vc-card-badge{
+  --badge-color:#3b82f6;
+  position:absolute; top:-14px; left:14px; width:42px; height:42px; border-radius:50%;
+  background:var(--badge-color); display:grid; place-items:center; color:#fff;
+  border:3px solid #fff; box-shadow:0 6px 12px rgba(2,6,23,.15); z-index:3;
 }
-.pet-card.hover:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-hover);
-  border-color: #cfeef2;
-}
+.vc-card-badge ion-icon{ font-size:18px; color:#fff; }
+.vc-card-badge.v1{ --badge-color:#ec4899; }
+.vc-card-badge.v2{ --badge-color:#10b981; }
+.vc-card-badge.v3{ --badge-color:#3b82f6; }
+.vc-card-badge.v4{ --badge-color:#f59e0b; }
 
-.pet-header {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: .8rem;
-  padding-right: .4rem;
+.vc-card{
+  position:relative; overflow:visible; padding-top:20px; border-radius:20px;
+  background:#fff; border:1px solid rgba(226,232,240,.8);
+  box-shadow:0 10px 25px rgba(0,0,0,.08);
+  transition: transform .2s ease, box-shadow .2s ease;
 }
-
-.pet-avatar {
-  width: 52px; height: 52px;
-  border-radius: 14px;
-  display: grid; place-items: center;
-  font-size: 24px;
-  background: radial-gradient(120% 120% at 0% 0%, #e7fbff 0%, #def6ff 100%);
-  border: 1px solid #d8eef5;
+.vc-card.hover:hover{
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 15px 40px rgba(33,147,176,.25);
 }
 
-.title-wrap { display: grid; gap: .3rem; }
-.name { font-weight: 800; color: #0b172f; }
-
-.badges { display: flex; flex-wrap: wrap; gap: .35rem; }
-.chip.soft {
-  --background: #eefaff;
-  --color: #275f73;
-  border: 1px solid #d7ecf5;
-  border-radius: 999px;
+/* Pacientes – tarjeta */
+.pet-header{
+  display:flex; align-items:center; gap:12px; padding-top:.5rem;
 }
-.chip.age {
-  --background: #f0fff4;
-  --color: #1e7f4b;
-  border: 1px solid #cff6df;
+.pet-avatar{
+  width:48px; height:48px; border-radius:50%; display:grid; place-items:center;
+  font-size:22px; font-weight:600; color:#fff;
+  background:linear-gradient(135deg,#6dd5ed,#2193b0);
+  box-shadow:0 6px 16px rgba(33,147,176,.25);
 }
+.pet-avatar.sk{ background:#e9eef6; color:transparent; }
 
-.meta {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: .75rem;
-  margin: .25rem 0;
-  @media (max-width: 520px) { grid-template-columns: 1fr; }
+.title-wrap{ flex:1; min-width:0; }
+
+.name{ font-weight:600; color:#2b5f72; font-size:1.1rem; }
+.vc-motivo ion-icon{ color:#2193b0; }
+
+.badges{ display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.25rem; }
+.badges ion-chip{ --background:#f4f7fb; --color:#2f3b52; border-radius:14px; }
+
+/* Meta */
+.meta{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:.75rem; margin-top:.5rem; }
+.meta-item{ background:#f9fbff; border:1px solid #e6edf5; border-radius:14px; padding:.7rem .9rem; }
+.meta-k{ font-size:.75rem; color:#66788a; }
+.meta-v{ font-weight:600; color:#1f2a44; }
+
+/* Historial */
+.history{
+  margin-top:1rem; background:#f9fbff; border:1px solid #e6edf5;
+  border-radius:14px; padding:.8rem .9rem;
 }
+.history-text{ font-size:.9rem; color:#1f2a44; margin-top:.3rem; line-height:1.4; }
 
-.meta-item {
-  background: #f9fdff;
-  border: 1px solid #e6f3fb;
-  border-radius: 14px;
-  padding: .7rem .9rem;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.03);
-}
+/* Estados */
+.vc-empty{ text-align:center; padding:2rem 1rem; }
+.error-card{ border-left:4px solid #eb445a; }
 
-.meta-k {
-  display: block;
-  font-size: .75rem;
-  color: #678;
-  margin-bottom: .15rem;
-}
-.meta-v {
-  font-weight: 700;
-  color: #1f2a44;
-}
-
-.history { margin-top: .4rem; }
-.history-text {
-  margin: .25rem 0 0;
-  color: #18324f;
-  line-height: 1.35;
-  display: -webkit-box;            /* truncado elegante */
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.empty { text-align: center; padding: 2.5rem 1rem; }
-.empty .emoji { font-size: 3rem; margin-bottom: .5rem; }
-.error-card { border-left: 4px solid #eb445a; }
-
-.sk-lines { display: grid; gap: .35rem; }
+/* Skeleton */
+.pet-card.sk{ position:relative; }
+.sk-lines{ display:grid; gap:6px; }

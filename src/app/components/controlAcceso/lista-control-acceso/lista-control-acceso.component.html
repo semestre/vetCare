@@ -1,29 +1,43 @@
-<ion-header class="header-gradient">
+<!-- HEADER SOLO TÍTULO + BUSCADOR -->
+<ion-header class="header-white">
   <ion-toolbar color="transparent">
-    <ion-title class="title">
-      <ion-icon name="shield-checkmark-outline" aria-hidden="true"></ion-icon>
-      Control de Acceso
-    </ion-title>
+    <div class="header-row">
+      <ion-title class="title">
+        <ion-icon name="shield-checkmark-outline" aria-hidden="true"></ion-icon>
+        Usuarios
+      </ion-title>
 
-    <ion-buttons slot="end">
-      <ion-button fill="solid" color="light" (click)="nuevoUsuario()">
+      <ion-searchbar
+        placeholder="Buscar por nombre, rol o ID..."
+        [(ngModel)]="searchTerm"
+        show-clear-button="focus"
+        animated="true">
+      </ion-searchbar>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<!-- CONTENIDO -->
+<ion-content class="ion-padding content-bg" [fullscreen]="true">
+
+  <!-- 🎛️ Filtros + botón (fuera del header, igual que Citas y Facturas) -->
+  <div class="controls container">
+    <div class="filters">
+      <ion-segment [(ngModel)]="rol" value="Todos" mode="md">
+        <ion-segment-button value="Todos"><ion-label>Todos</ion-label></ion-segment-button>
+        <ion-segment-button value="Administrador"><ion-label>Administrador</ion-label></ion-segment-button>
+        <ion-segment-button value="Veterinario"><ion-label>Veterinario</ion-label></ion-segment-button>
+        <ion-segment-button value="Asistente"><ion-label>Asistente</ion-label></ion-segment-button>
+      </ion-segment>
+    </div>
+
+    <div class="actions">
+      <ion-button fill="solid" color="primary" (click)="nuevoUsuario()">
         <ion-icon slot="start" name="add-outline"></ion-icon>
         Nuevo usuario
       </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-
-  <div class="subheader">
-    <ion-searchbar
-      placeholder="Buscar por nombre, rol o ID..."
-      [(ngModel)]="searchTerm"
-      show-clear-button="focus"
-      animated="true">
-    </ion-searchbar>
+    </div>
   </div>
-</ion-header>
-
-<ion-content class="ion-padding content-bg" [fullscreen]="true">
 
   <!-- Pull to refresh -->
   <ion-refresher slot="fixed" (ionRefresh)="load($event)">
@@ -72,36 +86,45 @@
     <ion-button (click)="nuevoUsuario()">Nuevo usuario</ion-button>
   </div>
 
-  <!-- Grid de tarjetas -->
+  <!-- Grid -->
   <ion-grid fixed *ngIf="!loading && filteredUsuarios.length">
     <ion-row>
-      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let user of filteredUsuarios">
-        <ion-card class="card glass hover">
-          <ion-card-header class="card-header">
-            <div class="avatar">{{ initial(user.nombreUsuario) }}</div>
-            <div class="title-wrap">
-              <ion-card-title class="name">{{ user.nombreUsuario }}</ion-card-title>
-              <div class="role-badge" [ngClass]="roleClass(user.rol)">
-                <ion-icon name="ribbon-outline"></ion-icon>
-                <span>{{ user.rol }}</span>
-              </div>
-            </div>
-          </ion-card-header>
+      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let user of filteredUsuarios; let i = index">
+        <div class="card-wrap">
+          <div class="card-badge" [ngClass]="'color-' + ((i % 4) + 1)">
+            <ion-icon name="person-outline"></ion-icon>
+          </div>
 
-          <ion-card-content>
-            <div class="meta">
-              <div class="meta-item">
-                <span class="meta-k">ID</span>
-                <span class="meta-v">#{{ user.idUsuario }}</span>
+          <ion-card class="card glass hover">
+            <ion-card-header class="card-header">
+              <div class="avatar" [attr.aria-label]="user.rol || 'usuario'">
+                  {{ roleEmoji(user.rol) || initial(user.nombreUsuario) }}
+                </div>
+              
+              <div class="title-wrap">
+                <ion-card-title class="name">{{ user.nombreUsuario }}</ion-card-title>
+              
+
               </div>
-              <div class="meta-item">
-                <span class="meta-k">Contraseña</span>
-                <span class="meta-v">#{{ user.password }}</span>
+            </ion-card-header>
+
+            <ion-card-content>
+              <div class="meta">
+                <div class="meta-item">
+                  <span class="meta-k">ID:</span>
+                  <span class="meta-v">#{{ user.idUsuario }}</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-k">Contraseña:</span>
+                  <span class="meta-v">#{{ user.password }}</span>
+                </div>
               </div>
-            </div>
-            <div class="note">Por seguridad no se muestran contraseñas en texto plano.</div>
-          </ion-card-content>
-        </ion-card>
+              <div class="note">
+                Por seguridad no se muestran contraseñas en texto plano.
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </div>
       </ion-col>
     </ion-row>
   </ion-grid>

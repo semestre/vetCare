@@ -1,47 +1,139 @@
-.sheet-header {
-  --background: #ffffff;
+:host {
+  color-scheme: only light; /* fuerza modo claro para todo el componente */
+}
+
+/* ===== Tarjeta del diálogo centrado ===== */
+.dialog {
+  width: min(720px, 92vw);
+  max-height: 90vh;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25);
+  display: grid;
+  grid-template-rows: auto 1fr auto; /* header / body (scroll) / footer */
+  overflow: hidden;
+  border: 1px solid rgba(226, 232, 240, .8);
+
+  /* normaliza variables Ionic dentro del modal */
+  --ion-background-color: #ffffff;
+  --ion-text-color: #0f172a;
+}
+
+/* ===== Header ===== */
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+.dialog-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* ===== Body con scroll ===== */
+.dialog-body {
+  overflow: auto;
+  padding: 14px 14px 8px;
+}
+
+/* ===== Footer ===== */
+.dialog-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #ffffff;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+.dialog-footer ion-button {
+  --border-radius: 9999px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.dialog-footer ion-button[color="medium"] {
+  --background: transparent;
+  --color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+/* ===== Listas y campos (evita el fondo oscuro) ===== */
+.dialog ion-list {
+  background: transparent !important;
+  padding: 0;
+  margin: 0 0 10px 0;
+}
+
+/* Estilo “tarjetita” a cada ion-item */
+.dialog ion-item {
+  --background: #f9fbff;                 /* fondo claro */
+  --color: #0f172a;                      /* texto */
+  --border-color: #e6edf5;               /* borde suave */
+  --inner-border-width: 0;               /* quita borde interno */
+  --padding-start: 12px;
+  --inner-padding-end: 12px;
+  margin: 10px 0;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.02);
+}
+.dialog ion-item::part(native) {
+  border: 1px solid #e6edf5;
+  border-radius: 14px;                   /* redondeado real */
+  overflow: hidden;
+}
+
+/* Inputs y selects: colores y placeholders */
+.dialog ion-input,
+.dialog ion-textarea,
+.dialog ion-select {
   --color: #0f172a;
-  border-bottom: 1px solid #eef2f7;
+  --placeholder-color: #64748b;
+  --highlight-color-focused: #3b82f6;    /* focus azul */
+  --highlight-color-valid: #3b82f6;
+  --highlight-color-invalid: #ef4444;
 }
 
-.sheet-content {
-  --background: #f5f8fc;
+/* Label apilada (stacked) */
+.dialog ion-input::part(label),
+.dialog ion-textarea::part(label),
+.dialog ion-select::part(label) {
+  color: #6b7280;
+  font-weight: 600;
 }
 
-.form-body {
-  padding: 12px 12px 0;
-}
-
-.group {
-  background: #fff !important;
-  border-radius: 14px;
-  margin: 12px 0;
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
-  border: 1px solid #eef2f7;
-}
-
-ion-item {
-  --background: #fff;
-  --color: #0f172a;
-  --highlight-color-focused: #2193b0;
-  border-radius: 12px;
-  margin: 2px 8px;
-}
-
-ion-item ion-icon {
+/* Iconos al inicio del item */
+.dialog ion-item ion-icon[slot="start"] {
   color: #2193b0;
+  margin-inline-end: 8px;
 }
 
-ion-note {
-  margin: 0 16px 8px;
+/* Notas de error */
+.dialog ion-note[color="danger"] {
+  margin: 4px 2px 0 2px;
+  font-size: 12px;
 }
 
-.sheet-footer {
-  --background: #ffffff;
-  border-top: 1px solid #eef2f7;
-  padding-bottom: max(env(safe-area-inset-bottom), 8px);
+/* Ajustes varios del formulario */
+.form-body .group { margin-bottom: 8px; }
+.bottom-space { height: 6px; }
+
+/* Scrollbar sutil en el body */
+.dialog-body::-webkit-scrollbar { width: 8px; }
+.dialog-body::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+  border-radius: 8px;
 }
 
-.bottom-space {
-  height: 72px; /* deja espacio para el footer fijo */
+/* Responsive */
+@media (max-width: 420px) {
+  .dialog {
+    width: 96vw;
+    max-height: 92vh;
+    border-radius: 14px;
+  }
 }

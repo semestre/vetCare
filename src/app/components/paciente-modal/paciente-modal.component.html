@@ -1,55 +1,97 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Nuevo Paciente</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="cerrar()">Cerrar</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
+<!-- Diálogo centrado (sin ion-header/footer para evitar “sheet”) -->
+<div class="dialog">
 
+  <!-- Header -->
+  <div class="dialog-header">
+    <h2>Nuevo Paciente</h2>
+    <ion-button (click)="cerrar()" fill="clear" aria-label="Cerrar" size="small">
+      <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+    </ion-button>
+  </div>
 
-</ion-header>
+  <!-- Body (scrollable) -->
+  <div class="dialog-body">
+    <form (ngSubmit)="guardar()" novalidate>
 
-<ion-content class="ion-padding">
-  <form (ngSubmit)="guardar()">
-    <ion-item>
-      <ion-label position="floating">Nombre de la mascota</ion-label>
-      <ion-input [(ngModel)]="paciente.nombreMascota" name="nombreMascota" required></ion-input>
-    </ion-item>
+      <ion-item>
+        <ion-icon name="paw-outline" slot="start"></ion-icon>
+        <ion-input
+          label="Nombre de la mascota"
+          labelPlacement="stacked"
+          [(ngModel)]="paciente.nombreMascota"
+          name="nombreMascota"
+          required>
+        </ion-input>
+      </ion-item>
 
-    <ion-item>
-      <ion-label position="floating">Especie</ion-label>
-      <ion-input [(ngModel)]="paciente.especie" name="especie" required></ion-input>
-    </ion-item>
+      <ion-item>
+        <ion-icon name="shapes-outline" slot="start"></ion-icon>
+        <ion-input
+          label="Especie"
+          labelPlacement="stacked"
+          [(ngModel)]="paciente.especie"
+          name="especie"
+          required>
+        </ion-input>
+      </ion-item>
 
-    <ion-item>
-      <ion-label position="floating">Raza</ion-label>
-      <ion-input [(ngModel)]="paciente.raza" name="raza"></ion-input>
-    </ion-item>
+      <ion-item>
+        <ion-icon name="id-card-outline" slot="start"></ion-icon>
+        <ion-input
+          label="Raza"
+          labelPlacement="stacked"
+          [(ngModel)]="paciente.raza"
+          name="raza">
+        </ion-input>
+      </ion-item>
 
-    <ion-item>
-      <ion-label position="floating">Edad</ion-label>
-      <ion-input type="number" [(ngModel)]="paciente.edad" name="edad"></ion-input>
-    </ion-item>
+      <ion-item>
+        <ion-icon name="time-outline" slot="start"></ion-icon>
+        <ion-input
+          type="number"
+          label="Edad"
+          labelPlacement="stacked"
+          [(ngModel)]="paciente.edad"
+          name="edad">
+        </ion-input>
+      </ion-item>
 
-    <ion-item>
-      <ion-label position="floating">Historial Médico</ion-label>
-      <ion-textarea [(ngModel)]="paciente.historialMedico" name="historialMedico"></ion-textarea>
-    </ion-item>
+      <ion-item>
+        <ion-icon name="document-text-outline" slot="start"></ion-icon>
+        <ion-textarea
+          label="Historial Médico"
+          labelPlacement="stacked"
+          [(ngModel)]="paciente.historialMedico"
+          name="historialMedico"
+          auto-grow="true">
+        </ion-textarea>
+      </ion-item>
 
-    <ion-item>
-      <ion-label>ID del Propietario</ion-label>
-      <ion-select [(ngModel)]="paciente.idPropietario" name="idPropietario" placeholder="Selecciona un propietario">
-        <ion-select-option *ngFor="let p of propietarios" [value]="p.idPropietario">
-          {{ p.idPropietario }} - {{ p.nombre }}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
+      <ion-item>
+        <ion-icon name="person-outline" slot="start"></ion-icon>
+        <ion-select
+          label="ID del Propietario"
+          labelPlacement="stacked"
+          [(ngModel)]="paciente.idPropietario"
+          name="idPropietario"
+          placeholder="Selecciona un propietario">
+          <ion-select-option *ngFor="let p of propietarios" [value]="p.idPropietario">
+            {{ p.idPropietario }} - {{ p.nombre }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
 
-    <ion-footer class="ion-padding-top">
-      <ion-button expand="block" type="submit" [disabled]="cargando">
-        <ion-spinner *ngIf="cargando" name="crescent"></ion-spinner>
-        <span *ngIf="!cargando">Guardar Paciente</span>
-      </ion-button>
-    </ion-footer>
-  </form>
-</ion-content>
+    </form>
+  </div>
+
+  <!-- Footer fijo (acciones) -->
+  <div class="dialog-footer">
+    <ion-button fill="outline" color="medium" (click)="cerrar()">Cancelar</ion-button>
+
+    <ion-button expand="block" type="submit" (click)="guardar()" [disabled]="cargando">
+      <ion-spinner *ngIf="cargando" name="crescent"></ion-spinner>
+      <span *ngIf="!cargando">Guardar Paciente</span>
+    </ion-button>
+  </div>
+
+</div>

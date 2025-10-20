@@ -1,97 +1,326 @@
+/* =======================================================
+   PROPIETARIOS – SCSS (mismos nombres, diseño unificado)
+   Nota: si ya importaste un ui-kit global, este archivo
+   es suficiente. Si no, incluye las secciones necesarias
+   para header, controles y tarjetas.
+======================================================= */
+
+/* ===== Forzamos modo claro en esta vista ===== */
 :host {
-  --amber-start: #fbbf24; /* amber */
-  --amber-end:   #f59e0b; /* darker amber */
-  --paper: #ffffff;
-  --ink: #0f172a;
-  --line: #f6efe3;
-  --shadow: 0 14px 30px rgba(245, 158, 11, 0.15);
-  --shadow-hover: 0 18px 46px rgba(245, 158, 11, 0.22);
+  color-scheme: only light;
 }
 
-.header-gradient-amber {
-  margin-top: 55px;
-  --background: transparent;
-  background: linear-gradient(135deg, var(--amber-start), var(--amber-end));
-  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.25);
+/* =======================================================
+   HEADER BLANCO + BUSCADOR REDONDEADO
+======================================================= */
+.vc-header-white {
+  margin-top: 55px; /* altura del header exterior si lo hubiera */
+  background: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  z-index: 10;
 }
 
-.title {
-  display: flex; gap: .5rem; align-items: center; color: #fff; font-weight: 800;
-  ion-icon { font-size: 1.3rem; }
+.vc-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 16px;
 }
 
-.subheader {
-  padding: 0 .75rem .75rem .75rem;
-  background: linear-gradient(135deg, var(--amber-start), var(--amber-end));
+.vc-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+.vc-title ion-icon {
+  color: #2193b0;
+  font-size: 1.4rem;
 }
 
-.content-bg { --background: linear-gradient(180deg, #fffbf3 0%, #ffffff 100%); }
+/* Searchbar redondeada */
+.vc-header-white ion-searchbar {
+  flex: 1;
+  max-width: 560px;
+  height: 48px;
+  --background: #ffffff;
+  --color: #0f172a;
+  --placeholder-color: #64748b;
+  --icon-color: #64748b;
+  border: none;
+}
+.vc-header-white ion-searchbar::part(container) {
+  border-radius: 999px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 4px 12px rgba(2, 6, 23, 0.08);
+  background: #ffffff;
+  padding-inline: 12px;
+}
+/* algunos temas requieren forzar el radio interno */
+:host ::ng-deep ion-searchbar .searchbar-input-container,
+:host ::ng-deep ion-searchbar .searchbar-input {
+  border-radius: 999px !important;
+}
 
-/* Card */
-.owner-card {
-  border-radius: 20px;
-  overflow: hidden;
-  background: var(--paper);
-  color: var(--ink);
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow);
-  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+/* =======================================================
+   CONTENIDO + CONTROLES
+======================================================= */
+.vc-content-bg {
+  --background: linear-gradient(180deg, #f7fbff 0%, #ffffff 100%);
+}
+
+.vc-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 8px 20px;
+}
+
+.vc-controls ion-segment {
+  background: #f3f7fb;
+  border-radius: 999px;
+  padding: 4px;
+}
+.vc-controls ion-segment-button {
+  --color: #0f172a;
+  --background-checked: #ffffff;
+  border-radius: 999px;
+}
+
+/* Botón principal consistente */
+.vc-controls .actions ion-button {
+  --border-radius: 9999px;
+  --box-shadow: none;
+  --background: #3b82f6;
+  --background-hover: #2563eb;
+  --color: #ffffff;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+
+  height: 42px;
+  padding: 0 26px;
+  min-width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: normal;
+}
+
+/* =======================================================
+   TARJETAS CON BADGE CIRCULAR
+======================================================= */
+.vc-card-wrap {
   position: relative;
 }
-.owner-card.hover:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-hover);
-  border-color: #fdecc9;
+
+.vc-card-badge {
+  --badge-color: #4f46e5;
+  position: absolute;
+  top: -14px;
+  left: 14px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--badge-color);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  border: 3px solid #fff;
+  box-shadow: 0 6px 12px rgba(2, 6, 23, 0.15);
+  z-index: 3;
+}
+.vc-card-badge ion-icon {
+  font-size: 18px;
+  color: #fff;
+}
+.vc-card-badge.v1 { --badge-color: #ec4899; } /* rosa */
+.vc-card-badge.v2 { --badge-color: #10b981; } /* verde */
+.vc-card-badge.v3 { --badge-color: #3b82f6; } /* azul */
+.vc-card-badge.v4 { --badge-color: #f59e0b; } /* ámbar */
+
+.vc-card {
+  position: relative;
+  overflow: visible;
+  padding-top: 20px;
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.vc-card.hover:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 15px 40px rgba(33, 147, 176, 0.25);
 }
 
+/* Tarjeta de error con acento */
+.vc-error {
+  border-left: 4px solid #eb445a;
+}
+
+/* Estados vacíos */
+.vc-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+.empty { /* compat: mantienes tu clase original */
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+/* =======================================================
+   ESTILOS ESPECÍFICOS DE PROPIETARIOS
+======================================================= */
 .owner-header {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
+  display: flex;
   align-items: center;
-  gap: .8rem;
-  padding-right: .4rem;
+  gap: 12px;
+  padding-top: 0.5rem;
 }
 
 .avatar {
-  width: 48px; height: 48px; border-radius: 12px;
-  display: grid; place-items: center; font-weight: 800; color: #5b3a00;
-  background: radial-gradient(120% 120% at 0% 0%, #fff4e1 0%, #ffe8bf 100%);
-  border: 1px solid #ffe0a6;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #6dd5ed, #2193b0);
+  box-shadow: 0 6px 16px rgba(33, 147, 176, 0.25);
 }
-.avatar.sk { background: #f5efe5; border: 0; }
+.avatar.sk {
+  background: #e9eef6;
+  color: transparent;
+}
 
-.title-wrap { display: grid; gap: .25rem; }
-.name { font-weight: 800; color: #0b172f; }
+.title-wrap {
+  flex: 1;
+  min-width: 0;
+}
 
-.badges { display: flex; flex-wrap: wrap; gap: .35rem; }
+.name,
+.owner-name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #2b5f72;
+  font-weight: 600;
+}
+.vc-motivo ion-icon {
+  color: #2193b0;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+}
+.badges a {
+  text-decoration: none;
+}
+
+/* Chips suaves consistentes (manteniendo tus clases .chip, .id, .tel) */
+ion-chip.vc-soft,
 .chip {
-  border-radius: 999px;
-  width: fit-content;
-}
-.chip.id {
-  --background: #fffaf0;
-  --color: #7a4b05;
-  border: 1px solid #fdecc9;
-}
-.chip.tel {
-  --background: #fff5f0;
-  --color: #7a2f05;
-  border: 1px solid #ffd9cc;
-}
-
-.addr {
-  display: flex; align-items: center; gap: .45rem;
-  color: #27364d;
-  background: #fffaf4;
-  border: 1px solid #fdebd7;
+  --background: #f4f7fb;
+  --color: #2f3b52;
   border-radius: 14px;
-  padding: .65rem .8rem;
 }
-.addr ion-icon { color: #b45309; }
 
-/* Empty & error */
-.empty { text-align: center; padding: 2.5rem 1rem; }
-.empty .emoji { font-size: 3rem; margin-bottom: .5rem; }
-.error-card { border-left: 4px solid #eb445a; }
+/* Dirección */
+.addr {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+.addr ion-icon {
+  color: #64748b;
+  margin-top: 0.15rem;
+}
 
-.sk-lines { display: grid; gap: .35rem; }
+/* Meta (contenedor de campos) reutiliza el patrón base */
+.vc-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+.vc-meta-item {
+  background: #f9fbff;
+  border: 1px solid #e6edf5;
+  border-radius: 14px;
+  padding: 0.7rem 0.9rem;
+}
+.vc-meta .k {
+  font-size: 0.75rem;
+  color: #66788a;
+}
+.vc-meta .v {
+  font-weight: 600;
+  color: #1f2a44;
+}
+
+/* =======================================================
+   SKELETON (compat con tus clases .sk)
+======================================================= */
+.owner-card.sk,
+.owner-card .sk {
+  position: relative;
+}
+.sk-lines {
+  display: grid;
+  gap: 6px;
+}
+
+/* =======================================================
+   PEQUEÑOS AJUSTES RESPONSIVOS
+======================================================= */
+@media (max-width: 768px) {
+  .vc-header-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .vc-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .vc-controls .actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+/* =======================================================
+   COMPATIBILIDAD CON TUS CLASES ANTERIORES
+   (no cambia nombres; sólo añade estilos consistentes)
+======================================================= */
+.content-bg {
+  --background: linear-gradient(180deg, #f7fbff 0%, #ffffff 100%);
+}
+
+.owner-card {
+  /* asegura que las owner-card reciban el look general */
+  border-radius: 20px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  overflow: visible;
+  padding-top: 18px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.owner-card.hover:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 15px 40px rgba(33, 147, 176, 0.25);
+}
+
+.error-card {
+  border-left: 4px solid #eb445a;
+}

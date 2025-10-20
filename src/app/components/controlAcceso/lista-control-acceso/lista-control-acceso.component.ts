@@ -16,20 +16,33 @@ import { ControlAccesoModalComponent } from '../../control-acceso-modal/control-
 export class ListaControlAccesoComponent implements OnInit {
   private controlAccesoService = inject(ControlAccesoService);
   private toast = inject(ToastController);
-  private modalCtrl = inject(ModalController); // por si después abres modal de crear
+  private modalCtrl = inject(ModalController);
 
   usuarios: ControlAcceso[] = [];
   fallback: ControlAcceso[] = [
-    { idUsuario: 1, nombreUsuario: 'admin',        password: '••••', rol: 'Administrador' },
-    { idUsuario: 2, nombreUsuario: 'veterinario01', password: '••••', rol: 'Veterinario' }
+    { idUsuario: 1, nombreUsuario: 'admin', password: '••••', rol: 'Administrador' },
+    { idUsuario: 2, nombreUsuario: 'veterinario01', password: '••••', rol: 'Veterinario' },
   ];
 
-  // ui state
   loading = true;
   error: string | null = null;
 
-  // search
-  searchTerm = '';
+  // setters para búsqueda y filtros
+  private _searchTerm = '';
+  get searchTerm() { return this._searchTerm; }
+  set searchTerm(v: string) {
+    this._searchTerm = (v || '').trim();
+    this.applyFilters();
+  }
+
+  private _rol: string = 'Todos';
+  get rol() { return this._rol; }
+  set rol(v: string) {
+    this._rol = v || 'Todos';
+    this.applyFilters();
+  }
+
+  filteredUsuarios: ControlAcceso[] = [];
 
   ngOnInit(): void {
     this.load();
@@ -41,19 +54,17 @@ export class ListaControlAccesoComponent implements OnInit {
 
     this.controlAccesoService.getAllUsuarios().subscribe({
       next: (data) => {
-        // Enmascaro password si viene del backend
-        this.usuarios = (Array.isArray(data) ? data : []).map(u => ({
-          ...u,
-
-        }));
+        this.usuarios = (Array.isArray(data) ? data : []).map(u => ({ ...u }));
         if (!this.usuarios.length) this.usuarios = this.fallback;
+        this.applyFilters();
         this.loading = false;
         event?.detail.complete();
       },
       error: async (err) => {
         console.error('Error al cargar los usuarios:', err);
         this.error = 'No se pudieron cargar los usuarios.';
-        this.usuarios = this.fallback; // mostramos algo para no dejar vacío
+        this.usuarios = this.fallback;
+        this.applyFilters();
         this.loading = false;
         event?.detail.complete();
         (await this.toast.create({
@@ -65,41 +76,62 @@ export class ListaControlAccesoComponent implements OnInit {
     });
   }
 
-  get filteredUsuarios(): ControlAcceso[] {
-    const q = this.searchTerm.trim().toLowerCase();
-    if (!q) return this.usuarios;
-    return this.usuarios.filter(u =>
-      String(u.idUsuario).includes(q) ||
-      (u.nombreUsuario ?? '').toLowerCase().includes(q) ||
-      (u.rol ?? '').toLowerCase().includes(q)
-    );
+  private normalize(t: any): string {
+    return (t ?? '').toString().toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
   }
+
+  applyFilters(): void {
+  const term = this.normalize(this.searchTerm);
+  const rolSel = this.normalize(this.rol);
+
+  this.filteredUsuarios = (this.usuarios || []).filter(u => {
+    const rolUser = this.normalize(u.rol);
+
+    // ✅ Rol: acepta igualdad o coincidencia parcial (por si hay variantes)
+    const matchRol = rolSel === this.normalize('Todos')
+      ? true
+      : (rolUser === rolSel || rolUser.includes(rolSel));
+
+    // ✅ Texto: busca en id, nombre y rol
+    const matchTexto =
+      !term ||
+      this.normalize(u.nombreUsuario).includes(term) ||
+      rolUser.includes(term) ||
+      this.normalize(u.idUsuario).includes(term);
+
+    return matchRol && matchTexto;
+  });
+}
+
   async nuevoUsuario() {
     const modal = await this.modalCtrl.create({
       component: ControlAccesoModalComponent,
-      breakpoints: [0, 0.6, 1],
-      initialBreakpoint: 0.6,
-      cssClass: 'rounded-modal'
+      cssClass: 'center-modal',     // 👈 importante
+      mode: 'md',                   // estilo tipo diálogo
+      backdropDismiss: false,       // evita que se cierre tocando fuera
+      animated: true
     });
 
     await modal.present();
 
     const { role } = await modal.onDidDismiss();
     if (role === 'created') {
-      this.load(); 
+      this.load();
     }
   }
 
-  // util para inicial del avatar
   initial(name: string) {
     return (name?.trim()?.charAt(0) || '?').toUpperCase();
   }
 
-  roleClass(rol: string | undefined) {
-    const r = (rol || '').toLowerCase();
-    if (r.includes('admin')) return 'role-admin';
-    if (r.includes('vet'))   return 'role-vet';
-    if (r.includes('recep')) return 'role-recep';
-    return 'role-generic';
-  }
+  roleEmoji(rol?: string): string {
+  const r = (rol || '').toLowerCase().trim();
+
+  if (r.includes('admin')) return '👑';       // Administrador
+  if (r.includes('vet')) return '🐾';         // Veterinario
+  if (r.includes('asis')) return '🧑‍💼';      // Asistente (también podrías usar 🧑‍⚕️)
+
+  return ''; // fallback
+}
+
 }

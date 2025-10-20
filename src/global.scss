@@ -35,3 +35,149 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+
+
+/* ===== Mini-ventana centrada (no bottom-sheet) ===== */
+/* Mini-ventana centrada */
+/* ===== MODAL CENTRADO TIPO DIÁLOGO (completo y claro) ===== */
+ion-modal.center-modal {
+  color-scheme: only light;              /* fuerza modo claro */
+  --width: min(640px, 92vw);
+  --max-width: 92vw;
+  --height: auto;
+  --max-height: 90vh;                    /* límite de alto visible */
+  --border-radius: 18px;
+  --background: #ffffff;
+  --box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25);
+  --backdrop-opacity: 0.35;
+  --offset-top: auto;
+  --offset-bottom: auto;
+}
+
+ion-modal.center-modal::part(content) {
+  border-radius: 18px;
+  /* CLAVE: el modal interno se comporta como columna para header/content/footer */
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;                      /* evita recortes */
+  overflow: hidden;                      /* el scroll va en ion-content */
+}
+
+ion-modal.center-modal::part(backdrop) {
+  background: #0b1324;
+  opacity: var(--backdrop-opacity);
+}
+
+/* ===== HAZ QUE EL CONTENIDO CREZCA Y TENGA SCROLL ===== */
+.center-modal ion-header,
+.center-modal ion-footer {
+  flex: 0 0 auto;                        /* no colapsan */
+}
+.center-modal ion-content {
+  flex: 1 1 auto;                        /* ocupa el resto del alto */
+  min-height: 0;                         /* evita “aplastamiento” de flexbox */
+  overflow-y: auto;                      /* scroll interno si hace falta */
+}
+
+/* ===== HEADER y FOOTER CLAROS ===== */
+.center-modal ion-toolbar {
+  --background: #ffffff !important;
+  --color: #0f172a !important;
+  --border-color: rgba(0, 0, 0, 0.08);
+  color: #0f172a !important;
+}
+
+/* bordes finos */
+.center-modal .sheet-header ion-toolbar { border-bottom: 1px solid rgba(0,0,0,0.08); }
+.center-modal .sheet-footer ion-toolbar { border-top:    1px solid rgba(0,0,0,0.08); }
+
+/* ===== Botones ===== */
+.center-modal .sheet-footer ion-button {
+  --border-radius: 9999px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.center-modal .sheet-footer ion-button[color="medium"] {
+  --background: transparent;
+  --color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+/* ===== Padding del contenido ===== */
+.center-modal .sheet-content {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 12px;
+  --padding-bottom: 16px;
+}
+.center-modal .form-body .group { margin-bottom: 10px; }
+.center-modal .bottom-space { height: 12px; }
+
+/* Scrollbar sutil (opcional) */
+.center-modal ion-content::-webkit-scrollbar { width: 6px; }
+.center-modal ion-content::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+  border-radius: 8px;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  ion-modal.center-modal {
+    --width: 96vw;
+    --max-height: 92vh;
+    --border-radius: 12px;
+  }
+}
+
+ion-modal.center-modal {
+  --background: transparent;   /* el .dialog pinta su fondo */
+  --box-shadow: none;
+  --backdrop-opacity: .35;
+  --width: auto;
+  --height: auto;
+  --offset-top: auto;
+  --offset-bottom: auto;
+}
+ion-modal.center-modal::part(content) {
+  display: grid;
+  place-items: center;         /* centra el .dialog */
+  max-height: 100vh;
+  padding: 16px;               /* respiración */
+}
+ion-modal.center-modal::part(backdrop) {
+  background: #0b1324;
+  opacity: var(--backdrop-opacity);
+}
+
+
+/* ===== Overlay de modal centrado (sin handle y sin recortes) ===== */
+ion-modal.center-modal {
+  --background: transparent;          /* el fondo lo pone .dialog */
+  --box-shadow: none;
+  --backdrop-opacity: .35;
+  --width: auto;                       /* tamaño lo maneja .dialog */
+  --height: auto;
+  --offset-top: auto;
+  --offset-bottom: auto;
+}
+
+ion-modal.center-modal::part(content){
+  /* CLAVE: centro perfecto y el contenedor ocupa toda la viewport */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100dvh;                      /* usa dvh para móviles */
+  padding: 16px;                       /* respiración alrededor */
+  overflow: hidden;                    /* nada se sale del overlay */
+}
+
+/* 🔧 Elimina la barrita de “sheet” */
+ion-modal.center-modal::part(handle){
+  display: none !important;
+}
+
+ion-modal.center-modal::part(backdrop){
+  background: #0b1324;
+  opacity: var(--backdrop-opacity);
+}

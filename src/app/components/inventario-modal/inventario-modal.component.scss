@@ -1,32 +1,73 @@
-.sheet-header {
-  --background: #ffffff;
-  --color: #0f172a;
-  border-bottom: 1px solid #e6f0ea;
-}
-.sheet-content { --background: #f4fbf7; }
-.form-body { padding: 12px 12px 0; }
+:host { color-scheme: only light; }
 
-.group {
-  background: #fff !important;
-  border-radius: 14px;
-  margin: 12px 0;
-  box-shadow: 0 6px 18px rgba(5, 150, 105, 0.06);
-  border: 1px solid #e6f0ea;
+/* Tarjeta del diálogo */
+.dialog{
+  width: min(560px, 92vw);
+  max-height: min(90vh, 92dvh);
+  background:#ffffff;
+  border-radius:20px;
+  box-shadow:0 20px 60px rgba(15,23,42,.25);
+  border:1px solid rgba(226,232,240,.8);
+  display:grid;
+  grid-template-rows:auto 1fr auto;   /* header / body (scroll) / footer */
+  overflow:hidden;
 }
 
-ion-item {
-  --background: #fff;
-  --color: #0f172a;
-  --highlight-color-focused: #059669; /* verde */
-  border-radius: 12px;
-  margin: 2px 8px;
+/* Header */
+.dialog-header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 16px;
+  background:#fff;
+  border-bottom:1px solid rgba(0,0,0,.08);
 }
-ion-item ion-icon { color: #059669; }
-ion-note { margin: 0 16px 8px; }
+.dialog-header h2{
+  margin:0; font-size:18px; font-weight:700; color:#0f172a;
+}
 
-.sheet-footer {
-  --background: #ffffff;
-  border-top: 1px solid #e6f0ea;
-  padding-bottom: max(env(safe-area-inset-bottom), 8px);
+/* Body con scroll */
+.dialog-body{
+  min-height:0;          /* evita aplastamiento */
+  overflow:auto;         /* scroll interno */
+  padding:14px;
 }
-.bottom-space { height: 72px; }
+
+/* Footer */
+.dialog-footer{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:10px 14px;
+  background:#fff; border-top:1px solid rgba(0,0,0,.08);
+}
+.dialog-footer ion-button{ --border-radius:9999px; text-transform:uppercase; font-weight:600; }
+.dialog-footer ion-button[color="medium"]{ --background:transparent; --color:#475569; border:1px solid #cbd5e1; }
+
+/* Campos claros y compactos */
+.dialog ion-list{ background:transparent !important; padding:0; margin:0 0 10px 0; }
+.dialog ion-item{
+  --background:#f9fbff; --color:#0f172a; --border-color:#e6edf5; --inner-border-width:0;
+  --padding-start:12px; --inner-padding-end:12px;
+  margin:10px 0;
+}
+.dialog ion-item::part(native){ border:1px solid #e6edf5; border-radius:14px; overflow:hidden; }
+.dialog ion-input, .dialog ion-select{
+  --color:#0f172a; --placeholder-color:#64748b;
+  --highlight-color-focused:#3b82f6; --highlight-color-valid:#3b82f6; --highlight-color-invalid:#ef4444;
+}
+.dialog ion-input::part(label), .dialog ion-select::part(label){
+  color:#6b7280; font-weight:600;
+}
+.dialog ion-item ion-icon[slot="start"]{ color:#2193b0; margin-inline-end:8px; }
+
+/* Notas de error */
+.dialog ion-note[color="danger"]{ margin:4px 2px 0 2px; font-size:12px; }
+
+/* Detalles */
+.form-body .group{ margin-bottom:10px; }
+.bottom-space{ height:6px; }
+
+/* Scrollbar sutil */
+.dialog-body::-webkit-scrollbar{ width:8px; }
+.dialog-body::-webkit-scrollbar-thumb{ background:rgba(0,0,0,.15); border-radius:8px; }
+
+@media (max-width: 420px){
+  .dialog{ width:96vw; max-height:min(92vh,94dvh); border-radius:14px; }
+}

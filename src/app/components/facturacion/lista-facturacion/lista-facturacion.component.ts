@@ -110,9 +110,10 @@ export class ListaFacturacionComponent implements OnInit {
   async nuevoRegistro() {
     const modal = await this.modalCtrl.create({
       component: FacturacionModalComponent,
-      breakpoints: [0, 0.6, 1],
-      initialBreakpoint: 0.6,
-      cssClass: 'rounded-modal'
+      cssClass: 'center-modal',     // 👈 importante
+      mode: 'md',                   // estilo tipo diálogo
+      backdropDismiss: false,       // evita que se cierre tocando fuera
+    animated: true
     });
     await modal.present();
 

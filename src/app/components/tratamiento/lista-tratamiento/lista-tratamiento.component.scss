@@ -1,119 +1,164 @@
-:host {
-  /* paleta cálida distinta a otras pantallas */
-  --warn-start: #fbbf24; /* amber */
-  --warn-end:   #fb923c; /* orange */
-  --paper: #ffffff;
-  --ink: #0f172a;
-  --line: #ffe9cf;
-  --shadow: 0 14px 30px rgba(251, 146, 60, 0.16);
-  --shadow-hover: 0 18px 46px rgba(251, 146, 60, 0.24);
+/* ===========================================
+   TRATAMIENTOS – Diseño unificado (vc-*)
+   Manteniendo tus clases y bindings
+=========================================== */
+
+/* Header blanco + buscador redondeado */
+.vc-header-white{
+  margin-top:55px;
+  background:#fff !important;
+  box-shadow:0 2px 8px rgba(15,23,42,.06);
+  border-bottom:1px solid rgba(0,0,0,.05);
+  z-index:10;
+}
+.vc-header-row{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:16px; padding:8px 16px;
+}
+.vc-title{ display:flex; align-items:center; gap:.5rem; font-weight:700; color:#1e293b; }
+.vc-title ion-icon{ color:#2193b0; font-size:1.4rem; }
+
+.vc-header-white ion-searchbar{
+  flex:1; max-width:560px; height:48px;
+  --background:#fff; --color:#0f172a; --placeholder-color:#64748b; --icon-color:#64748b;
+}
+.vc-header-white ion-searchbar::part(container){
+  border-radius:999px; border:1px solid rgba(226,232,240,.9);
+  box-shadow:0 4px 12px rgba(2,6,23,.08); background:#fff; padding-inline:12px;
+}
+:host ::ng-deep ion-searchbar .searchbar-input-container,
+:host ::ng-deep ion-searchbar .searchbar-input{ border-radius:999px !important; }
+
+/* Fondo */
+.vc-content-bg{ --background:linear-gradient(180deg,#f7fbff 0%,#fff 100%); }
+.content-bg{ --background:linear-gradient(180deg,#f7fbff 0%,#fff 100%); }
+
+/* ============================
+   Barra de controles inferior
+============================ */
+.vc-controls{
+  display:flex; align-items:stretch; justify-content:space-between;
+  gap:12px; margin:12px 8px 20px;
+}
+.vc-controls .filters{ flex:1 1 auto; min-width:0; }
+
+.vc-controls .filters ion-segment{
+  display:flex; width:100%; padding:6px; border-radius:999px; background:#f3f7fb;
+  overflow:hidden; column-gap:8px;
+}
+.vc-controls .filters ion-segment-button{
+  flex:1 1 0; min-width:0;
+  --background:transparent; --background-checked:#fff;
+  --color:#0f172a; --color-checked:#0f172a; --indicator-box-shadow:none;
+  border-radius:999px; text-transform:uppercase; letter-spacing:.5px;
 }
 
-.header-gradient-warn {
-  margin-top: 55px;
-  --background: transparent;
-  background: linear-gradient(135deg, var(--warn-start), var(--warn-end));
-  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.25);
+.vc-controls .actions{ display:flex; align-items:center; justify-content:flex-end; }
+.vc-controls .actions ion-button{
+  --border-radius:9999px; --box-shadow:none;
+  --background:#3b82f6; --background-hover:#2563eb; --color:#fff;
+  height:42px; min-width:170px; padding:0 26px; font-weight:700; text-transform:uppercase;
+  display:flex; align-items:center; justify-content:center; line-height:normal;
 }
 
-.title {
-  display: flex; gap: .5rem; align-items: center; color: #fff; font-weight: 800;
-  ion-icon { font-size: 1.3rem; }
+/* Responsive: filtros con scroll en móvil */
+@media (max-width:768px){
+  .vc-controls{ flex-direction:column; align-items:stretch; gap:10px; }
+  .vc-controls .filters ion-segment{ overflow-x:auto; scrollbar-width:none; }
+  .vc-controls .filters ion-segment::-webkit-scrollbar{ display:none; }
+  .vc-controls .filters ion-segment-button{ flex:0 0 auto; min-width:120px; }
 }
 
-.subheader {
-  padding: 0 .75rem .75rem .75rem;
-  background: linear-gradient(135deg, var(--warn-start), var(--warn-end));
+/* ============================
+   Cards y badge circular
+============================ */
+/* ===== Círculo superior limpio (usa SOLO el badge) ===== */
+.vc-card-badge{
+  --badge-color:#10b981;                     /* color base (verde) */
+  position:absolute; top:-14px; left:14px;
+  width:42px; height:42px; border-radius:50%;
+  display:grid; place-items:center; color:#fff;
+  background:var(--badge-color);
+  border:2px solid #fff;                     /* borde más fino */
+  box-shadow:0 4px 10px rgba(2,6,23,.10);    /* sombra más suave */
+  z-index:3;
+}
+.vc-card-badge ion-icon{ font-size:18px; color:#fff; }
+
+.vc-card-badge.v1{ --badge-color:#ec4899; }
+.vc-card-badge.v2{ --badge-color:#10b981; }
+.vc-card-badge.v3{ --badge-color:#3b82f6; }
+.vc-card-badge.v4{ --badge-color:#f59e0b; }
+
+/* 🔧 Elimina el círculo de abajo */
+.timeline-dot{ display:none !important; }
+
+/* Si quieres color por estado, lo aplicamos al badge según la clase del card */
+.t-card.past   .vc-card-badge{ --badge-color:#94a3b8; }  /* gris */
+.t-card.today  .vc-card-badge{ --badge-color:#10b981; }  /* verde */
+.t-card.future .vc-card-badge{ --badge-color:#3b82f6; }  /* azul */
+
+
+.vc-card{
+  position:relative; overflow:visible; padding-top:20px; border-radius:20px;
+  background:#fff; border:1px solid rgba(226,232,240,.8);
+  box-shadow:0 10px 25px rgba(0,0,0,.08);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.vc-card.hover:hover{
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 15px 40px rgba(33,147,176,.25);
 }
 
-.content-bg { --background: linear-gradient(180deg, #fff8ef 0%, #ffffff 100%); }
-
-/* Card */
-.t-card {
-  position: relative;
-  border-radius: 20px;
-  overflow: hidden;
-  background: var(--paper);
-  color: var(--ink);
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow);
-  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+/* ============================
+   Tratamientos – tarjeta
+============================ */
+.t-card{ padding-top:18px; }
+.t-header{
+  display:flex; align-items:flex-start; justify-content:space-between;
+  gap:12px; padding-top:.25rem;
 }
-.t-card.hover:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-hover);
-  border-color: #ffd9b5;
+.t-header .left{ display:flex; flex-direction:column; gap:.35rem; }
+.t-header .desc{ color:#1f2a44; font-weight:700; }
+
+.t-header .date{
+  display:flex; align-items:center; gap:.4rem;
+  background:#f9fbff; border:1px solid #e6edf5; border-radius:12px;
+  padding:.4rem .6rem; color:#1f2a44; font-weight:600;
 }
+.t-header .date ion-icon{ color:#64748b; }
 
-.t-header {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: .75rem;
-  align-items: center;
-  padding-right: .6rem;
+/* Chip de tipo */
+ion-chip.tipo{
+  --background:#f4f7fb; --color:#2f3b52; border-radius:14px; font-weight:600;
 }
+ion-chip.tipo.success{ --background:#ecfdf5; --color:#065f46; }   /* ejemplo */
+ion-chip.tipo.warn{ --background:#fff7ed; --color:#9a3412; }
+ion-chip.tipo.info{ --background:#eff6ff; --color:#1e40af; }
 
-.left { display: grid; gap: .35rem; }
-.desc { font-weight: 800; color: #0b172f; }
-
-.date {
-  display: inline-flex; align-items: center; gap: .35rem;
-  color: #7a4d12; background: #fff4e6; border: 1px solid #ffe3c7;
-  border-radius: 999px; padding: .18rem .6rem; font-size: .85rem;
+/* Timeline dot (estado por fecha) */
+.timeline-dot{
+  position:absolute; top:-14px; left:14px; width:42px; height:42px; border-radius:50%;
+  border:3px solid #fff; box-shadow:0 6px 12px rgba(2,6,23,.15); z-index:2;
+  background:#94a3b8; /* default */
 }
-.date ion-icon { color: #e67e22; }
+.timeline-dot.past{ background:#94a3b8; }   /* gris */
+.timeline-dot.today{ background:#10b981; }  /* verde */
+.timeline-dot.future{ background:#3b82f6; } /* azul */
+.timeline-dot.sk{ background:#e9eef6; }
 
-/* Tipo chip (colores por tipo) */
-ion-chip.tipo {
-  --background: #fff7ed;
-  --color: #7a2f05;
-  border-radius: 999px;
-  border: 1px solid #ffe3c7;
-  width: fit-content;
+/* Contenido */
+.rows{ display:grid; grid-template-columns:1fr 1fr; gap:.75rem; margin-top:.5rem; }
+.row{
+  background:#f9fbff; border:1px solid #e6edf5; border-radius:14px; padding:.7rem .9rem;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
 }
-.t-vacuna   { --background: #eafcf1 !important; --color: #176a3a !important; border-color: #c7f0d7 !important; }
-.t-higiene  { --background: #eef6ff !important; --color: #274a7a !important; border-color: #d6e7ff !important; }
-.t-cirugia  { --background: #fff0f0 !important; --color: #8a1b1b !important; border-color: #ffd2d2 !important; }
-.t-despara  { --background: #f5f0ff !important; --color: #4b2e83 !important; border-color: #e3d7ff !important; }
-.t-control  { --background: #f0fff4 !important; --color: #1e7f4b !important; border-color: #cff6df !important; }
-.t-otro     {}
+.k{ font-size:.8rem; color:#66788a; }
+.v{ font-weight:700; color:#1f2a44; }
 
-/* Timeline sutil en el lado izquierdo */
-.timeline-dot {
-  position: absolute; left: 10px; top: 16px;
-  width: 10px; height: 10px; border-radius: 50%;
-  background: #ffd7b0; border: 2px solid #fff; box-shadow: 0 0 0 3px #ffecd1;
-}
-.t-card::after {
-  content: ''; position: absolute; left: 14px; top: 28px; bottom: 12px;
-  width: 2px; background: repeating-linear-gradient(
-    to bottom,
-    #ffe2c5 0, #ffe2c5 6px,
-    transparent 6px, transparent 12px
-  );
-  opacity: .9;
-}
-/* estados por fecha */
-.t-card.pasado  { border-color: #ffe2c5; }
-.t-card.hoy     { border-color: #ffd089; }
-.t-card.proximo { border-color: #ffd089; }
-.timeline-dot.hoy,
-.timeline-dot.proximo { background: #ffb84c; box-shadow: 0 0 0 3px #ffe8c7; }
+/* Estados generales */
+.vc-empty{ text-align:center; padding:2rem 1rem; }
+.vc-error, .error-card{ border-left:4px solid #eb445a; }
 
-/* Rows */
-.rows .row {
-  display: grid;
-  grid-template-columns: 140px 1fr;
-  gap: .75rem;
-  padding: .5rem 0;
-  border-bottom: 1px solid #fff1df;
-}
-.rows .row:last-of-type { border-bottom: none; }
-
-.k { color: #7a6a54; font-size: .85rem; }
-.v { color: #0f172a; font-weight: 700; }
-
-/* Empty & error */
-.empty { text-align: center; padding: 2.5rem 1rem; }
-.empty .emoji { font-size: 3rem; margin-bottom: .5rem; }
-.error-card { border-left: 4px solid #eb445a; }
+/* Skeleton */
+.t-card.sk{ position:relative; }

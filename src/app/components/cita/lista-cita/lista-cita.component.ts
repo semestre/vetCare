@@ -93,9 +93,11 @@ export class ListaCitaComponent implements OnInit {
   async nuevaCita() {
     const modal = await this.modalCtrl.create({
       component: CitaModalComponent,
-      breakpoints: [0, 0.6, 1],
-      initialBreakpoint: 0.6,
-      cssClass: 'rounded-modal'
+      cssClass: 'center-modal',  // clase para estilos de diálogo centrado
+      mode: 'md',                // animación tipo diálogo
+      backdropDismiss: false,    // opcional: bloquear cierre al tocar fondo
+      animated: true 
+            
     });
 
     await modal.present();
