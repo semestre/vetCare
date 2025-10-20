@@ -1,56 +1,71 @@
-<ion-header class="sheet-header">
-  <ion-toolbar color="light">
-    <ion-title>Nuevo propietario</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="close()" fill="clear" aria-label="Cerrar">
-        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<!-- Diálogo centrado (sin ion-header/footer para evitar sheet) -->
+<div class="dialog">
 
-<ion-content class="sheet-content" [fullscreen]="true">
-  <form [formGroup]="form" (ngSubmit)="save()" class="form-body" novalidate>
-    <ion-list inset="true" class="group">
-      <ion-item>
-        <ion-icon name="person-outline" slot="start"></ion-icon>
-        <ion-input label="Nombre" labelPlacement="stacked" formControlName="nombre" placeholder="Juan Pérez"></ion-input>
-      </ion-item>
-      <ion-note color="danger" *ngIf="form.get('nombre')?.touched && form.get('nombre')?.invalid">
-        Mínimo 3 caracteres.
-      </ion-note>
+  <!-- Header -->
+  <div class="dialog-header">
+    <h2>Nuevo propietario</h2>
+    <ion-button (click)="close()" fill="clear" aria-label="Cerrar" size="small">
+      <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+    </ion-button>
+  </div>
 
-      <ion-item>
-        <ion-icon name="call-outline" slot="start"></ion-icon>
-        <ion-input label="Teléfono" labelPlacement="stacked" formControlName="telefono" placeholder="555-1234"></ion-input>
-      </ion-item>
-      <ion-note color="danger" *ngIf="form.get('telefono')?.touched && form.get('telefono')?.invalid">
-        Ingresa un teléfono válido.
-      </ion-note>
+  <!-- Body (scrollable) -->
+  <div class="dialog-body">
+    <form [formGroup]="form" (ngSubmit)="save()" class="form-body" novalidate>
 
-      <ion-item>
-        <ion-icon name="location-outline" slot="start"></ion-icon>
-        <ion-textarea label="Dirección" labelPlacement="stacked" formControlName="direccion" placeholder="Calle y número, ciudad" auto-grow="true"></ion-textarea>
-      </ion-item>
-      <ion-note color="danger" *ngIf="form.get('direccion')?.touched && form.get('direccion')?.invalid">
-        Mínimo 5 caracteres.
-      </ion-note>
-    </ion-list>
+      <ion-list inset="true" class="group">
+        <ion-item>
+          <ion-icon name="person-outline" slot="start"></ion-icon>
+          <ion-input
+            label="Nombre"
+            labelPlacement="stacked"
+            formControlName="nombre"
+            placeholder="Juan Pérez">
+          </ion-input>
+        </ion-item>
+        <ion-note color="danger" *ngIf="form.get('nombre')?.touched && form.get('nombre')?.invalid">
+          Mínimo 3 caracteres.
+        </ion-note>
 
-    <div class="bottom-space"></div>
-  </form>
-</ion-content>
+        <ion-item>
+          <ion-icon name="call-outline" slot="start"></ion-icon>
+          <ion-input
+            label="Teléfono"
+            labelPlacement="stacked"
+            formControlName="telefono"
+            placeholder="555-1234">
+          </ion-input>
+        </ion-item>
+        <ion-note color="danger" *ngIf="form.get('telefono')?.touched && form.get('telefono')?.invalid">
+          Ingresa un teléfono válido.
+        </ion-note>
 
-<ion-footer class="sheet-footer">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-button fill="outline" color="medium" (click)="close()">Cancelar</ion-button>
-    </ion-buttons>
-    <ion-buttons slot="end">
-      <ion-button type="submit" (click)="save()">
-        <ion-icon slot="start" name="save-outline"></ion-icon>
-        Guardar
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-footer>
+        <ion-item>
+          <ion-icon name="location-outline" slot="start"></ion-icon>
+          <ion-textarea
+            label="Dirección"
+            labelPlacement="stacked"
+            formControlName="direccion"
+            placeholder="Calle y número, ciudad"
+            auto-grow="true">
+          </ion-textarea>
+        </ion-item>
+        <ion-note color="danger" *ngIf="form.get('direccion')?.touched && form.get('direccion')?.invalid">
+          Mínimo 5 caracteres.
+        </ion-note>
+      </ion-list>
+
+      <div class="bottom-space"></div>
+    </form>
+  </div>
+
+  <!-- Footer fijo -->
+  <div class="dialog-footer">
+    <ion-button fill="outline" color="medium" (click)="close()">Cancelar</ion-button>
+    <ion-button type="submit" (click)="save()">
+      <ion-icon slot="start" name="save-outline"></ion-icon>
+      Guardar
+    </ion-button>
+  </div>
+
+</div>

@@ -105,9 +105,10 @@ export class ListaInventarioComponent implements OnInit {
   async nuevoItem() {
     const modal = await this.modalCtrl.create({
       component: InventarioModalComponent,
-      breakpoints: [0, 0.6, 1],
-      initialBreakpoint: 0.6,
-      cssClass: 'rounded-modal'
+      cssClass: 'center-modal',
+      mode: 'md',
+      backdropDismiss: false,
+      animated: true
     });
     await modal.present();
 

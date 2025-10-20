@@ -4,6 +4,7 @@ import { IonicModule, ModalController, ToastController, LoadingController } from
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ControlAccesoService } from 'src/app/services/controlAcceso/control-acceso.service';
 import { ControlAcceso } from 'src/app/models/controlAcceso.model';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-control-usuario-modal',
@@ -19,11 +20,10 @@ export class ControlAccesoModalComponent {
   private toast = inject(ToastController);
   private loading = inject(LoadingController);
 
-  // Formulario
   form = this.fb.group({
     nombreUsuario: ['', [Validators.required, Validators.minLength(3)]],
     password: ['', [Validators.required, Validators.minLength(4)]],
-    rol: ['Veterinario', Validators.required] // opciones: Administrador | Veterinario | Recepcionista
+    rol: ['Veterinario', Validators.required]
   });
 
   showPass = false;
@@ -39,7 +39,8 @@ export class ControlAccesoModalComponent {
         message: 'Revisa los campos obligatorios.',
         duration: 1800,
         color: 'warning',
-        icon: 'alert-circle-outline'
+        icon: 'alert-circle-outline',
+        position: 'top'
       })).present();
       return;
     }
@@ -47,35 +48,45 @@ export class ControlAccesoModalComponent {
     const loading = await this.loading.create({ message: 'Creando usuario...' });
     await loading.present();
 
-    // Armamos el payload de acuerdo a tu modelo
     const { nombreUsuario, password, rol } = this.form.value;
+
     const payload: ControlAcceso = {
-      idUsuario: 0, // el backend debe asignarlo
+      idUsuario: 0, // lo asigna el backend
       nombreUsuario: String(nombreUsuario),
       password: String(password),
       rol: String(rol)
     };
 
-    this.service.createUsuario(payload).subscribe({
+    this.service.createUsuario(payload).pipe(take(1)).subscribe({
       next: async (res) => {
-        await loading.dismiss();
+        try {
+          await loading.dismiss();
+        } catch {}
         (await this.toast.create({
           message: 'Usuario creado',
           duration: 1500,
           color: 'success',
-          icon: 'checkmark-circle-outline'
+          icon: 'checkmark-circle-outline',
+          position: 'top'
         })).present();
         this.modalCtrl.dismiss(true, 'created');
       },
       error: async (err) => {
-        await loading.dismiss();
+        try {
+          await loading.dismiss();
+        } catch {}
         console.error('createUsuario error:', { status: err?.status, body: err?.error });
-        const msg = (typeof err?.error === 'string' && err.error.length < 160) ? err.error : 'No se pudo crear el usuario.';
+        const msg =
+          (typeof err?.error === 'string' && err.error.length < 160)
+            ? err.error
+            : 'No se pudo crear el usuario.';
         (await this.toast.create({
           message: msg,
-          duration: 2200,
+          duration: 2500,
           color: 'danger',
-          icon: 'close-circle-outline'
+          icon: 'close-circle-outline',
+          position: 'top',
+          buttons: [{ text: 'Cerrar', role: 'cancel' }]
         })).present();
       }
     });

@@ -1,91 +1,86 @@
-<ion-header class="sheet-header">
-  <ion-toolbar color="light">
-    <ion-title>Nueva cita</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="close()" fill="clear" aria-label="Cerrar">
-        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<!-- Contenido “card” centrado. OJO: ya no usamos ion-header/ion-footer. -->
+<div class="dialog">
 
-<ion-content class="sheet-content" [fullscreen]="true">
-  <form [formGroup]="form" (ngSubmit)="save()" class="form-body" novalidate>
-    <ion-list inset="true" class="group">
-      <ion-item>
-        <ion-icon name="calendar-outline" slot="start"></ion-icon>
-        <ion-input type="date" label="Fecha" labelPlacement="stacked" formControlName="fecha"></ion-input>
-      </ion-item>
-      <ion-note color="danger" *ngIf="form.get('fecha')?.touched && form.get('fecha')?.invalid">
-        La fecha es obligatoria.
-      </ion-note>
+  <!-- Header -->
+  <div class="dialog-header">
+    <h2>Nueva cita</h2>
+    <ion-button (click)="close()" fill="clear" aria-label="Cerrar" size="small">
+      <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+    </ion-button>
+  </div>
 
-      <ion-item>
-        <ion-icon name="time-outline" slot="start"></ion-icon>
-        <ion-input type="time" label="Hora" labelPlacement="stacked" formControlName="hora"></ion-input>
-      </ion-item>
-      <ion-note color="danger" *ngIf="form.get('hora')?.touched && form.get('hora')?.invalid">
-        La hora es obligatoria.
-      </ion-note>
-    </ion-list>
+  <!-- Body (scrollable) -->
+  <div class="dialog-body">
+    <form [formGroup]="form" (ngSubmit)="save()" class="form-body" novalidate>
 
-    <ion-list inset="true" class="group">
-      <ion-item>
-        <ion-icon name="medkit-outline" slot="start"></ion-icon>
-        <ion-textarea label="Motivo" labelPlacement="stacked" auto-grow="true"
-          placeholder="Vacunación, Chequeo general, etc." formControlName="motivo">
-        </ion-textarea>
-      </ion-item>
-      <ion-note color="danger" *ngIf="form.get('motivo')?.touched && form.get('motivo')?.invalid">
-        Escribe al menos 3 caracteres.
-      </ion-note>
-    </ion-list>
+      <ion-list inset="true" class="group">
+        <ion-item>
+          <ion-icon name="calendar-outline" slot="start"></ion-icon>
+          <ion-input type="date" label="Fecha" labelPlacement="stacked" formControlName="fecha"></ion-input>
+        </ion-item>
+        <ion-note color="danger" *ngIf="form.get('fecha')?.touched && form.get('fecha')?.invalid">
+          La fecha es obligatoria.
+        </ion-note>
 
-    <ion-list inset="true" class="group">
-      <ion-item>
-        <ion-icon name="person-outline" slot="start"></ion-icon>
-        <ion-select label="Veterinario" labelPlacement="stacked" interface="popover" formControlName="idVeterinario">
-          <ion-select-option *ngFor="let vet of veterinarios" [value]="vet.idUsuario">
-            {{ vet.idUsuario }} - {{ vet.nombreUsuario }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
+        <ion-item>
+          <ion-icon name="time-outline" slot="start"></ion-icon>
+          <ion-input type="time" label="Hora" labelPlacement="stacked" formControlName="hora"></ion-input>
+        </ion-item>
+        <ion-note color="danger" *ngIf="form.get('hora')?.touched && form.get('hora')?.invalid">
+          La hora es obligatoria.
+        </ion-note>
+      </ion-list>
 
-      <ion-note color="danger" *ngIf="form.get('idVeterinario')?.touched && form.get('idVeterinario')?.invalid">
-        Ingresa un veterinario válido.
-      </ion-note>
+      <ion-list inset="true" class="group">
+        <ion-item>
+          <ion-icon name="medkit-outline" slot="start"></ion-icon>
+          <ion-textarea label="Motivo" labelPlacement="stacked" auto-grow="true"
+                        placeholder="Vacunación, Chequeo general, etc." formControlName="motivo">
+          </ion-textarea>
+        </ion-item>
+        <ion-note color="danger" *ngIf="form.get('motivo')?.touched && form.get('motivo')?.invalid">
+          Escribe al menos 3 caracteres.
+        </ion-note>
+      </ion-list>
 
-      <ion-item>
-        <ion-icon name="paw-outline" slot="start"></ion-icon>
-        <ion-label position="stacked">Paciente</ion-label>
-        <ion-select formControlName="idPaciente" placeholder="Selecciona un paciente">
-          <ion-select-option *ngFor="let p of pacientes" [value]="p.idPaciente">
-            {{ p.idPaciente }} - {{ p.nombreMascota }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
+      <ion-list inset="true" class="group">
+        <ion-item>
+          <ion-icon name="person-outline" slot="start"></ion-icon>
+          <ion-select label="Veterinario" labelPlacement="stacked" interface="popover" formControlName="idVeterinario">
+            <ion-select-option *ngFor="let vet of veterinarios" [value]="vet.idUsuario">
+              {{ vet.idUsuario }} - {{ vet.nombreUsuario }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-note color="danger" *ngIf="form.get('idVeterinario')?.touched && form.get('idVeterinario')?.invalid">
+          Ingresa un veterinario válido.
+        </ion-note>
 
-      <ion-note color="danger" *ngIf="form.get('idPaciente')?.touched && form.get('idPaciente')?.invalid">
-        Ingresa un paciente válido.
-      </ion-note>
+        <ion-item>
+          <ion-icon name="paw-outline" slot="start"></ion-icon>
+          <ion-label position="stacked">Paciente</ion-label>
+          <ion-select formControlName="idPaciente" placeholder="Selecciona un paciente">
+            <ion-select-option *ngFor="let p of pacientes" [value]="p.idPaciente">
+              {{ p.idPaciente }} - {{ p.nombreMascota }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-note color="danger" *ngIf="form.get('idPaciente')?.touched && form.get('idPaciente')?.invalid">
+          Ingresa un paciente válido.
+        </ion-note>
+      </ion-list>
 
-    </ion-list>
+      <div class="bottom-space"></div>
+    </form>
+  </div>
 
-    <!-- Espaciador para que el último control no choque con el footer -->
-    <div class="bottom-space"></div>
-  </form>
-</ion-content>
+  <!-- Footer (siempre visible) -->
+  <div class="dialog-footer">
+    <ion-button fill="outline" color="medium" (click)="close()">Cancelar</ion-button>
+    <ion-button type="submit" (click)="save()">
+      <ion-icon slot="start" name="save-outline"></ion-icon>
+      Guardar
+    </ion-button>
+  </div>
 
-<ion-footer class="sheet-footer">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-button fill="outline" color="medium" (click)="close()">Cancelar</ion-button>
-    </ion-buttons>
-    <ion-buttons slot="end">
-      <ion-button type="submit" (click)="save()">
-        <ion-icon slot="start" name="save-outline"></ion-icon>
-        Guardar
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-footer>
+</div>

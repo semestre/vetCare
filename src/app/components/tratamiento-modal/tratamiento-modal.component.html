@@ -1,71 +1,83 @@
-<ion-header class="sheet-header">
-  <ion-toolbar color="light">
-    <ion-title>Nuevo tratamiento</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="close()" fill="clear" aria-label="Cerrar">
-        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<!-- Diálogo centrado (sin ion-header/footer para evitar sheet) -->
+<div class="dialog">
 
-<ion-content class="sheet-content" [fullscreen]="true">
-  <form [formGroup]="form" (ngSubmit)="save()" class="form-body" novalidate>
-    <ion-list inset="true" class="group">
-      <ion-item>
-        <ion-icon name="medkit-outline" slot="start"></ion-icon>
-        <ion-input label="Descripción" labelPlacement="stacked" formControlName="descripcion" placeholder="Vacuna, limpieza dental…"></ion-input>
-      </ion-item>
-      <ion-note color="danger" *ngIf="form.get('descripcion')?.touched && form.get('descripcion')?.invalid">
-        Escribe al menos 3 caracteres.
-      </ion-note>
+  <!-- Header -->
+  <div class="dialog-header">
+    <h2>Nuevo tratamiento</h2>
+    <ion-button (click)="close()" fill="clear" aria-label="Cerrar" size="small">
+      <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+    </ion-button>
+  </div>
 
-      <ion-item>
-        <ion-icon name="flask-outline" slot="start"></ion-icon>
-        <ion-select label="Tipo" labelPlacement="stacked" interface="popover" formControlName="tipo">
-          <ion-select-option value="Vacuna">Vacuna</ion-select-option>
-          <ion-select-option value="Higiene">Higiene</ion-select-option>
-          <ion-select-option value="Cirugía">Cirugía</ion-select-option>
-          <ion-select-option value="Desparasitación">Desparasitación</ion-select-option>
-          <ion-select-option value="Control">Control</ion-select-option>
-          <ion-select-option value="Otro">Otro</ion-select-option>
-        </ion-select>
-      </ion-item>
+  <!-- Body (scrollable) -->
+  <div class="dialog-body">
+    <form [formGroup]="form" (ngSubmit)="save()" class="form-body" novalidate>
 
-      <ion-item>
-        <ion-icon name="calendar-outline" slot="start"></ion-icon>
-        <ion-input type="date" label="Fecha" labelPlacement="stacked" formControlName="fecha"></ion-input>
-      </ion-item>
+      <ion-list inset="true" class="group">
+        <ion-item>
+          <ion-icon name="medkit-outline" slot="start"></ion-icon>
+          <ion-input
+            label="Descripción"
+            labelPlacement="stacked"
+            formControlName="descripcion"
+            placeholder="Vacuna, limpieza dental…">
+          </ion-input>
+        </ion-item>
+        <ion-note color="danger" *ngIf="form.get('descripcion')?.touched && form.get('descripcion')?.invalid">
+          Escribe al menos 3 caracteres.
+        </ion-note>
 
-      <ion-item>
-        <ion-icon name="paw-outline" slot="start"></ion-icon>
-        <ion-label position="stacked">Paciente</ion-label>
-        <ion-select formControlName="idPaciente" placeholder="Selecciona un paciente">
-          <ion-select-option *ngFor="let p of pacientes" [value]="p.idPaciente">
-            {{ p.idPaciente }} - {{ p.nombreMascota }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
+        <ion-item>
+          <ion-icon name="flask-outline" slot="start"></ion-icon>
+          <ion-select
+            label="Tipo"
+            labelPlacement="stacked"
+            interface="popover"
+            formControlName="tipo">
+            <ion-select-option value="Vacuna">Vacuna</ion-select-option>
+            <ion-select-option value="Higiene">Higiene</ion-select-option>
+            <ion-select-option value="Cirugía">Cirugía</ion-select-option>
+            <ion-select-option value="Desparasitación">Desparasitación</ion-select-option>
+            <ion-select-option value="Control">Control</ion-select-option>
+            <ion-select-option value="Otro">Otro</ion-select-option>
+          </ion-select>
+        </ion-item>
 
-      <ion-note color="danger" *ngIf="form.get('idPaciente')?.touched && form.get('idPaciente')?.invalid">
-        Ingresa un paciente válido.
-      </ion-note>
-    </ion-list>
+        <ion-item>
+          <ion-icon name="calendar-outline" slot="start"></ion-icon>
+          <ion-input
+            type="date"
+            label="Fecha"
+            labelPlacement="stacked"
+            formControlName="fecha">
+          </ion-input>
+        </ion-item>
 
-    <div class="bottom-space"></div>
-  </form>
-</ion-content>
+        <ion-item>
+          <ion-icon name="paw-outline" slot="start"></ion-icon>
+          <ion-label position="stacked">Paciente</ion-label>
+          <ion-select formControlName="idPaciente" placeholder="Selecciona un paciente">
+            <ion-select-option *ngFor="let p of pacientes" [value]="p.idPaciente">
+              {{ p.idPaciente }} - {{ p.nombreMascota }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-note color="danger" *ngIf="form.get('idPaciente')?.touched && form.get('idPaciente')?.invalid">
+          Ingresa un paciente válido.
+        </ion-note>
+      </ion-list>
 
-<ion-footer class="sheet-footer">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-button fill="outline" color="medium" (click)="close()">Cancelar</ion-button>
-    </ion-buttons>
-    <ion-buttons slot="end">
-      <ion-button type="submit" (click)="save()">
-        <ion-icon slot="start" name="save-outline"></ion-icon>
-        Guardar
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-footer>
+      <div class="bottom-space"></div>
+    </form>
+  </div>
+
+  <!-- Footer fijo -->
+  <div class="dialog-footer">
+    <ion-button fill="outline" color="medium" (click)="close()">Cancelar</ion-button>
+    <ion-button type="submit" (click)="save()">
+      <ion-icon slot="start" name="save-outline"></ion-icon>
+      Guardar
+    </ion-button>
+  </div>
+
+</div>

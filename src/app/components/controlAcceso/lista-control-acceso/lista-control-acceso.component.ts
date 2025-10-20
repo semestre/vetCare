@@ -106,9 +106,10 @@ export class ListaControlAccesoComponent implements OnInit {
   async nuevoUsuario() {
     const modal = await this.modalCtrl.create({
       component: ControlAccesoModalComponent,
-      breakpoints: [0, 0.6, 1],
-      initialBreakpoint: 0.6,
-      cssClass: 'rounded-modal'
+      cssClass: 'center-modal',     // 👈 importante
+      mode: 'md',                   // estilo tipo diálogo
+      backdropDismiss: false,       // evita que se cierre tocando fuera
+      animated: true
     });
 
     await modal.present();
