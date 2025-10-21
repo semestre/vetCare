@@ -1,6 +1,12 @@
 <ion-header>
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <!-- botón para abrir/cerrar el slide-bar -->
+      <ion-menu-button autoHide="false"></ion-menu-button>
+    </ion-buttons>
+
     <ion-title>Veterinario Dashboard</ion-title>
+
     <ion-buttons slot="end">
       <ion-button [routerLink]="['/']">
         <ion-icon name="log-out-outline"></ion-icon>
@@ -10,40 +16,54 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-tabs>
+<!-- Split pane: menú lateral + contenido -->
+<ion-split-pane when="md" contentId="admin-content">
+  <!-- SLIDE BAR LATERAL -->
+  <ion-menu menuId="adminMenu" contentId="admin-content" side="start" swipeGesture="true">
+    <ion-content class="menu-content">
+      <div class="menu-header">
+        <div class="brand-logo">
+          <img src="../../../../assets/img/logo.png.png" alt="Logo Clínica Veterinaria">
+        </div>
+      </div>
 
-    <ion-tab-bar slot="bottom">
+      <ion-list class="menu-list" inset="true" lines="none">
+        <ion-menu-toggle auto-hide="false">
+          <ion-item button detail="false" [routerLink]="['/veterinario/citas']">
+            <ion-icon slot="start" name="calendar-outline"></ion-icon>
+            <ion-label>Citas</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
 
-      <ion-tab-button [routerLink]="['paciente']">
-        <ion-label>Pacientes</ion-label>
-      </ion-tab-button>
+        <ion-menu-toggle auto-hide="false">
+          <ion-item button detail="false" [routerLink]="['/veterinario/inventario']">
+            <ion-icon slot="start" name="layers-outline"></ion-icon>
+            <ion-label>Inventario</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
 
-      <ion-tab-button [routerLink]="['citas']">
-        <ion-label>Citas</ion-label>
-      </ion-tab-button>
+        <ion-menu-toggle auto-hide="false">
+          <ion-item button detail="false" [routerLink]="['/veterinario/paciente']">
+            <ion-icon slot="start" name="medkit-outline"></ion-icon>
+            <ion-label>Pacientes</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
 
-      <ion-tab-button [routerLink]="['tratamiento']"> 
-        <ion-label>Tratamientos</ion-label>
-      </ion-tab-button>
+        <ion-menu-toggle auto-hide="false">
+          <ion-item button detail="false" [routerLink]="['/veterinario/tratamiento']">
+            <ion-icon slot="start" name="bandage-outline"></ion-icon>
+            <ion-label>Tratamientos</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+      </ion-list>
+    </ion-content>
+  </ion-menu>
 
-      <ion-tab-button [routerLink]="['inventario']">
-        <ion-label>Inventario</ion-label>
-      </ion-tab-button>
-
-    </ion-tab-bar>
-
-    <ion-router-outlet></ion-router-outlet>
-  </ion-tabs>
-</ion-content>
-
-
-<ion-tabs>
-  <ion-tab-bar slot="bottom">
-    <ion-tab-button [routerLink]="['/veterinario/citas']"><ion-label>Citas</ion-label></ion-tab-button>
-    <ion-tab-button [routerLink]="['/veterinario/inventario']"><ion-label>Inventario</ion-label></ion-tab-button>
-    <ion-tab-button [routerLink]="['/veterinario/paciente']"><ion-label>Pacientes</ion-label></ion-tab-button>
-    <ion-tab-button [routerLink]="['/veterinario/tratamiento']"><ion-label>Tratamientos</ion-label></ion-tab-button>
-  </ion-tab-bar>
-
-</ion-tabs>
+  <!-- CONTENIDO PRINCIPAL -->
+  <div id="admin-content" class="page-shell">
+    <ion-content fullscreen>
+      <!-- aquí se pintan tus páginas hijas -->
+      <ion-router-outlet></ion-router-outlet>
+    </ion-content>
+  </div>
+</ion-split-pane>
