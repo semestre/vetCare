@@ -1,4 +1,4 @@
-<!-- Diálogo centrado (no usamos ion-header/footer para evitar “sheet”) -->
+<!-- Diálogo centrado -->
 <div class="dialog">
 
   <!-- Header -->
@@ -9,23 +9,86 @@
     </ion-button>
   </div>
 
-  <!-- Body (scrollable) -->
+  <!-- Body -->
   <div class="dialog-body">
     <form [formGroup]="form" (ngSubmit)="save()" class="form-body" novalidate>
 
+
+      <!-- ========================================================= -->
+      <!-- 🔹 SELECCIÓN DE PACIENTE (buscador y chip en una sola línea) -->
+      <!-- ========================================================= -->
+
       <ion-list inset="true" class="group">
-        <ion-item>
-          <ion-icon name="paw-outline" slot="start"></ion-icon>
-          <ion-label position="stacked">Paciente</ion-label>
-          <ion-select formControlName="idPaciente" placeholder="Selecciona un paciente">
-            <ion-select-option *ngFor="let p of pacientes" [value]="p.idPaciente">
-              {{ p.idPaciente }} - {{ p.nombreMascota }}
-            </ion-select-option>
-          </ion-select>
-        </ion-item>
+
+        <!-- CONTENEDOR UNIFICADO: buscador ó selección -->
+        <div class="paciente-inline">
+
+          <!-- ⭐ MODO BUSCADOR (si NO hay seleccionado) -->
+          <div class="search-mode" *ngIf="!selectedPaciente">
+            <ion-icon name="search-outline" class="icon"></ion-icon>
+
+            <ion-input
+              placeholder="Buscar paciente..."
+              (ionInput)="onSearchPaciente($event)"
+              clear-input="true"
+              debounce="200"
+              class="search-input">
+            </ion-input>
+          </div>
+
+          <!-- ⭐ MODO PACIENTE SELECCIONADO (chip) -->
+          <div class="selected-mode" *ngIf="selectedPaciente" (click)="clearPacienteSelection()">
+            <ion-icon name="paw-outline" class="icon"></ion-icon>
+
+            <div class="text">
+              #{{ selectedPaciente.idPaciente }} - {{ selectedPaciente.nombreMascota }}
+            </div>
+
+            <ion-icon name="close-circle-outline" class="close"></ion-icon>
+          </div>
+
+        </div>
+
+        <!-- RESULTADOS DEL BUSCADOR -->
+        <div class="search-results" *ngIf="!selectedPaciente && pacientesFiltrados.length && searchPacienteTerm">
+          <ion-list lines="none">
+            <ion-item
+              button
+              detail="false"
+              class="result-item"
+              *ngFor="let p of pacientesFiltrados"
+              (click)="selectPaciente(p)">
+              
+              <ion-avatar slot="start">
+                <div class="avatar-circle">
+                  {{ (p.nombreMascota || '?')[0] | uppercase }}
+                </div>
+              </ion-avatar>
+
+              <ion-label>
+                <h3>#{{ p.idPaciente }} - {{ p.nombreMascota }}</h3>
+                <p>{{ p.especie || '—' }}<span *ngIf="p.raza"> · {{ p.raza }}</span></p>
+              </ion-label>
+
+            </ion-item>
+          </ion-list>
+        </div>
+
+        <!-- Mensaje sin resultados -->
+        <div class="no-results" *ngIf="!pacientesFiltrados.length && searchPacienteTerm">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <p>No se encontraron pacientes.</p>
+        </div>
+
+        <!-- Validación -->
         <ion-note color="danger" *ngIf="form.get('idPaciente')?.touched && form.get('idPaciente')?.invalid">
-          Ingresa un paciente válido.
+          Selecciona un paciente válido.
         </ion-note>
+
+
+        <!-- ========================================================= -->
+        <!-- 🔹 CAMPOS DE FACTURA -->
+        <!-- ========================================================= -->
 
         <ion-item>
           <ion-icon name="medkit-outline" slot="start"></ion-icon>
@@ -51,7 +114,10 @@
             formControlName="medicamentos">
           </ion-textarea>
         </ion-item>
+
       </ion-list>
+
+
 
       <ion-list inset="true" class="group">
         <ion-item>
@@ -65,9 +131,6 @@
             formControlName="total">
           </ion-input>
         </ion-item>
-        <ion-note color="danger" *ngIf="form.get('total')?.touched && form.get('total')?.invalid">
-          Ingresa un monto válido.
-        </ion-note>
 
         <ion-item>
           <ion-icon name="calendar-outline" slot="start"></ion-icon>
@@ -78,9 +141,6 @@
             formControlName="fecha">
           </ion-input>
         </ion-item>
-        <ion-note color="danger" *ngIf="form.get('fecha')?.touched && form.get('fecha')?.invalid">
-          La fecha es obligatoria.
-        </ion-note>
 
         <ion-item>
           <ion-icon name="card-outline" slot="start"></ion-icon>
@@ -100,7 +160,7 @@
     </form>
   </div>
 
-  <!-- Footer fijo -->
+  <!-- Footer -->
   <div class="dialog-footer">
     <ion-button fill="outline" color="medium" (click)="close()">Cancelar</ion-button>
     <ion-button type="submit" (click)="save()">

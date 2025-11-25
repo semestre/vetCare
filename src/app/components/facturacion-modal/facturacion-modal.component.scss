@@ -70,6 +70,224 @@
 .dialog-body::-webkit-scrollbar{ width:8px; }
 .dialog-body::-webkit-scrollbar-thumb{ background:rgba(0,0,0,.15); border-radius:8px; }
 
+/* ----- BUSCADOR ----- */
+
+.search-container {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 6px 12px;
+  border: 1px solid rgba(0,0,0,0.12);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  margin-bottom: 8px;
+  transition: 0.2s ease-in-out;
+}
+
+.search-container:focus-within {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.25);
+}
+
+.search-icon {
+  font-size: 20px;
+  margin-right: 10px;
+  color: #4f46e5;
+}
+
+.search-input {
+  --placeholder-color: #9ca3af;
+  font-size: 15px;
+}
+
+
+/* ----- RESULTADOS DE BUSQUEDA ----- */
+
+.search-results {
+  margin-top: 4px;
+  background: white;
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,0.1);
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0px 4px 16px rgba(0,0,0,0.12);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.result-item {
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin: 4px 6px;
+  transition: 0.15s ease;
+}
+
+.result-item:hover {
+  background: #f3f4f6;
+}
+
+.avatar-circle {
+  background: #6366f1;
+  color: white;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.no-results {
+  text-align: center;
+  color: #6b7280;
+  margin-top: 10px;
+}
+
+.no-results ion-icon {
+  font-size: 22px;
+  color: #a1a1aa;
+  margin-bottom: 4px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Tarjeta de paciente seleccionado */
+.paciente-selected {
+  --background: #eef2ff;
+  --inner-padding-end: 6px;
+  border-radius: 14px;
+  margin-bottom: 8px;
+
+  h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #4f46e5;
+    margin-bottom: 2px;
+  }
+
+  p {
+    font-size: 14px;
+    color: #111827;
+  }
+
+  ion-icon[slot="start"] {
+    color: #4f46e5;
+  }
+}
+
+/* Resultado marcado como seleccionado dentro de la lista */
+.selected-result {
+  background: #eef2ff !important;
+  border: 1px solid #a5b4fc;
+}
+
+.selected-icon {
+  font-size: 18px;
+  color: #22c55e;
+  margin-left: 6px;
+}
+
+/* ----- CHIP + BUSCADOR EN UNA SOLO LÍNEA ----- */
+.paciente-inline {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: white;
+  border-radius: 14px;
+  padding: 8px 12px;
+  border: 1px solid rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  margin-bottom: 8px;
+  transition: 0.2s ease-in-out;
+}
+
+/* ----- BUSCADOR ----- */
+.search-mode {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+
+  .icon {
+    color: #4f46e5;
+    font-size: 20px;
+  }
+
+  .search-input {
+    flex: 1;
+    --placeholder-color: #9ca3af;
+    font-size: 15px;
+  }
+}
+
+/* ----- PACIENTE SELECCIONADO ----- */
+.selected-mode {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+  background: #eef2ff;
+  padding: 6px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 1px solid #a5b4fc;
+
+  .icon {
+    color: #4f46e5;
+    font-size: 20px;
+  }
+
+  .text {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 500;
+    color: #1e1b4b;
+  }
+
+  .close {
+    font-size: 20px;
+    color: #6b7280;
+  }
+}
+
+/* ----- RESULTADOS ----- */
+.search-results {
+  margin-top: 4px;
+  background: white;
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,0.12);
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.result-item {
+  border-radius: 10px;
+  margin: 4px 6px;
+  transition: 0.15s ease;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+}
+
+.avatar-circle {
+  background: #6366f1;
+  color: white;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
 @media (max-width: 420px){
   .dialog{ width:96vw; max-height:min(92vh,94dvh); border-radius:14px; }
 }

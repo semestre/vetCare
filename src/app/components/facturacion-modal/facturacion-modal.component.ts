@@ -15,6 +15,7 @@ import { PacienteService } from 'src/app/services/paciente/paciente.service';
   styleUrls: ['./facturacion-modal.component.scss'],
 })
 export class FacturacionModalComponent {
+
   private fb = inject(FormBuilder);
   private modalCtrl = inject(ModalController);
   private service = inject(FacturacionService);
@@ -26,44 +27,82 @@ export class FacturacionModalComponent {
     servicios: ['', [Validators.required, Validators.minLength(3)]],
     medicamentos: [''],
     total: ['', [Validators.required, Validators.min(0)]],
-    fecha: ['', [Validators.required]],               // YYYY-MM-DD
-    metodoPago: ['Efectivo', Validators.required],   // Efectivo | Tarjeta | Transferencia
+    fecha: ['', [Validators.required]],
+    metodoPago: ['Efectivo', Validators.required],
   });
+
+  pacientes: Paciente[] = [];
+  pacientesFiltrados: Paciente[] = [];
+  selectedPaciente: Paciente | null = null;
+  searchPacienteTerm = '';
+
+  constructor(private pacienteService: PacienteService) {}
+
+  ngOnInit() {
+    this.loadPacientes();
+  }
 
   close() {
     this.modalCtrl.dismiss(null, 'cancel');
   }
 
+  loadPacientes() {
+    this.pacienteService.getAllPacientes().subscribe({
+      next: (data) => {
+        this.pacientes = data;
+        this.pacientesFiltrados = [...data];
+      },
+      error: (err) => console.error('❌ Error loading pacientes:', err)
+    });
+  }
 
+  // 🔍 BUSCAR
+  onSearchPaciente(event: any) {
+    const value = (event.target.value || '').toLowerCase().trim();
+    this.searchPacienteTerm = value;
 
-
-    pacientes: Paciente[] = []; //added this line
-    constructor(private pacienteService: PacienteService) { } // added this line
-  
-    ngOnInit() {
-      this.loadPacientes();
-    }
-  
-    loadPacientes() {
-      this.pacienteService.getAllPacientes().subscribe({
-        next: (data) => {
-          console.log('✅ Pacientes loaded:', data);
-          this.pacientes = data;
-        },
-        error: (err) => {
-          console.error('❌ Error loading pacientes:', err);
-        }
-      });
+    if (!value) {
+      this.pacientesFiltrados = [...this.pacientes];
+      return;
     }
 
-    
+    this.pacientesFiltrados = this.pacientes.filter(p =>
+      p.nombreMascota.toLowerCase().includes(value) ||
+      p.especie.toLowerCase().includes(value) ||
+      p.raza.toLowerCase().includes(value) ||
+      String(p.idPaciente).includes(value)
+    );
+  }
 
+  // ✔️ SELECCIONAR PACIENTE
+  selectPaciente(p: Paciente) {
+    this.selectedPaciente = p;
+
+    this.form.patchValue({
+      idPaciente: String(p.idPaciente)  // Lo guardamos como STRING para el form
+    });
+
+    // Ocultar panel de búsqueda
+    this.searchPacienteTerm = '';
+    this.pacientesFiltrados = [];
+  }
+
+  // ❌ LIMPIAR SELECCIÓN
+  clearPacienteSelection() {
+    this.selectedPaciente = null;
+    this.form.patchValue({ idPaciente: '' });
+  }
+
+  // ✔️ GUARDAR FACTURA
   async save() {
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       (await this.toast.create({
         message: 'Revisa los campos obligatorios.',
-        duration: 1800, color: 'warning', icon: 'alert-circle-outline'
+        duration: 1800,
+        color: 'warning',
+        icon: 'alert-circle-outline'
       })).present();
       return;
     }
@@ -73,9 +112,8 @@ export class FacturacionModalComponent {
 
     const { idPaciente, servicios, medicamentos, total, fecha, metodoPago } = this.form.value;
 
-    // Payload para tu modelo
     const payload: Facturacion = {
-      idFactura: 0, // lo asigna el backend
+      idFactura: 0,
       idPaciente: Number(idPaciente),
       servicios: String(servicios),
       medicamentos: String(medicamentos ?? ''),
@@ -89,17 +127,24 @@ export class FacturacionModalComponent {
         await loader.dismiss();
         (await this.toast.create({
           message: 'Factura creada',
-          duration: 1500, color: 'success', icon: 'checkmark-circle-outline'
+          duration: 1500,
+          color: 'success',
+          icon: 'checkmark-circle-outline'
         })).present();
-        // avisamos a la lista para recargar
+
         this.modalCtrl.dismiss(true, 'created');
       },
       error: async (err) => {
         await loader.dismiss();
-        console.error('createFactura error:', { status: err?.status, body: err?.error });
-        const msg = (typeof err?.error === 'string' && err.error.length < 200) ? err.error : 'No se pudo crear la factura.';
+        const msg = (typeof err?.error === 'string' && err.error.length < 200)
+          ? err.error
+          : 'No se pudo crear la factura.';
+
         (await this.toast.create({
-          message: msg, duration: 2500, color: 'danger', icon: 'close-circle-outline'
+          message: msg,
+          duration: 2500,
+          color: 'danger',
+          icon: 'close-circle-outline'
         })).present();
       }
     });
