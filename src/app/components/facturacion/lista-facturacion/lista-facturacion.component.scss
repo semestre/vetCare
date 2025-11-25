@@ -4,12 +4,19 @@
   --ion-background-color: #fff;
   --ion-text-color: #0f172a;
 
-  --accent: #2193b0;
+  --accent: #0ea5e9;
   --btn-blue: #3b82f6;
   --btn-blue-hover: #2563eb;
 
   --soft-border: 1px solid rgba(226, 232, 240, 0.9);
-  --card-shadow: 0 12px 28px rgba(2, 6, 23, 0.08);
+  --card-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+/* Contenedor central para alinear TODO */
+.page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 8px 12px 16px;
 }
 
 /* ====== HEADER BLANCO ====== */
@@ -19,14 +26,14 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   z-index: 20;
   margin-top: var(--outer-header-height, 55px);
-  overflow: visible !important; /* deja ver sombra del buscador */
+  overflow: visible !important;
 }
 .header-white ion-toolbar {
   --background: #fff !important;
   overflow: visible !important;
 }
 
-/* ====== FILA SUPERIOR: TÍTULO + BUSCADOR ====== */
+/* Título + buscador */
 .header-row {
   display: flex;
   align-items: center;
@@ -34,7 +41,6 @@
   padding: 12px 16px 10px;
   margin-bottom: 8px;
 }
-
 .title {
   display: flex;
   align-items: center;
@@ -47,7 +53,7 @@
   font-size: 1.2rem;
 }
 
-/* ====== SEARCHBAR PÍLDORA ====== */
+/* Searchbar pill */
 .header-row ion-searchbar {
   flex: 1;
   max-width: 560px;
@@ -57,93 +63,223 @@
   --placeholder-color: #64748b;
   --icon-color: #64748b;
   --clear-button-color: #64748b;
-  border: none !important;
-  box-shadow: none !important;
 }
-
-/* Contenedor principal del searchbar */
 .header-row ion-searchbar::part(container) {
   border-radius: 9999px !important;
   border: 1px solid rgba(226, 232, 240, 0.9) !important;
   background: #ffffff !important;
   padding-inline: 14px !important;
-  box-shadow: 0 8px 18px rgba(2, 6, 23, 0.08) !important;
+  box-shadow: 0 8px 18px rgba(2, 6, 23, 0.06) !important;
   overflow: hidden !important;
-  transition: box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
-/* Glow al enfocarse */
-.header-row ion-searchbar:focus-within::part(container) {
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25),
-              0 8px 18px rgba(2, 6, 23, 0.08);
-  border-color: rgba(59, 130, 246, 0.6);
-}
-
-/* Refuerzo interno del radio */
-:host ::ng-deep ion-searchbar .searchbar-input-container,
-:host ::ng-deep ion-searchbar .searchbar-input {
-  border-radius: 9999px !important;
-  overflow: hidden !important;
+/* ====== FONDO ====== */
+.content-bg {
+  --background: linear-gradient(180deg, #f7fbff 0%, #ffffff 100%);
 }
 
 /* ====== CONTROLES (FILTROS + BOTÓN) ====== */
-.controls {
+.controls-row {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: 12px;
-  margin: 8px 12px 14px;
-  position: relative;
-  z-index: 1;
-}
-.controls .filters {
-  flex: 1;
-  min-width: 0;
+  gap: 16px;
+  margin: 8px 0 10px;
+  flex-wrap: wrap;
 }
 
-/* Segment pastilla claro */
-ion-segment {
+.filters-col {
+  flex: 1;
+  min-width: 260px;
+}
+
+.filters-header {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 6px;
+}
+.filters-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: #0f172a;
+}
+.filters-title ion-icon {
+  color: #0ea5e9;
+}
+.filters-header small {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* Campos de filtros en fila */
+.filters-fields {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.field {
+  flex: 1;
+  min-width: 220px;
+}
+.field-label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+/* Segment método */
+.field-metodo ion-segment {
   background: #f3f7fb;
   border-radius: 999px;
   padding: 4px;
-  box-shadow: none;
-  border: 0;
 }
-ion-segment-button {
+.field-metodo ion-segment-button {
   --indicator-color: #fff;
   --color: #0f172a;
   --color-checked: #0f172a;
   --background: transparent;
   --background-checked: #fff;
   border-radius: 999px;
+  font-size: 13px;
 }
 
-/* Botón "Nueva factura" */
-.controls ion-button {
+/* Fechas */
+.field-fechas .dates-inline {
+  display: flex;
+  gap: 8px;
+}
+.field-fechas .date-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: #6b7280;
+}
+.field-fechas .date-item span {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.field-fechas ion-input {
+  --background: #f9fafb;
+  --padding-start: 10px;
+  --padding-end: 10px;
+  --border-radius: 999px;
+  border-radius: 999px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  font-size: 13px;
+}
+
+/* Botón nueva factura */
+.actions-col {
+  display: flex;
+  align-items: flex-end;
+}
+.actions-col ion-button {
   --border-radius: 9999px;
   --box-shadow: none;
   --background: var(--btn-blue);
   --background-hover: var(--btn-blue-hover);
   --color: #fff;
-  height: 42px;
-  min-width: 140px;
+  height: 44px;
   padding: 0 22px;
-  white-space: nowrap;
   font-weight: 700;
-  letter-spacing: 0.3px;
+}
+
+/* ====== KPIs: Total + Gráfica (grid) ====== */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 2fr);
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.kpi-card {
+  border-radius: 18px;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
+}
+
+/* Total */
+.total-card {
+  background: linear-gradient(135deg, #0ea5e9, #6366f1);
+  padding: 14px 16px;
+  color: #f9fafb;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+}
+.kpi-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.kpi-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.kpi-period {
+  font-size: 13px;
+}
+.kpi-right {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+/* Gráfica */
+.chart-card {
+  background: #ffffff;
+  padding: 12px 14px 10px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+.chart-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 6px;
+}
+.chart-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: #0f172a;
+}
+.chart-title ion-icon {
+  color: #0ea5e9;
+}
+.chart-header small {
+  font-size: 12px;
+  color: #6b7280;
+}
+.chart-body {
+  display: flex;
   justify-content: center;
 }
-
-/* ====== FONDO DEL CONTENIDO ====== */
-.content-bg {
-  --background: linear-gradient(180deg, #f7fbff 0%, #fff 100%);
+.chart-wrapper {
+  max-width: 240px;      /* 👈 hace que la dona sea compacta */
+  width: 100%;
+}
+.chart-wrapper canvas {
+  width: 100% !important;
+  height: 180px !important;
 }
 
-/* ====== TICKETS ====== */
-.ticket-wrap { position: relative; }
+/* ====== GRID DE FACTURAS ALINEADO ====== */
+.facturas-grid {
+  --ion-grid-padding: 0;
+}
 
+/* Tickets (igual que tenías) */
+.ticket-wrap {
+  position: relative;
+}
 .ticket-badge {
   --badge-color: #4f46e5;
   position: absolute;
@@ -160,43 +296,49 @@ ion-segment-button {
   box-shadow: 0 6px 12px rgba(2, 6, 23, 0.15);
   z-index: 3;
 }
-.ticket-badge ion-icon { font-size: 18px; color: #fff; }
-.ticket-badge.color-1 { --badge-color: #ec4899; } /* rosa */
-.ticket-badge.color-2 { --badge-color: #10b981; } /* verde */
-.ticket-badge.color-3 { --badge-color: #3b82f6; } /* azul */
-.ticket-badge.color-4 { --badge-color: #f59e0b; } /* ámbar */
+.ticket-badge ion-icon {
+  font-size: 18px;
+}
+.ticket-badge.color-1 { --badge-color: #ec4899; }
+.ticket-badge.color-2 { --badge-color: #10b981; }
+.ticket-badge.color-3 { --badge-color: #3b82f6; }
+.ticket-badge.color-4 { --badge-color: #f59e0b; }
 
 .ticket {
   background: #fff;
   border: var(--soft-border);
   border-radius: 18px;
   box-shadow: var(--card-shadow);
-  overflow: visible;                 /* permite ver el badge */
-  padding-top: 10px;                 /* respiro bajo el badge */
+  padding-top: 10px;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 .ticket.hover:hover {
   transform: translateY(-4px);
   box-shadow: 0 16px 32px rgba(2, 6, 23, 0.12);
 }
-
 .ticket-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px;
 }
-.ticket-head .left .k { font-size: 0.8rem; color: #64748b; }
-.ticket-head .left .v { font-weight: 800; color: #1f2a44; }
-
+.ticket-head .left .k {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+.ticket-head .left .v {
+  font-weight: 800;
+  color: #1f2a44;
+}
 .ticket-head .right ion-chip.mp {
   --background: #eef7ff;
   --color: #1e3a8a;
   border-radius: 16px;
 }
 
-/* Filas */
-.ticket ion-card-content { padding: 12px 16px 16px; }
+.ticket ion-card-content {
+  padding: 12px 16px 16px;
+}
 .ticket .row {
   display: flex;
   align-items: center;
@@ -207,11 +349,19 @@ ion-segment-button {
   border-radius: 12px;
   margin-bottom: 10px;
 }
-.ticket .row.dotted { background: #f9fbff; border-style: dashed; }
-.ticket .row .k { color: #64748b; font-size: 0.9rem; }
-.ticket .row .v { color: #0f172a; font-weight: 600; margin-left: 10px; }
-
-/* Total */
+.ticket .row.dotted {
+  background: #f9fbff;
+  border-style: dashed;
+}
+.ticket .row .k {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+.ticket .row .v {
+  color: #0f172a;
+  font-weight: 600;
+  margin-left: 10px;
+}
 .ticket .total {
   display: flex;
   align-items: center;
@@ -225,25 +375,41 @@ ion-segment-button {
 .ticket .total span { color: #64748b; }
 .ticket .total strong { color: #0f172a; }
 
-/* Bordes de boleto */
 .ticket-edge.top,
 .ticket-edge.bottom {
   height: 10px;
-  background: radial-gradient(circle at 10px 5px, #fff 6px, transparent 6px) repeat-x;
+  background: radial-gradient(circle at 10px 5px, #fff 6px, transparent 6px)
+    repeat-x;
   opacity: 0.7;
 }
-.ticket-edge.bottom { transform: rotate(180deg); }
+.ticket-edge.bottom {
+  transform: rotate(180deg);
+}
 
-/* Skeleton */
-.ticket.sk { box-shadow: none; }
-
-/* Estado vacío */
-.empty { text-align: center; padding: 2rem 1rem; }
-.empty .emoji { font-size: 2.5rem; }
+/* Empty */
+.empty {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+.empty .emoji {
+  font-size: 2.5rem;
+}
 
 /* ====== RESPONSIVE ====== */
+@media (max-width: 768px) {
+  .controls-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .actions-col {
+    align-self: flex-end;
+  }
+  .kpi-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 @media (max-width: 480px) {
-  .header-row { flex-wrap: wrap; }
-  .controls { flex-direction: column; align-items: stretch; }
-  .controls ion-button { align-self: flex-end; }
+  .header-row {
+    flex-wrap: wrap;
+  }
 }
