@@ -21,42 +21,92 @@ export class TratamientoModalComponent {
   private toast = inject(ToastController);
   private loading = inject(LoadingController);
 
-  hoy = new Date().toISOString().slice(0,10);
+  hoy = new Date().toISOString().slice(0, 10);
 
+  // 🔹 OJO: idPaciente como string en el form (convertimos a number al guardar)
   form = this.fb.group({
     descripcion: ['', [Validators.required, Validators.minLength(3)]],
-    tipo: ['Vacuna', Validators.required], // Vacuna | Higiene | Cirugía | Desparasitación | Control | Otro
-    fecha: [this.hoy, Validators.required], // YYYY-MM-DD
-    idPaciente: [null as unknown as number, [Validators.required, Validators.min(1)]],
+    tipo: ['vacuna', Validators.required],         // valores: vacuna | medicamento | procedimiento
+    fecha: [this.hoy, Validators.required],        // YYYY-MM-DD
+    idPaciente: ['', [Validators.required]],       // string en el form
   });
 
-  close() { this.modal.dismiss(null, 'cancel'); }
+  // 🔹 Datos de pacientes y búsqueda
+  pacientes: Paciente[] = [];
+  pacientesFiltrados: Paciente[] = [];
+  selectedPaciente: Paciente | null = null;
+  searchPacienteTerm = '';
 
+  constructor(private pacienteService: PacienteService) {}
 
-  
-    pacientes: Paciente[] = []; //added this line
-    constructor(private pacienteService: PacienteService) { } // added this line
-  
-    ngOnInit() {
-      this.loadPacientes();
+  ngOnInit() {
+    this.loadPacientes();
+  }
+
+  close() {
+    this.modal.dismiss(null, 'cancel');
+  }
+
+  loadPacientes() {
+    this.pacienteService.getAllPacientes().subscribe({
+      next: (data) => {
+        console.log('✅ Pacientes loaded:', data);
+        this.pacientes = data;
+        this.pacientesFiltrados = [...data];
+      },
+      error: (err) => {
+        console.error('❌ Error loading pacientes:', err);
+      }
+    });
+  }
+
+  // 🔍 Buscar pacientes
+  onSearchPaciente(event: any) {
+    const value = (event.target.value || '').toLowerCase().trim();
+    this.searchPacienteTerm = value;
+
+    if (!value) {
+      this.pacientesFiltrados = [...this.pacientes];
+      return;
     }
-  
-    loadPacientes() {
-      this.pacienteService.getAllPacientes().subscribe({
-        next: (data) => {
-          console.log('✅ Pacientes loaded:', data);
-          this.pacientes = data;
-        },
-        error: (err) => {
-          console.error('❌ Error loading pacientes:', err);
-        }
-      });
-    }
+
+    this.pacientesFiltrados = this.pacientes.filter(p =>
+      (p.nombreMascota || '').toLowerCase().includes(value) ||
+      (p.especie || '').toLowerCase().includes(value) ||
+      (p.raza || '').toLowerCase().includes(value) ||
+      String(p.idPaciente).includes(value)
+    );
+  }
+
+  // ✅ Seleccionar paciente (se convierte en chip y se esconde el buscador)
+  selectPaciente(p: Paciente) {
+    this.selectedPaciente = p;
+
+    this.form.patchValue({
+      idPaciente: String(p.idPaciente)
+    });
+
+    // Ocultamos resultados y limpiamos cadena
+    this.searchPacienteTerm = '';
+    this.pacientesFiltrados = [];
+  }
+
+  // ❌ Limpiar selección y volver al buscador
+  clearPacienteSelection() {
+    this.selectedPaciente = null;
+    this.form.patchValue({ idPaciente: '' });
+    // restaurar listado completo
+    this.pacientesFiltrados = [...this.pacientes];
+  }
 
   async save() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      (await this.toast.create({ message: 'Completa los campos obligatorios.', duration: 1800, color: 'warning' })).present();
+      (await this.toast.create({
+        message: 'Completa los campos obligatorios.',
+        duration: 1800,
+        color: 'warning'
+      })).present();
       return;
     }
 
@@ -69,20 +119,30 @@ export class TratamientoModalComponent {
       descripcion: String(v.descripcion),
       tipo: String(v.tipo),
       fecha: String(v.fecha),
-      idPaciente: Number(v.idPaciente),
+      idPaciente: Number(v.idPaciente), // 👈 aquí lo convertimos a número para el backend
     };
 
     this.service.createTratamiento(payload).subscribe({
       next: async () => {
         await loader.dismiss();
-        (await this.toast.create({ message: 'Tratamiento creado', duration: 1500, color: 'success' })).present();
+        (await this.toast.create({
+          message: 'Tratamiento creado',
+          duration: 1500,
+          color: 'success'
+        })).present();
         this.modal.dismiss(true, 'created'); // para recargar lista
       },
       error: async (err) => {
         await loader.dismiss();
         console.error('createTratamiento error:', { status: err?.status, body: err?.error });
-        const msg = (typeof err?.error === 'string' && err.error.length < 200) ? err.error : 'No se pudo crear el tratamiento.';
-        (await this.toast.create({ message: msg, duration: 2200, color: 'danger' })).present();
+        const msg = (typeof err?.error === 'string' && err.error.length < 200)
+          ? err.error
+          : 'No se pudo crear el tratamiento.';
+        (await this.toast.create({
+          message: msg,
+          duration: 2200,
+          color: 'danger'
+        })).present();
       }
     });
   }

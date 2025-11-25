@@ -57,11 +57,15 @@
 }
 .dialog ion-item::part(native){ border:1px solid #e6edf5; border-radius:14px; overflow:hidden; }
 
-.dialog ion-input, .dialog ion-select{
+.dialog ion-input,
+.dialog ion-select,
+.dialog ion-textarea {
   --color:#0f172a; --placeholder-color:#64748b;
   --highlight-color-focused:#3b82f6; --highlight-color-valid:#3b82f6; --highlight-color-invalid:#ef4444;
 }
-.dialog ion-input::part(label), .dialog ion-select::part(label){
+.dialog ion-input::part(label),
+.dialog ion-select::part(label),
+.dialog ion-textarea::part(label){
   color:#6b7280; font-weight:600;
 }
 .dialog ion-item ion-icon[slot="start"]{
@@ -79,4 +83,131 @@
 
 @media (max-width: 420px){
   .dialog{ width:96vw; max-height:min(92vh,94dvh); border-radius:14px; }
+}
+
+/* ===================================================== */
+/* 🔍 Estilos para el buscador + chip de paciente        */
+/* ===================================================== */
+
+.dialog .paciente-inline {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 8px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+  margin-top: 10px;
+  margin-bottom: 8px;
+  transition: 0.2s ease-in-out;
+}
+
+/* Modo buscador */
+.dialog .search-mode {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+}
+
+.dialog .search-mode .icon {
+  color: #4f46e5;
+  font-size: 20px;
+}
+
+.dialog .search-mode .search-input {
+  flex: 1;
+  --placeholder-color: #9ca3af;
+  font-size: 15px;
+}
+
+/* Modo paciente seleccionado (chip) */
+.dialog .selected-mode {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+  background: #eef2ff;
+  padding: 6px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 1px solid #a5b4fc;
+}
+
+.dialog .selected-mode .icon {
+  color: #4f46e5;
+  font-size: 20px;
+}
+
+.dialog .selected-mode .text {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 500;
+  color: #1e1b4b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dialog .selected-mode .close {
+  font-size: 20px;
+  color: #6b7280;
+}
+
+/* Panel de resultados de búsqueda */
+.dialog .search-results {
+  margin-top: 4px;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  max-height: 210px;
+  overflow-y: auto;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.16);
+  animation: fadeInSearch 0.18s ease-out;
+}
+
+.dialog .result-item {
+  border-radius: 10px;
+  margin: 4px 6px;
+  transition: 0.15s ease;
+}
+
+.dialog .result-item:hover {
+  background: #f3f4f6;
+}
+
+/* Avatar redondito para el paciente */
+.dialog .avatar-circle {
+  background: #6366f1;
+  color: #ffffff;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+/* Sin resultados */
+.dialog .no-results {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 6px;
+  padding: 4px 2px;
+}
+
+.dialog .no-results ion-icon {
+  font-size: 18px;
+  color: #9ca3af;
+}
+
+/* Animación suave del panel */
+@keyframes fadeInSearch {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
