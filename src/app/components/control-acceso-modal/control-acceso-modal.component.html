@@ -1,9 +1,8 @@
-<!-- Modal centrado con estructura consistente -->
 <div class="dialog">
 
   <!-- Header -->
   <div class="dialog-header">
-    <h2>Nuevo usuario</h2>
+    <h2>{{ usuario ? 'Editar usuario' : 'Nuevo usuario' }}</h2>
     <ion-button (click)="close()" fill="clear" aria-label="Cerrar" size="small">
       <ion-icon name="close-outline" slot="icon-only"></ion-icon>
     </ion-button>
@@ -49,7 +48,7 @@
           <ion-select label="Rol" labelPlacement="stacked" formControlName="rol" interface="popover">
             <ion-select-option value="Administrador">Administrador</ion-select-option>
             <ion-select-option value="Veterinario">Veterinario</ion-select-option>
-            <ion-select-option value="Asistente">Recepcionista</ion-select-option>
+            <ion-select-option value="Asistente">Asistente</ion-select-option>
           </ion-select>
         </ion-item>
       </ion-list>

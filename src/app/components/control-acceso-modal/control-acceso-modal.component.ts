@@ -1,6 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ModalController, ToastController, LoadingController } from '@ionic/angular';
+import {
+  IonicModule,
+  ModalController,
+  ToastController,
+  LoadingController
+} from '@ionic/angular';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ControlAccesoService } from 'src/app/services/controlAcceso/control-acceso.service';
 import { ControlAcceso } from 'src/app/models/controlAcceso.model';
@@ -13,12 +18,15 @@ import { take } from 'rxjs/operators';
   templateUrl: './control-acceso-modal.component.html',
   styleUrls: ['./control-acceso-modal.component.scss'],
 })
-export class ControlAccesoModalComponent {
+export class ControlAccesoModalComponent implements OnInit {
   private fb = inject(FormBuilder);
   private modalCtrl = inject(ModalController);
   private service = inject(ControlAccesoService);
   private toast = inject(ToastController);
   private loading = inject(LoadingController);
+
+  // 👉 se llena cuando abrimos en modo edición
+  usuario?: ControlAcceso;
 
   form = this.fb.group({
     nombreUsuario: ['', [Validators.required, Validators.minLength(3)]],
@@ -27,6 +35,17 @@ export class ControlAccesoModalComponent {
   });
 
   showPass = false;
+
+  ngOnInit(): void {
+    // Si viene un usuario, es modo edición → rellenamos form
+    if (this.usuario) {
+      this.form.patchValue({
+        nombreUsuario: this.usuario.nombreUsuario,
+        password: this.usuario.password,
+        rol: this.usuario.rol
+      });
+    }
+  }
 
   close() {
     this.modalCtrl.dismiss(null, 'cancel');
@@ -45,41 +64,48 @@ export class ControlAccesoModalComponent {
       return;
     }
 
-    const loading = await this.loading.create({ message: 'Creando usuario...' });
+    const loading = await this.loading.create({
+      message: this.usuario ? 'Actualizando usuario...' : 'Creando usuario...'
+    });
     await loading.present();
 
     const { nombreUsuario, password, rol } = this.form.value;
 
     const payload: ControlAcceso = {
-      idUsuario: 0, // lo asigna el backend
+      idUsuario: this.usuario?.idUsuario ?? 0, // 0 en crear, id real en editar
       nombreUsuario: String(nombreUsuario),
       password: String(password),
       rol: String(rol)
     };
 
-    this.service.createUsuario(payload).pipe(take(1)).subscribe({
+    const isEdit = !!this.usuario;
+
+    const req$ = isEdit
+      ? this.service.updateUsuario(payload).pipe(take(1))
+      : this.service.createUsuario(payload).pipe(take(1));
+
+    req$.subscribe({
       next: async (res) => {
-        try {
-          await loading.dismiss();
-        } catch {}
+        try { await loading.dismiss(); } catch {}
+
         (await this.toast.create({
-          message: 'Usuario creado',
+          message: res?.msg ?? (isEdit ? 'Usuario actualizado' : 'Usuario creado'),
           duration: 1500,
           color: 'success',
           icon: 'checkmark-circle-outline',
           position: 'top'
         })).present();
-        this.modalCtrl.dismiss(true, 'created');
+
+        // 👇 devolvemos el usuario al padre para actualizar la lista sin recargar todo
+        this.modalCtrl.dismiss(payload, isEdit ? 'updated' : 'created');
       },
       error: async (err) => {
-        try {
-          await loading.dismiss();
-        } catch {}
-        console.error('createUsuario error:', { status: err?.status, body: err?.error });
+        try { await loading.dismiss(); } catch {}
+        console.error('create/update usuario error:', { status: err?.status, body: err?.error });
         const msg =
           (typeof err?.error === 'string' && err.error.length < 160)
             ? err.error
-            : 'No se pudo crear el usuario.';
+            : (this.usuario ? 'No se pudo actualizar el usuario.' : 'No se pudo crear el usuario.');
         (await this.toast.create({
           message: msg,
           duration: 2500,
