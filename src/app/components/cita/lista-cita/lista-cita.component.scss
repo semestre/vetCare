@@ -199,3 +199,16 @@ ion-chip.soft { --background: #f4f7fb; --color: #2f3b52; border-radius: 14px; }
   justify-content: flex-end;
   padding-left: 12px;
 }
+
+.status-row {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-actions {
+  display: flex;
+  gap: 4px;
+}
+

@@ -128,6 +128,43 @@
   background: rgba(0,0,0,0.15);
   border-radius: 8px;
 }
+.pacientes-selector {
+  margin-top: 8px;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+  background: var(--ion-color-light, #fff);
+}
+
+.paciente-placeholder {
+  font-size: 14px;
+  color: var(--ion-color-medium);
+}
+
+.pacientes-dropdown {
+  margin-top: 4px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #ffffff; // blanco fijo, aunque la app esté en dark
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.pacientes-dropdown ion-searchbar {
+  --background: #ffffff;
+  --color: #000000;
+  --placeholder-color: var(--ion-color-medium);
+}
+
+.pacientes-dropdown ion-list {
+  background: #ffffff;
+}
+
+.pacientes-dropdown ion-item {
+  --background: #ffffff;
+  --color: #000000;
+}
+
 
 /* Responsive */
 @media (max-width: 420px) {

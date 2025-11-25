@@ -1,9 +1,8 @@
-<!-- Contenido “card” centrado. OJO: ya no usamos ion-header/ion-footer. -->
 <div class="dialog">
 
   <!-- Header -->
   <div class="dialog-header">
-    <h2>Nueva cita</h2>
+    <h2>{{ cita ? 'Editar cita' : 'Nueva cita' }}</h2>
     <ion-button (click)="close()" fill="clear" aria-label="Cerrar" size="small">
       <ion-icon name="close-outline" slot="icon-only"></ion-icon>
     </ion-button>
@@ -43,6 +42,7 @@
         </ion-note>
       </ion-list>
 
+      <!-- Veterinario -->
       <ion-list inset="true" class="group">
         <ion-item>
           <ion-icon name="person-outline" slot="start"></ion-icon>
@@ -55,26 +55,68 @@
         <ion-note color="danger" *ngIf="form.get('idVeterinario')?.touched && form.get('idVeterinario')?.invalid">
           Ingresa un veterinario válido.
         </ion-note>
+      </ion-list>
 
-        <ion-item>
+      <!-- Paciente con buscador tipo dropdown -->
+      <ion-list inset="true" class="group">
+        <!-- Cabecera del dropdown -->
+        <ion-item button detail="true" (click)="togglePacienteSelector()">
           <ion-icon name="paw-outline" slot="start"></ion-icon>
-          <ion-label position="stacked">Paciente</ion-label>
-          <ion-select formControlName="idPaciente" placeholder="Selecciona un paciente">
-            <ion-select-option *ngFor="let p of pacientes" [value]="p.idPaciente">
-              {{ p.idPaciente }} - {{ p.nombreMascota }}
-            </ion-select-option>
-          </ion-select>
+          <ion-label>
+            <h3>Paciente</h3>
+            <p class="paciente-placeholder">
+              {{ pacienteSeleccionadoLabel || 'Toca para seleccionar un paciente' }}
+            </p>
+          </ion-label>
         </ion-item>
         <ion-note color="danger" *ngIf="form.get('idPaciente')?.touched && form.get('idPaciente')?.invalid">
           Ingresa un paciente válido.
         </ion-note>
+
+        <!-- Cuerpo del dropdown -->
+        <div *ngIf="pacienteSelectorAbierto" class="pacientes-dropdown">
+          <ion-searchbar
+            placeholder="Buscar por nombre o ID..."
+            (ionInput)="onPacienteSearch($event)"
+            [value]="pacienteBusqueda"
+            show-clear-button="focus">
+          </ion-searchbar>
+
+          <ion-list>
+            <ion-item
+              button
+              detail="false"
+              *ngFor="let p of pacientesFiltrados"
+              (click)="seleccionarPaciente(p)">
+              {{ p.idPaciente }} - {{ p.nombreMascota }}
+            </ion-item>
+
+            <ion-item *ngIf="!pacientesFiltrados.length">
+              <ion-label>Sin resultados</ion-label>
+            </ion-item>
+          </ion-list>
+        </div>
+      </ion-list>
+
+      <!-- Estado -->
+      <ion-list inset="true" class="group">
+        <ion-item>
+          <ion-icon name="flag-outline" slot="start"></ion-icon>
+          <ion-select label="Estado" labelPlacement="stacked"
+                      interface="popover" formControlName="status">
+            <ion-select-option value="Programada">Programada</ion-select-option>
+            <ion-select-option value="En proceso">En proceso</ion-select-option>
+            <ion-select-option value="Completada">Completada</ion-select-option>
+            <ion-select-option value="Cancelada">Cancelada</ion-select-option>
+          </ion-select>
+        </ion-item>
       </ion-list>
 
       <div class="bottom-space"></div>
     </form>
   </div>
 
-  <!-- Footer (siempre visible) -->
+  <!-- Footer -->
   <div class="dialog-footer">
     <ion-button fill="outline" color="medium" (click)="close()">Cancelar</ion-button>
     <ion-button type="submit" (click)="save()">

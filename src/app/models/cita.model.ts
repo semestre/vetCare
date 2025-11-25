@@ -6,4 +6,5 @@ export interface Cita {
     idVeterinario: number;
     idPaciente: number;
     pacienteNombre?: string;
+    status?: string;
 }

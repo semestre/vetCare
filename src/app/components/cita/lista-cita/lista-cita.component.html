@@ -21,12 +21,20 @@
   <!-- 🎛️ Controles (Filtros + Nueva cita) -->
   <div class="controls container">
     <div class="filters">
-      <ion-segment value="todos" mode="md"
-                   (ionChange)="onSearchChange({ detail: { value: ($event.detail.value==='todos' ? '' : $event.detail.value) } })">
-        <ion-segment-button value="todos"><ion-label>All</ion-label></ion-segment-button>
-        <ion-segment-button value="started"><ion-label>Started</ion-label></ion-segment-button>
-        <ion-segment-button value="approval"><ion-label>Approval</ion-label></ion-segment-button>
-        <ion-segment-button value="completed"><ion-label>Completed</ion-label></ion-segment-button>
+      <!-- Filtros por estado en español -->
+      <ion-segment value="todas" mode="md" (ionChange)="onStatusFilterChange($event)">
+        <ion-segment-button value="todas">
+          <ion-label>Todas</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="pendiente">
+          <ion-label>En proceso</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="completada">
+          <ion-label>Completadas</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="cancelada">
+          <ion-label>Canceladas</ion-label>
+        </ion-segment-button>
       </ion-segment>
     </div>
 
@@ -108,6 +116,26 @@
                   <ion-label>Paciente #{{ cita.idPaciente }} {{ cita.pacienteNombre }}</ion-label>
                 </ion-chip>
               </ion-card-subtitle>
+
+              <!-- Status + acciones -->
+              <div class="status-row">
+                <ion-chip [color]="getStatusColor(cita.status)" outline="true">
+                  <ion-icon name="ellipse" slot="start"></ion-icon>
+                  <ion-label>{{ cita.status || 'Sin estado' }}</ion-label>
+                </ion-chip>
+
+                <div class="card-actions">
+                  <!-- Editar -->
+                  <ion-button size="small" fill="clear" (click)="editarCita(cita)">
+                    <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+
+                  <!-- Eliminar -->
+                  <ion-button size="small" fill="clear" color="danger" (click)="eliminarCita(cita)">
+                    <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </div>
+              </div>
             </ion-card-header>
 
             <ion-card-content>
@@ -124,6 +152,16 @@
                   <span class="meta-k">Motivo: </span>
                   <span class="meta-v">{{ cita.motivo }}</span>
                 </div>
+              </div>
+
+              <div style="margin-top: 12px; display: flex; gap: 8px; justify-content: flex-end;">
+                <ion-button size="small" fill="outline" (click)="editarCita(cita)">
+                  Editar
+                </ion-button>
+
+                <ion-button size="small" color="danger" fill="outline" (click)="eliminarCita(cita)">
+                  Eliminar
+                </ion-button>
               </div>
             </ion-card-content>
           </ion-card>
