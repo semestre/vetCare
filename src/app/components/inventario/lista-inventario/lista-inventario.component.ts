@@ -20,6 +20,10 @@ export class ListaInventarioComponent implements OnInit {
   private toast = inject(ToastController);
   private modalCtrl = inject(ModalController);
 
+  activarFiltroBajo = false;
+  limiteBajoStock = 10; // valor por defecto
+
+
   items: Inventario[] = [
     { idItem: 1, nombreItem: 'Vacuna antirrábica', cantidad: 20,  categoria: 'Medicamento',         fechaActualizacion: '2025-10-10' },
     { idItem: 2, nombreItem: 'Guantes de látex',    cantidad: 100, categoria: 'Material quirúrgico', fechaActualizacion: '2025-10-08' }
@@ -75,15 +79,24 @@ export class ListaInventarioComponent implements OnInit {
 
   filtered(): Inventario[] {
     const q = this.searchTerm.trim().toLowerCase();
+
     return this.items.filter(i => {
-      const byCat = this.categoria === 'Todas' || (i.categoria ?? '') === this.categoria;
+      const byCat =
+        this.categoria === 'Todas' || (i.categoria ?? '') === this.categoria;
+
       const byText =
         (i.nombreItem ?? '').toLowerCase().includes(q) ||
         (i.categoria ?? '').toLowerCase().includes(q) ||
         String(i.idItem).includes(q);
-      return byCat && (!q || byText);
+
+      const byLow =
+        !this.activarFiltroBajo ||
+        (i.cantidad ?? 0) < (this.limiteBajoStock || 0);
+
+      return byCat && byText && byLow;
     });
   }
+
 
   stockPercent(i: Inventario): number {
     return Math.max(0, Math.min(100, Math.round((i.cantidad / this.maxQty) * 100)));

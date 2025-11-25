@@ -28,6 +28,26 @@
       </ion-segment>
     </div>
 
+    <div class="low-stock-filter">
+
+      <ion-toggle
+        [(ngModel)]="activarFiltroBajo"
+        color="warning">
+      </ion-toggle>
+
+      <ion-input
+        type="number"
+        min="1"
+        placeholder="Cantidad límite"
+        [(ngModel)]="limiteBajoStock"
+        [disabled]="!activarFiltroBajo"
+        style="max-width: 120px;">
+      </ion-input>
+
+      <span class="label">Stock &lt; {{ limiteBajoStock || 0 }}</span>
+
+    </div>
+
     <div class="actions">
       <ion-button fill="solid" color="primary" (click)="nuevoItem()">
         <ion-icon slot="start" name="add-outline"></ion-icon>
