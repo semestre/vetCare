@@ -134,9 +134,13 @@
                   <span class="meta-k k">ID Paciente</span>
                   <span class="meta-v v">#{{ paciente.idPaciente }}</span>
                 </div>
-                <div class="meta-item vc-meta-item">
+
+                <!-- 🔹 AQUÍ: clic para ver propietario -->
+                <div class="meta-item vc-meta-item propietario-click" (click)="verPropietario(paciente)">
                   <span class="meta-k k">Propietario</span>
-                  <span class="meta-v v">{{ paciente.propietarioNombre }} (#{{ paciente.idPropietario }})</span>
+                  <span class="meta-v v propietario-link">
+                    {{ paciente.propietarioNombre }} (#{{ paciente.idPropietario }})
+                  </span>
                 </div>
               </div>
 

@@ -1,0 +1,19 @@
+.propietario-modal-content {
+    ion-card {
+        border-radius: 18px;
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    ion-card-title {
+        font-weight: 700;
+    }
+
+    ion-item h3 {
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .actions {
+        margin-top: 16px;
+    }
+}

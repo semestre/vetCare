@@ -7,6 +7,8 @@ import { PacienteService } from 'src/app/services/paciente/paciente.service';
 import { ModalController } from '@ionic/angular';
 import { PacienteModalComponent } from 'src/app/components/paciente-modal/paciente-modal.component';
 import { PropietarioService } from 'src/app/services/propetario/propetario.service';
+import { Propietario } from 'src/app/models/propetario.model';
+import { PropietarioInfoModalComponent } from 'src/app/components/propietario-info-modal/propietario-info-modal.component';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -19,7 +21,7 @@ import { forkJoin } from 'rxjs';
 export class ListaPacienteComponent implements OnInit {
 
   private pacienteService = inject(PacienteService);
-  private propietarioService = inject(PropietarioService); // 👈 added
+  private propietarioService = inject(PropietarioService);
   private toast = inject(ToastController);
   private modalCtrl = inject(ModalController);
 
@@ -27,8 +29,8 @@ export class ListaPacienteComponent implements OnInit {
     { idPaciente: 201, nombreMascota: 'Firulais', especie: 'Perro', raza: 'Labrador', edad: 3, historialMedico: 'Vacunación completa', idPropietario: 101 },
     { idPaciente: 202, nombreMascota: 'Mishi',    especie: 'Gato',  raza: 'Siamés',   edad: 2, historialMedico: 'Alergia a ciertos alimentos', idPropietario: 102 }
   ];
-  propietarios: any[] = []; // 👈 added
 
+  propietarios: Propietario[] = [];
 
   loading = true;
   error: string | null = null;
@@ -41,11 +43,11 @@ export class ListaPacienteComponent implements OnInit {
     this.load();
   }
 
-    load(event?: CustomEvent) {
+  load(event?: CustomEvent) {
     this.loading = !event;
     this.error = null;
 
-    // 🧠 load propietarios + pacientes in parallel
+    // Carga propietarios + pacientes en paralelo
     forkJoin({
       propietarios: this.propietarioService.getAllPropietarios(),
       pacientes: this.pacienteService.getAllPacientes()
@@ -53,7 +55,7 @@ export class ListaPacienteComponent implements OnInit {
       next: ({ propietarios, pacientes }) => {
         this.propietarios = propietarios;
 
-        // 🔗 Match each paciente with its propietario name
+        // Match cada paciente con nombre de propietario
         this.pacientes = pacientes.map(p => {
           const propietario = propietarios.find(pr => pr.idPropietario === p.idPropietario);
           return {
@@ -97,7 +99,7 @@ export class ListaPacienteComponent implements OnInit {
         String(p.idPaciente).includes(q) ||
         String(p.idPropietario).includes(q) ||
         (p.historialMedico ?? '').toLowerCase().includes(q) ||
-        (p.propietarioNombre ?? '').toLowerCase().includes(q); // 🔍 can also search by owner name
+        (p.propietarioNombre ?? '').toLowerCase().includes(q);
       return byEspecie && (!q || byText);
     });
   }
@@ -124,5 +126,30 @@ export class ListaPacienteComponent implements OnInit {
 
     const { role } = await modal.onDidDismiss();
     if (role === 'created') this.load(); // recarga lista si se creó
+  }
+
+  // 🔹 NUEVO: abrir modal con info del propietario
+  async verPropietario(paciente: Paciente) {
+    const propietario = this.propietarios.find(pr => pr.idPropietario === paciente.idPropietario);
+
+    if (!propietario) {
+      (await this.toast.create({
+        message: 'No se encontró el propietario para este paciente.',
+        duration: 1800,
+        color: 'warning'
+      })).present();
+      return;
+    }
+
+    const modal = await this.modalCtrl.create({
+      component: PropietarioInfoModalComponent,
+      componentProps: { propietario },
+      cssClass: 'owner-modal',
+      mode: 'md',
+      backdropDismiss: true,
+      animated: true
+    });
+
+    await modal.present();
   }
 }

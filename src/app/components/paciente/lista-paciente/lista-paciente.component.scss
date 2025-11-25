@@ -170,3 +170,11 @@
 /* Skeleton */
 .pet-card.sk{ position:relative; }
 .sk-lines{ display:grid; gap:6px; }
+
+.propietario-click {
+  cursor: pointer;
+}
+
+.propietario-link {
+  text-decoration: underline;
+}
