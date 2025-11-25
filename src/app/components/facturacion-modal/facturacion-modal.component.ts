@@ -1,6 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ModalController, ToastController, LoadingController } from '@ionic/angular';
+import {
+  IonicModule,
+  ModalController,
+  ToastController,
+  LoadingController
+} from '@ionic/angular';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { FacturacionService } from 'src/app/services/facturacion/facturacion.service';
 import { Facturacion } from 'src/app/models/facturacion.model';
@@ -14,13 +19,17 @@ import { PacienteService } from 'src/app/services/paciente/paciente.service';
   templateUrl: './facturacion-modal.component.html',
   styleUrls: ['./facturacion-modal.component.scss'],
 })
-export class FacturacionModalComponent {
+export class FacturacionModalComponent implements OnInit {
 
   private fb = inject(FormBuilder);
   private modalCtrl = inject(ModalController);
   private service = inject(FacturacionService);
   private toast = inject(ToastController);
   private loading = inject(LoadingController);
+  private pacienteService = inject(PacienteService);
+
+  // 👉 se llena cuando es edición
+  factura?: Facturacion;
 
   form = this.fb.group({
     idPaciente: ['', [Validators.required]],
@@ -36,10 +45,20 @@ export class FacturacionModalComponent {
   selectedPaciente: Paciente | null = null;
   searchPacienteTerm = '';
 
-  constructor(private pacienteService: PacienteService) {}
-
   ngOnInit() {
     this.loadPacientes();
+
+    // Si viene factura -> modo edición
+    if (this.factura) {
+      this.form.patchValue({
+        idPaciente: String(this.factura.idPaciente),
+        servicios: this.factura.servicios,
+        medicamentos: this.factura.medicamentos,
+        total: String(this.factura.total),
+        fecha: this.factura.fecha,
+        metodoPago: this.factura.metodoPago
+      });
+    }
   }
 
   close() {
@@ -51,6 +70,15 @@ export class FacturacionModalComponent {
       next: (data) => {
         this.pacientes = data;
         this.pacientesFiltrados = [...data];
+
+        // Si estamos editando, rellenar paciente seleccionado
+        if (this.factura) {
+          const p = this.pacientes.find(px => px.idPaciente === this.factura!.idPaciente);
+          if (p) {
+            this.selectedPaciente = p;
+            this.form.patchValue({ idPaciente: String(p.idPaciente) });
+          }
+        }
       },
       error: (err) => console.error('❌ Error loading pacientes:', err)
     });
@@ -67,9 +95,9 @@ export class FacturacionModalComponent {
     }
 
     this.pacientesFiltrados = this.pacientes.filter(p =>
-      p.nombreMascota.toLowerCase().includes(value) ||
-      p.especie.toLowerCase().includes(value) ||
-      p.raza.toLowerCase().includes(value) ||
+      (p.nombreMascota || '').toLowerCase().includes(value) ||
+      (p.especie || '').toLowerCase().includes(value) ||
+      (p.raza || '').toLowerCase().includes(value) ||
       String(p.idPaciente).includes(value)
     );
   }
@@ -79,7 +107,7 @@ export class FacturacionModalComponent {
     this.selectedPaciente = p;
 
     this.form.patchValue({
-      idPaciente: String(p.idPaciente)  // Lo guardamos como STRING para el form
+      idPaciente: String(p.idPaciente)
     });
 
     // Ocultar panel de búsqueda
@@ -93,9 +121,8 @@ export class FacturacionModalComponent {
     this.form.patchValue({ idPaciente: '' });
   }
 
-  // ✔️ GUARDAR FACTURA
+  // ✔️ GUARDAR FACTURA (crear o editar)
   async save() {
-
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       (await this.toast.create({
@@ -107,13 +134,15 @@ export class FacturacionModalComponent {
       return;
     }
 
-    const loader = await this.loading.create({ message: 'Guardando factura...' });
+    const loader = await this.loading.create({
+      message: this.factura ? 'Actualizando factura...' : 'Guardando factura...'
+    });
     await loader.present();
 
     const { idPaciente, servicios, medicamentos, total, fecha, metodoPago } = this.form.value;
 
     const payload: Facturacion = {
-      idFactura: 0,
+      idFactura: this.factura?.idFactura ?? 0,
       idPaciente: Number(idPaciente),
       servicios: String(servicios),
       medicamentos: String(medicamentos ?? ''),
@@ -122,23 +151,30 @@ export class FacturacionModalComponent {
       metodoPago: String(metodoPago)
     };
 
-    this.service.createFactura(payload).subscribe({
+    const isEdit = !!this.factura;
+
+    const request$ = isEdit
+      ? this.service.updateFactura(payload)
+      : this.service.createFactura(payload);
+
+    request$.subscribe({
       next: async () => {
         await loader.dismiss();
         (await this.toast.create({
-          message: 'Factura creada',
+          message: isEdit ? 'Factura actualizada' : 'Factura creada',
           duration: 1500,
           color: 'success',
           icon: 'checkmark-circle-outline'
         })).present();
 
-        this.modalCtrl.dismiss(true, 'created');
+        // devolvemos la factura al padre
+        this.modalCtrl.dismiss(payload, isEdit ? 'updated' : 'created');
       },
       error: async (err) => {
         await loader.dismiss();
         const msg = (typeof err?.error === 'string' && err.error.length < 200)
           ? err.error
-          : 'No se pudo crear la factura.';
+          : (this.factura ? 'No se pudo actualizar la factura.' : 'No se pudo crear la factura.');
 
         (await this.toast.create({
           message: msg,

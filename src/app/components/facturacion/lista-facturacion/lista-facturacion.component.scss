@@ -395,6 +395,13 @@
   font-size: 2.5rem;
 }
 
+.factura-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 /* ====== RESPONSIVE ====== */
 @media (max-width: 768px) {
   .controls-row {
