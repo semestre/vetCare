@@ -174,19 +174,30 @@ export class ListaCitaComponent implements OnInit {
     const modal = await this.modalCtrl.create({
       component: CitaModalComponent,
       cssClass: 'center-modal',
-      mode: 'md',
       backdropDismiss: false,
-      animated: true,
-      componentProps: {
-        cita: { ...cita } // copia para no mutar directo
-      }
+      componentProps: { cita }
     });
 
     await modal.present();
 
-    const { role } = await modal.onDidDismiss();
-    if (role === 'updated') {
-      this.load();
+    const { role, data } = await modal.onDidDismiss();
+
+    if (role === 'updated' && data) {
+      // ⭐ Instantly update without waiting for server
+      const index = this.citas.findIndex(c => c.idCita === data.idCita);
+      if (index !== -1) {
+        this.citas[index] = {
+          ...data,
+          status: this.mapStatus(data.status)
+        };
+      }
+
+      // ⭐ Refresh the full list to stay clean
+      if (role === 'updated') {
+        setTimeout(() => {
+          this.load();
+        }, 900); // 0.3 seconds
+      }
     }
   }
 
@@ -212,6 +223,7 @@ export class ListaCitaComponent implements OnInit {
       this.service.deleteCita(cita.idCita).subscribe({
         next: async () => {
           this.citas = this.citas.filter(c => c.idCita !== cita.idCita);
+          this.load();
           (await this.toastCtrl.create({
             message: 'Cita eliminada.',
             duration: 1600,
