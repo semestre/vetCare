@@ -4,33 +4,46 @@ import { Observable } from 'rxjs';
 import { Paciente } from 'src/app/models/paciente.model';
 import { API_CONFIG } from 'src/app/config/api.config';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class PacienteService {
+
   private apiURL = `${API_CONFIG.baseURL}/pacientes`;
 
   constructor(private http: HttpClient) {}
 
+  // GET: todos los pacientes
   getAllPacientes(): Observable<Paciente[]> {
     return this.http.get<Paciente[]>(`${this.apiURL}/getAll`);
   }
 
-  // POST /pacientes/save -> @FormParam("paciente")
+  // POST: crear paciente
   createPaciente(paciente: Paciente): Observable<{ msg: string }> {
-    // Asegura tipos y forma esperada por el backend
-    const payload: Paciente = {
-      idPaciente: 0, // lo asigna el backend
-      nombreMascota: String(paciente.nombreMascota),
-      especie: String(paciente.especie ?? ''),
-      raza: String(paciente.raza ?? ''),
-      edad: Number(paciente.edad ?? 0),
-      historialMedico: String(paciente.historialMedico ?? ''),
-      idPropietario: Number(paciente.idPropietario)
-    };
-
-    // Se envía como formulario: paciente=<JSON>
-    const body = new HttpParams().set('paciente', JSON.stringify(payload));
+    const body = new HttpParams().set('paciente', JSON.stringify(paciente));
     const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
 
-    return this.http.post<{ msg: string }>(`${this.apiURL}/save`, body.toString(), { headers });
+    return this.http.post<{ msg: string }>(
+      `${this.apiURL}/save`,
+      body.toString(),
+      { headers }
+    );
+  }
+
+  // PUT: actualizar paciente
+  updatePaciente(paciente: Paciente): Observable<{ msg: string }> {
+    const body = new HttpParams().set('paciente', JSON.stringify(paciente));
+    const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
+
+    return this.http.put<{ msg: string }>(
+      `${this.apiURL}/update`,
+      body.toString(),
+      { headers }
+    );
+  }
+
+  // DELETE: eliminar paciente
+  deletePaciente(idPaciente: number): Observable<{ msg: string }> {
+    return this.http.delete<{ msg: string }>(`${this.apiURL}/delete/${idPaciente}`);
   }
 }

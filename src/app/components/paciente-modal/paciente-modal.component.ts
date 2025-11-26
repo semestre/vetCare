@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
@@ -14,11 +14,14 @@ import { PropietarioService } from 'src/app/services/propetario/propetario.servi
   templateUrl: './paciente-modal.component.html',
   styleUrls: ['./paciente-modal.component.scss'],
 })
-export class PacienteModalComponent {
+export class PacienteModalComponent implements OnInit {
   private modalCtrl = inject(ModalController);
   private toast = inject(ToastController);
   private pacienteService = inject(PacienteService);
+  private propietarioService = inject(PropietarioService);
 
+  // 👉 si venimos de "nuevo", se queda con idPaciente = 0
+  // si venimos de "editar", el padre inyecta un objeto aquí vía componentProps
   paciente: Paciente = {
     idPaciente: 0,
     nombreMascota: '',
@@ -29,28 +32,23 @@ export class PacienteModalComponent {
     idPropietario: 0
   };
 
+  propietarios: Propietario[] = [];
+  cargando = false;
 
-
-
-  propietarios: Propietario[] = []; //added this line
-  constructor(private propietarioService: PropietarioService) { } // added this line
   ngOnInit() {
     this.loadPropietarios();
   }
+
   loadPropietarios() {
     this.propietarioService.getAllPropietarios().subscribe({
       next: (data) => {
-        console.log('✅ Propietarios loaded:', data);
         this.propietarios = data;
       },
       error: (err) => {
         console.error('❌ Error loading propietarios:', err);
       }
     });
-  } // up to here
-
-
-  cargando = false;
+  }
 
   async guardar() {
     if (!this.paciente.nombreMascota || !this.paciente.especie) {
@@ -64,21 +62,30 @@ export class PacienteModalComponent {
 
     this.cargando = true;
 
-    this.pacienteService.createPaciente(this.paciente).subscribe({
-      next: async (res) => {
+    const esEdicion = !!this.paciente.idPaciente && this.paciente.idPaciente !== 0;
+    const req$ = esEdicion
+      ? this.pacienteService.updatePaciente(this.paciente)
+      : this.pacienteService.createPaciente(this.paciente);
+
+    req$.subscribe({
+      next: async () => {
         this.cargando = false;
         (await this.toast.create({
-          message: 'Paciente registrado correctamente ✅',
+          message: esEdicion
+            ? 'Paciente actualizado correctamente ✅'
+            : 'Paciente registrado correctamente ✅',
           duration: 1500,
           color: 'success'
         })).present();
-        this.modalCtrl.dismiss(null, 'created'); // avisa que se creó
+        this.modalCtrl.dismiss(this.paciente, esEdicion ? 'updated' : 'created');
       },
       error: async (err) => {
-        console.error('Error al guardar paciente:', err);
+        console.error('Error al guardar/actualizar paciente:', err);
         this.cargando = false;
         (await this.toast.create({
-          message: 'Error al registrar paciente ❌',
+          message: esEdicion
+            ? 'Error al actualizar paciente ❌'
+            : 'Error al registrar paciente ❌',
           duration: 1800,
           color: 'danger'
         })).present();

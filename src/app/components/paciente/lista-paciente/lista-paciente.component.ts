@@ -1,10 +1,15 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ToastController } from '@ionic/angular';
+import {
+  IonicModule,
+  ToastController,
+  ModalController,
+  AlertController
+} from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { Paciente } from 'src/app/models/paciente.model';
 import { PacienteService } from 'src/app/services/paciente/paciente.service';
-import { ModalController } from '@ionic/angular';
+import { ModalController as MC } from '@ionic/angular';
 import { PacienteModalComponent } from 'src/app/components/paciente-modal/paciente-modal.component';
 import { PropietarioService } from 'src/app/services/propetario/propetario.service';
 import { Propietario } from 'src/app/models/propetario.model';
@@ -24,10 +29,29 @@ export class ListaPacienteComponent implements OnInit {
   private propietarioService = inject(PropietarioService);
   private toast = inject(ToastController);
   private modalCtrl = inject(ModalController);
+  private alertCtrl = inject(AlertController);
 
   pacientes: Paciente[] = [
-    { idPaciente: 201, nombreMascota: 'Firulais', especie: 'Perro', raza: 'Labrador', edad: 3, historialMedico: 'Vacunación completa', idPropietario: 101 },
-    { idPaciente: 202, nombreMascota: 'Mishi',    especie: 'Gato',  raza: 'Siamés',   edad: 2, historialMedico: 'Alergia a ciertos alimentos', idPropietario: 102 }
+    {
+      idPaciente: 201,
+      nombreMascota: 'Firulais',
+      especie: 'Perro',
+      raza: 'Labrador',
+      edad: 3,
+      historialMedico: 'Vacunación completa',
+      idPropietario: 101,
+      propietarioNombre: 'Propietario demo'
+    },
+    {
+      idPaciente: 202,
+      nombreMascota: 'Mishi',
+      especie: 'Gato',
+      raza: 'Siamés',
+      edad: 2,
+      historialMedico: 'Alergia a ciertos alimentos',
+      idPropietario: 102,
+      propietarioNombre: 'Propietario demo 2'
+    }
   ];
 
   propietarios: Propietario[] = [];
@@ -47,7 +71,6 @@ export class ListaPacienteComponent implements OnInit {
     this.loading = !event;
     this.error = null;
 
-    // Carga propietarios + pacientes en paralelo
     forkJoin({
       propietarios: this.propietarioService.getAllPropietarios(),
       pacientes: this.pacienteService.getAllPacientes()
@@ -55,7 +78,6 @@ export class ListaPacienteComponent implements OnInit {
       next: ({ propietarios, pacientes }) => {
         this.propietarios = propietarios;
 
-        // Match cada paciente con nombre de propietario
         this.pacientes = pacientes.map(p => {
           const propietario = propietarios.find(pr => pr.idPropietario === p.idPropietario);
           return {
@@ -66,13 +88,13 @@ export class ListaPacienteComponent implements OnInit {
 
         this.refreshEspecies();
         this.loading = false;
-        event?.detail.complete();
+        event?.detail.complete?.();
       },
       error: async (err) => {
         console.error('Error al cargar pacientes o propietarios:', err);
         this.error = 'No se pudieron cargar los datos.';
         this.loading = false;
-        event?.detail.complete();
+        event?.detail.complete?.();
         (await this.toast.create({
           message: 'No se pudieron cargar los pacientes o propietarios.',
           duration: 1800,
@@ -114,6 +136,7 @@ export class ListaPacienteComponent implements OnInit {
     return '🐾';
   }
 
+  // ➕ NUEVO
   async nuevoPaciente() {
     const modal = await this.modalCtrl.create({
       component: PacienteModalComponent,
@@ -124,11 +147,86 @@ export class ListaPacienteComponent implements OnInit {
     });
     await modal.present();
 
-    const { role } = await modal.onDidDismiss();
-    if (role === 'created') this.load(); // recarga lista si se creó
+    const { role, data } = await modal.onDidDismiss();
+    if (role === 'created') {
+      this.load();
+    }
   }
 
-  // 🔹 NUEVO: abrir modal con info del propietario
+  // ✏️ EDITAR
+  async editarPaciente(p: Paciente) {
+    const modal = await this.modalCtrl.create({
+      component: PacienteModalComponent,
+      cssClass: 'center-modal',
+      mode: 'md',
+      backdropDismiss: false,
+      animated: true,
+      componentProps: {
+        paciente: { ...p }
+      }
+    });
+
+    await modal.present();
+    const { role, data } = await modal.onDidDismiss();
+
+    if (role === 'updated' && data) {
+      const updated = data as Paciente;
+      this.pacientes = this.pacientes.map(px =>
+        px.idPaciente === updated.idPaciente ? { ...px, ...updated } : px
+      );
+      this.refreshEspecies();
+
+      (await this.toast.create({
+        message: 'Paciente actualizado.',
+        duration: 1500,
+        color: 'success'
+      })).present();
+    }
+  }
+
+  // 🗑️ ELIMINAR
+  async eliminarPaciente(p: Paciente) {
+    const alert = await this.alertCtrl.create({
+      header: 'Eliminar paciente',
+      subHeader: 'Esta acción no se puede deshacer',
+      message: `¿Seguro que quieres eliminar a "${p.nombreMascota}" (ID #${p.idPaciente})?`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'confirm',
+          cssClass: 'danger'
+        }
+      ]
+    });
+
+    await alert.present();
+    const { role } = await alert.onDidDismiss();
+
+    if (role === 'confirm') {
+      this.pacienteService.deletePaciente(p.idPaciente).subscribe({
+        next: async () => {
+          this.pacientes = this.pacientes.filter(px => px.idPaciente !== p.idPaciente);
+          this.refreshEspecies();
+          (await this.toast.create({
+            message: 'Paciente eliminado.',
+            duration: 1500,
+            color: 'success'
+          })).present();
+        },
+        error: async (err) => {
+          console.error('Error al eliminar paciente:', err);
+          (await this.toast.create({
+            message: 'No se pudo eliminar el paciente.',
+            duration: 2000,
+            color: 'danger'
+          })).present();
+        }
+      });
+    }
+  }
+
+  // 🔹 Modal de propietario (lo de antes, igual)
   async verPropietario(paciente: Paciente) {
     const propietario = this.propietarios.find(pr => pr.idPropietario === paciente.idPropietario);
 
