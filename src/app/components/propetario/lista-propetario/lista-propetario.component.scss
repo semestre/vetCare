@@ -324,3 +324,17 @@ ion-chip.vc-soft,
 .error-card {
   border-left: 4px solid #eb445a;
 }
+
+.owner-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+
+  ion-button {
+    --border-radius: 999px;
+    --padding-start: 10px;
+    --padding-end: 10px;
+  }
+}
+
