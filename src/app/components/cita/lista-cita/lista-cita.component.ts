@@ -4,7 +4,8 @@ import {
   IonicModule,
   ModalController,
   ToastController,
-  AlertController
+  AlertController,
+  ActionSheetController
 } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { Cita } from 'src/app/models/cita.model';
@@ -27,14 +28,39 @@ export class ListaCitaComponent implements OnInit {
   private modalCtrl = inject(ModalController);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
+  private actionSheetCtrl = inject(ActionSheetController);
+
+  // 🔹 Mapeo de estados a SOLO 3 valores internos:
+  //   - pendiente
+  //   - completada
+  //   - cancelada
   private mapStatus(raw?: string): string {
-    if (!raw) return 'Programada';
+    if (!raw) return 'pendiente';
     const r = raw.toLowerCase();
-    if (r === 'started' || r === 'programada') return 'Programada';
-    if (r === 'approval' || r === 'en proceso') return 'En proceso';
-    if (r === 'completed' || r === 'completada') return 'Completada';
-    if (r === 'cancelled' || r === 'cancelada') return 'Cancelada';
+
+    // Todo lo que sea "programada" o "en proceso" lo mandamos a pendiente
+    if (['started', 'programada', 'pendiente', 'en proceso', 'approval', 'pending'].includes(r)) {
+      return 'pendiente';
+    }
+
+    if (['completed', 'completada', 'hecha', 'realizada'].includes(r)) {
+      return 'completada';
+    }
+
+    if (['cancelled', 'cancelada'].includes(r)) {
+      return 'cancelada';
+    }
+
     return raw;
+  }
+
+  // 🔹 Texto bonito para mostrar en el chip
+  getStatusLabel(status?: string): string {
+    const st = this.mapStatus(status);
+    if (st === 'pendiente') return 'Pendiente';
+    if (st === 'completada') return 'Completada';
+    if (st === 'cancelada') return 'Cancelada';
+    return status || 'Sin estado';
   }
 
   loading = true;
@@ -49,7 +75,7 @@ export class ListaCitaComponent implements OnInit {
       motivo: 'Vacunación',
       idVeterinario: 101,
       idPaciente: 201,
-      status: 'Programada'
+      status: 'pendiente'
     },
     {
       idCita: 2,
@@ -58,7 +84,7 @@ export class ListaCitaComponent implements OnInit {
       motivo: 'Chequeo general',
       idVeterinario: 102,
       idPaciente: 202,
-      status: 'Programada'
+      status: 'pendiente'
     }
   ];
   pacientes: any[] = [];
@@ -66,13 +92,14 @@ export class ListaCitaComponent implements OnInit {
   // Búsqueda por texto
   searchTerm = signal<string>('');
 
-  // Filtro por estado en español
+  // Filtro por estado
+  // values: 'todas' | 'pendiente' | 'completada' | 'cancelada'
   statusFilter = signal<string>('todas');
 
   // Citas filtradas (búsqueda + estado)
   filteredCitas = computed(() => {
     const q = this.searchTerm().trim().toLowerCase();
-    const status = this.statusFilter();
+    const statusFilter = this.statusFilter();
 
     return this.citas.filter(c => {
       const matchesSearch =
@@ -83,10 +110,11 @@ export class ListaCitaComponent implements OnInit {
         (c.fecha ?? '').includes(q) ||
         (c.hora ?? '').includes(q);
 
-      const st = (c.status ?? '').toLowerCase();
+      const st = this.mapStatus(c.status);
+
       const matchesStatus =
-        status === 'todas' ||
-        st === status.toLowerCase();
+        statusFilter === 'todas' ||
+        st === statusFilter;
 
       return matchesSearch && matchesStatus;
     });
@@ -144,9 +172,8 @@ export class ListaCitaComponent implements OnInit {
 
   // Color del chip de estado
   getStatusColor(status?: string): string {
-    const st = (status || '').toLowerCase();
-    if (st === 'programada') return 'primary';
-    if (st === 'en proceso') return 'warning';
+    const st = this.mapStatus(status);
+    if (st === 'pendiente') return 'warning';    // En proceso / pendiente
     if (st === 'completada') return 'success';
     if (st === 'cancelada') return 'danger';
     return 'medium';
@@ -169,7 +196,7 @@ export class ListaCitaComponent implements OnInit {
     }
   }
 
-  // Editar cita
+  // Editar cita completa
   async editarCita(cita: Cita) {
     const modal = await this.modalCtrl.create({
       component: CitaModalComponent,
@@ -183,7 +210,7 @@ export class ListaCitaComponent implements OnInit {
     const { role, data } = await modal.onDidDismiss();
 
     if (role === 'updated' && data) {
-      // ⭐ Instantly update without waiting for server
+      // update rápido local
       const index = this.citas.findIndex(c => c.idCita === data.idCita);
       if (index !== -1) {
         this.citas[index] = {
@@ -192,11 +219,11 @@ export class ListaCitaComponent implements OnInit {
         };
       }
 
-      // ⭐ Refresh the full list to stay clean
+      // refresh completo
       if (role === 'updated') {
         setTimeout(() => {
           this.load();
-        }, 900); // 0.3 seconds
+        }, 900);
       }
     }
   }
@@ -240,5 +267,79 @@ export class ListaCitaComponent implements OnInit {
         }
       });
     }
+  }
+
+  // 🔹 NUEVO: abrir ActionSheet para cambiar solo el estado
+  async openStatusSheet(cita: Cita) {
+    const current = this.mapStatus(cita.status);
+
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Cambiar estado',
+      subHeader: cita.motivo,
+      mode: 'md',
+      buttons: [
+        {
+          text: current === 'pendiente' ? 'Pendiente ✓' : 'Pendiente',
+          icon: 'time-outline',
+          handler: () => this.changeStatus(cita, 'pendiente')
+        },
+        {
+          text: current === 'completada' ? 'Completada ✓' : 'Completada',
+          icon: 'checkmark-circle-outline',
+          handler: () => this.changeStatus(cita, 'completada')
+        },
+        {
+          text: current === 'cancelada' ? 'Cancelada ✓' : 'Cancelada',
+          icon: 'close-circle-outline',
+          handler: () => this.changeStatus(cita, 'cancelada')
+        },
+        {
+          text: 'Cerrar',
+          role: 'cancel',
+          icon: 'close-outline'
+        }
+      ]
+    });
+
+    await actionSheet.present();
+  }
+
+  // 🔹 NUEVO: actualizar solo el status
+  private async changeStatus(cita: Cita, newStatus: string) {
+    const normalized = this.mapStatus(newStatus);
+
+    // Actualización optimista en UI
+    const index = this.citas.findIndex(c => c.idCita === cita.idCita);
+    if (index !== -1) {
+      this.citas[index] = {
+        ...this.citas[index],
+        status: normalized
+      };
+    }
+
+    this.service.updateCita({
+      ...cita,
+      status: normalized
+    }).subscribe({
+      next: async () => {
+        (await this.toastCtrl.create({
+          message: `Estado actualizado a "${this.getStatusLabel(normalized)}".`,
+          duration: 1500,
+          color: 'success',
+          icon: 'checkmark-circle-outline'
+        })).present();
+      },
+      error: async (err) => {
+        console.error('Error al cambiar estado:', err);
+        // Si falla, recargamos para no dejar datos inconsistentes
+        this.load();
+        (await this.toastCtrl.create({
+          message: 'No se pudo cambiar el estado.',
+          duration: 2000,
+          color: 'danger',
+          icon: 'close-circle-outline'
+        })).present();
+      }
+    });
   }
 }

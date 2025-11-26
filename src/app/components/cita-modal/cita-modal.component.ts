@@ -36,7 +36,7 @@ export class CitaModalComponent implements OnInit {
     motivo: ['', [Validators.required, Validators.minLength(3)]],
     idVeterinario: [null as number | null, [Validators.required]],
     idPaciente: [null as number | null, [Validators.required]],
-    status: ['Programada', [Validators.required]]
+    status: ['pendiente', [Validators.required]]
   });
 
   veterinarios: ControlAcceso[] = [];

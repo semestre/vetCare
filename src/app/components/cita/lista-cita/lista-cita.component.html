@@ -119,9 +119,15 @@
 
               <!-- Status + acciones -->
               <div class="status-row">
-                <ion-chip [color]="getStatusColor(cita.status)" outline="true">
+                <!-- Chip clickeable para cambiar estado -->
+                <ion-chip
+                  class="status-chip"
+                  [color]="getStatusColor(cita.status)"
+                  outline="true"
+                  (click)="openStatusSheet(cita)"
+                >
                   <ion-icon name="ellipse" slot="start"></ion-icon>
-                  <ion-label>{{ cita.status || 'Sin estado' }}</ion-label>
+                  <ion-label>{{ getStatusLabel(cita.status) }}</ion-label>
                 </ion-chip>
 
                 <div class="card-actions">

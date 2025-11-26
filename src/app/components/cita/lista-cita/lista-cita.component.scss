@@ -212,3 +212,7 @@ ion-chip.soft { --background: #f4f7fb; --color: #2f3b52; border-radius: 14px; }
   gap: 4px;
 }
 
+.status-chip {
+  cursor: pointer;
+  --background: rgba(255, 255, 255, 0.04);
+}
