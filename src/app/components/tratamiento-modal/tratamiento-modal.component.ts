@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController, ToastController, LoadingController } from '@ionic/angular';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
@@ -14,33 +14,45 @@ import { PacienteService } from 'src/app/services/paciente/paciente.service';
   templateUrl: './tratamiento-modal.component.html',
   styleUrls: ['./tratamiento-modal.component.scss'],
 })
-export class TratamientoModalComponent {
+export class TratamientoModalComponent implements OnInit {
   private fb = inject(FormBuilder);
   private modal = inject(ModalController);
   private service = inject(TratamientoService);
   private toast = inject(ToastController);
   private loading = inject(LoadingController);
 
+  private pacienteService = inject(PacienteService);
+
+  @Input() tratamiento: Tratamiento | null = null;
+  isEdit = false;
+
   hoy = new Date().toISOString().slice(0, 10);
 
-  // 🔹 OJO: idPaciente como string en el form (convertimos a number al guardar)
   form = this.fb.group({
     descripcion: ['', [Validators.required, Validators.minLength(3)]],
-    tipo: ['vacuna', Validators.required],         // valores: vacuna | medicamento | procedimiento
-    fecha: [this.hoy, Validators.required],        // YYYY-MM-DD
-    idPaciente: ['', [Validators.required]],       // string en el form
+    tipo: ['vacuna', Validators.required],
+    fecha: [this.hoy, Validators.required],
+    idPaciente: ['', [Validators.required]],
   });
 
-  // 🔹 Datos de pacientes y búsqueda
   pacientes: Paciente[] = [];
   pacientesFiltrados: Paciente[] = [];
   selectedPaciente: Paciente | null = null;
   searchPacienteTerm = '';
 
-  constructor(private pacienteService: PacienteService) {}
-
   ngOnInit() {
     this.loadPacientes();
+
+    if (this.tratamiento && this.tratamiento.idTratamiento && this.tratamiento.idTratamiento !== 0) {
+      this.isEdit = true;
+
+      this.form.patchValue({
+        descripcion: this.tratamiento.descripcion,
+        tipo: this.tratamiento.tipo,
+        fecha: this.tratamiento.fecha,
+        idPaciente: String(this.tratamiento.idPaciente),
+      });
+    }
   }
 
   close() {
@@ -50,9 +62,16 @@ export class TratamientoModalComponent {
   loadPacientes() {
     this.pacienteService.getAllPacientes().subscribe({
       next: (data) => {
-        console.log('✅ Pacientes loaded:', data);
         this.pacientes = data;
         this.pacientesFiltrados = [...data];
+
+        // Si estamos editando, intentar armar el chip del paciente
+        if (this.tratamiento) {
+          const p = this.pacientes.find(x => x.idPaciente === this.tratamiento!.idPaciente);
+          if (p) {
+            this.selectedPaciente = p;
+          }
+        }
       },
       error: (err) => {
         console.error('❌ Error loading pacientes:', err);
@@ -78,24 +97,22 @@ export class TratamientoModalComponent {
     );
   }
 
-  // ✅ Seleccionar paciente (se convierte en chip y se esconde el buscador)
+  // ✅ Seleccionar paciente
   selectPaciente(p: Paciente) {
     this.selectedPaciente = p;
 
     this.form.patchValue({
-      idPaciente: String(p.idPaciente)
+      idPaciente: String(p.idPaciente),
     });
 
-    // Ocultamos resultados y limpiamos cadena
     this.searchPacienteTerm = '';
     this.pacientesFiltrados = [];
   }
 
-  // ❌ Limpiar selección y volver al buscador
+  // ❌ Limpiar selección
   clearPacienteSelection() {
     this.selectedPaciente = null;
     this.form.patchValue({ idPaciente: '' });
-    // restaurar listado completo
     this.pacientesFiltrados = [...this.pacientes];
   }
 
@@ -110,34 +127,41 @@ export class TratamientoModalComponent {
       return;
     }
 
-    const loader = await this.loading.create({ message: 'Guardando tratamiento...' });
+    const loader = await this.loading.create({
+      message: this.isEdit ? 'Actualizando tratamiento...' : 'Guardando tratamiento...'
+    });
     await loader.present();
 
     const v = this.form.value;
     const payload: Tratamiento = {
-      idTratamiento: 0, // lo asigna backend
+      idTratamiento: this.tratamiento?.idTratamiento ?? 0,
       descripcion: String(v.descripcion),
       tipo: String(v.tipo),
       fecha: String(v.fecha),
-      idPaciente: Number(v.idPaciente), // 👈 aquí lo convertimos a número para el backend
+      idPaciente: Number(v.idPaciente),
     };
 
-    this.service.createTratamiento(payload).subscribe({
+    const req$ = this.isEdit
+      ? this.service.updateTratamiento(payload)
+      : this.service.createTratamiento(payload);
+
+    req$.subscribe({
       next: async () => {
         await loader.dismiss();
         (await this.toast.create({
-          message: 'Tratamiento creado',
+          message: this.isEdit ? 'Tratamiento actualizado' : 'Tratamiento creado',
           duration: 1500,
           color: 'success'
         })).present();
-        this.modal.dismiss(true, 'created'); // para recargar lista
+        this.modal.dismiss(payload, this.isEdit ? 'updated' : 'created');
       },
       error: async (err) => {
         await loader.dismiss();
-        console.error('createTratamiento error:', { status: err?.status, body: err?.error });
-        const msg = (typeof err?.error === 'string' && err.error.length < 200)
-          ? err.error
-          : 'No se pudo crear el tratamiento.';
+        console.error('save/update Tratamiento error:', { status: err?.status, body: err?.error });
+        const msg =
+          (typeof err?.error === 'string' && err.error.length < 200)
+            ? err.error
+            : (this.isEdit ? 'No se pudo actualizar el tratamiento.' : 'No se pudo crear el tratamiento.');
         (await this.toast.create({
           message: msg,
           duration: 2200,

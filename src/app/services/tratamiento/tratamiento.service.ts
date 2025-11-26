@@ -10,32 +10,57 @@ import { API_CONFIG } from 'src/app/config/api.config';
 export class TratamientoService {
 
   private apiURL = `${API_CONFIG.baseURL}/tratamientos`;
+  private FORM_FIELD = 'tratamiento';
 
   constructor(private http: HttpClient) {}
 
-  // Get all tratamientos
+  // GET: todos los tratamientos
   getAllTratamientos(): Observable<Tratamiento[]> {
     return this.http.get<Tratamiento[]>(`${this.apiURL}/getAll`);
   }
 
-  // Create a new tratamiento
+  // POST: crear tratamiento
   createTratamiento(tratamiento: Tratamiento): Observable<{ msg: string }> {
-  // Ajusta nombres si tu GET devuelve otros (p.ej. 'id_paciente')
-  const payload: Tratamiento = {
-    idTratamiento: 0,
-    descripcion: String(tratamiento.descripcion),
-    tipo: String(tratamiento.tipo ?? ''),
-    fecha: String(tratamiento.fecha),      // 'YYYY-MM-DD'
-    idPaciente: Number(tratamiento.idPaciente)
-  };
+    const payload: Tratamiento = {
+      idTratamiento: 0,
+      descripcion: String(tratamiento.descripcion),
+      tipo: String(tratamiento.tipo ?? ''),
+      fecha: String(tratamiento.fecha),
+      idPaciente: Number(tratamiento.idPaciente),
+    };
 
-  // Nombre del campo en el form (cámbialo si tu backend usa otro):
-  const FORM_FIELD = 'tratamiento';
+    const body = new HttpParams().set(this.FORM_FIELD, JSON.stringify(payload));
+    const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
 
-  const body = new HttpParams().set(FORM_FIELD, JSON.stringify(payload));
-  const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
+    return this.http.post<{ msg: string }>(
+      `${this.apiURL}/save`,
+      body.toString(),
+      { headers }
+    );
+  }
 
-  return this.http.post<{ msg: string }>(`${this.apiURL}/save`, body.toString(), { headers });
-}
+  // PUT: actualizar tratamiento
+  updateTratamiento(tratamiento: Tratamiento): Observable<{ msg: string }> {
+    const payload: Tratamiento = {
+      idTratamiento: Number(tratamiento.idTratamiento),
+      descripcion: String(tratamiento.descripcion),
+      tipo: String(tratamiento.tipo ?? ''),
+      fecha: String(tratamiento.fecha),
+      idPaciente: Number(tratamiento.idPaciente),
+    };
 
+    const body = new HttpParams().set(this.FORM_FIELD, JSON.stringify(payload));
+    const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
+
+    return this.http.put<{ msg: string }>(
+      `${this.apiURL}/update`,
+      body.toString(),
+      { headers }
+    );
+  }
+
+  // DELETE: eliminar tratamiento
+  deleteTratamiento(idTratamiento: number): Observable<{ msg: string }> {
+    return this.http.delete<{ msg: string }>(`${this.apiURL}/delete/${idTratamiento}`);
+  }
 }

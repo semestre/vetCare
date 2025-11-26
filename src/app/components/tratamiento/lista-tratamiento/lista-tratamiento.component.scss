@@ -162,3 +162,16 @@ ion-chip.tipo.info{ --background:#eff6ff; --color:#1e40af; }
 
 /* Skeleton */
 .t-card.sk{ position:relative; }
+
+.t-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+
+  ion-button {
+    --border-radius: 999px;
+    --padding-start: 10px;
+    --padding-end: 10px;
+  }
+}
