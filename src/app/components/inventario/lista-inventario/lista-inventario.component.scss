@@ -324,6 +324,13 @@ ion-chip.cat ion-label {
   font-size: 2.5rem;
 }
 
+.inv-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 /* ====== RESPONSIVE ====== */
 @media (max-width: 480px) {
   .header-row {

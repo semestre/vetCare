@@ -1,9 +1,8 @@
-<!-- Diálogo centrado (sin ion-header/footer para evitar sheet) -->
 <div class="dialog">
 
   <!-- Header -->
   <div class="dialog-header">
-    <h2>Nuevo ítem</h2>
+    <h2>{{ item ? 'Editar ítem' : 'Nuevo ítem' }}</h2>
     <ion-button (click)="close()" fill="clear" aria-label="Cerrar" size="small">
       <ion-icon slot="icon-only" name="close-outline"></ion-icon>
     </ion-button>
@@ -12,7 +11,6 @@
   <!-- Body scrollable -->
   <div class="dialog-body">
     <form [formGroup]="form" (ngSubmit)="save()" class="form-body" novalidate>
-
 
       <ion-list inset="true" class="group">
         <ion-item>
@@ -49,8 +47,8 @@
             labelPlacement="stacked"
             formControlName="categoria"
             interface="popover">
-            <ion-select-option value="medicina">Medicamento</ion-select-option>
-            <ion-select-option value="material medico">Material quirúrgico</ion-select-option>
+            <ion-select-option value="Medicamento">Medicamento</ion-select-option>
+            <ion-select-option value="Material quirúrgico">Material quirúrgico</ion-select-option>
           </ion-select>
         </ion-item>
 
