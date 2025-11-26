@@ -13,6 +13,12 @@
   overflow:hidden;
 }
 
+ion-searchbar {
+  --background: #ffffff;
+  --color: #000000;
+  --placeholder-color: var(--ion-color-medium);
+}
+
 /* Header */
 .dialog-header{
   display:flex; align-items:center; justify-content:space-between;

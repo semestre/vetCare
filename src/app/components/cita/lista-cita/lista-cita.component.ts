@@ -190,14 +190,11 @@ export class ListaCitaComponent implements OnInit {
           ...data,
           status: this.mapStatus(data.status)
         };
+        this.citas = [...this.citas]; // <- MAGIC LINE ✨
       }
 
       // ⭐ Refresh the full list to stay clean
-      if (role === 'updated') {
-        setTimeout(() => {
-          this.load();
-        }, 900); // 0.3 seconds
-      }
+      this.load();
     }
   }
 

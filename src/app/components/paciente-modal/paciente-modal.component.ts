@@ -20,6 +20,14 @@ export class PacienteModalComponent implements OnInit {
   private pacienteService = inject(PacienteService);
   private propietarioService = inject(PropietarioService);
 
+  // Dropdown propietario
+  propietarioSelectorAbierto = false;
+  propietarioBusqueda = '';
+  propietariosFiltrados: Propietario[] = [];
+  propietarioSeleccionadoLabel = '';
+  intentoGuardar = false;
+
+
   // 👉 si venimos de "nuevo", se queda con idPaciente = 0
   // si venimos de "editar", el padre inyecta un objeto aquí vía componentProps
   paciente: Paciente = {
@@ -43,12 +51,48 @@ export class PacienteModalComponent implements OnInit {
     this.propietarioService.getAllPropietarios().subscribe({
       next: (data) => {
         this.propietarios = data;
+        this.propietariosFiltrados = [...data];
+
+        // Preseleccionar propietario si estamos editando
+        if (this.paciente.idPropietario) {
+          const pr = this.propietarios.find(x => x.idPropietario === this.paciente.idPropietario);
+          if (pr) {
+            this.propietarioSeleccionadoLabel = `${pr.idPropietario} - ${pr.nombre}`;
+          }
+        }
       },
-      error: (err) => {
-        console.error('❌ Error loading propietarios:', err);
-      }
+      error: (err) => console.error('❌ Error loading propietarios:', err)
     });
   }
+
+
+  togglePropietarioSelector() {
+    this.propietarioSelectorAbierto = !this.propietarioSelectorAbierto;
+
+    if (this.propietarioSelectorAbierto) {
+      this.propietariosFiltrados = [...this.propietarios];
+      this.propietarioBusqueda = '';
+    }
+  }
+
+
+
+  onPropietarioSearch(ev: any) {
+    const value = (ev?.detail?.value || '').toLowerCase();
+    this.propietarioBusqueda = value;
+
+    this.propietariosFiltrados = this.propietarios.filter(pr =>
+      String(pr.idPropietario).includes(value) ||
+      (pr.nombre || '').toLowerCase().includes(value)
+    );
+  }
+
+  seleccionarPropietario(pr: Propietario) {
+    this.paciente.idPropietario = pr.idPropietario;
+    this.propietarioSeleccionadoLabel = `${pr.idPropietario} - ${pr.nombre}`;
+    this.propietarioSelectorAbierto = false;
+  }
+
 
   async guardar() {
     if (!this.paciente.nombreMascota || !this.paciente.especie) {
@@ -61,6 +105,18 @@ export class PacienteModalComponent implements OnInit {
     }
 
     this.cargando = true;
+    this.intentoGuardar = true;
+
+    if (this.paciente.idPropietario === 0) {
+      (await this.toast.create({
+        message: 'Selecciona un propietario.',
+        duration: 1500,
+        color: 'warning'
+      })).present();
+      return;
+    }
+
+
 
     const esEdicion = !!this.paciente.idPaciente && this.paciente.idPaciente !== 0;
     const req$ = esEdicion

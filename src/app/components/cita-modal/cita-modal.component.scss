@@ -2,6 +2,39 @@
   color-scheme: only light; /* fuerza modo claro para todo el componente */
 }
 
+.avatar-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--ion-color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.circle-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.paciente-item h3 {
+  margin: 0;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.paciente-item p {
+  margin: 0;
+  color: var(--ion-color-medium);
+  font-size: 13px;
+}
+
 /* ===== Tarjeta del diálogo centrado ===== */
 .dialog {
   width: min(720px, 92vw);

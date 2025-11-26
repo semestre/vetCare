@@ -86,10 +86,32 @@
             <ion-item
               button
               detail="false"
+              class="paciente-item"
               *ngFor="let p of pacientesFiltrados"
               (click)="seleccionarPaciente(p)">
-              {{ p.idPaciente }} - {{ p.nombreMascota }}
+
+              <ion-avatar slot="start" class="avatar-circle">
+                <div class="circle-content">
+                  {{ p.nombreMascota?.charAt(0)?.toUpperCase() }}
+                </div>
+              </ion-avatar>
+
+
+
+
+              <ion-label>
+                <h3>#{{ p.idPaciente }} - {{ p.nombreMascota }}</h3>
+                <p>{{ p.especie || '—' }}<span *ngIf="p.raza"> · {{ p.raza }}</span></p>
+              </ion-label>
+
             </ion-item>
+
+
+
+
+
+
+
 
             <ion-item *ngIf="!pacientesFiltrados.length">
               <ion-label>Sin resultados</ion-label>
@@ -119,10 +141,10 @@
   <!-- Footer -->
   <div class="dialog-footer">
     <ion-button fill="outline" color="medium" (click)="close()">Cancelar</ion-button>
-    <ion-button type="submit" (click)="save()">
+    <ion-button (click)="save()">
       <ion-icon slot="start" name="save-outline"></ion-icon>
       Guardar
     </ion-button>
   </div>
-
+  
 </div>

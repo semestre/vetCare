@@ -59,55 +59,56 @@ export class TratamientoModalComponent implements OnInit {
     this.modal.dismiss(null, 'cancel');
   }
 
+
+  pacienteSelectorAbierto = false;
+  pacienteBusqueda = '';
+  pacienteSeleccionadoLabel = '';
+
   loadPacientes() {
     this.pacienteService.getAllPacientes().subscribe({
       next: (data) => {
         this.pacientes = data;
         this.pacientesFiltrados = [...data];
 
-        // Si estamos editando, intentar armar el chip del paciente
+        // Si estamos en edición → mostrar label correcto
         if (this.tratamiento) {
           const p = this.pacientes.find(x => x.idPaciente === this.tratamiento!.idPaciente);
           if (p) {
-            this.selectedPaciente = p;
+            this.pacienteSeleccionadoLabel = `#${p.idPaciente} - ${p.nombreMascota}`;
           }
         }
       },
-      error: (err) => {
-        console.error('❌ Error loading pacientes:', err);
-      }
+      error: (err) => console.error('❌ Error loading pacientes:', err)
     });
   }
 
-  // 🔍 Buscar pacientes
-  onSearchPaciente(event: any) {
-    const value = (event.target.value || '').toLowerCase().trim();
-    this.searchPacienteTerm = value;
+  togglePacienteSelector() {
+    this.pacienteSelectorAbierto = !this.pacienteSelectorAbierto;
 
-    if (!value) {
+    if (this.pacienteSelectorAbierto) {
       this.pacientesFiltrados = [...this.pacientes];
-      return;
+      this.pacienteBusqueda = '';
     }
+  }
+
+  onPacienteSearch(ev: any) {
+    const value = (ev?.detail?.value || '').toLowerCase();
+    this.pacienteBusqueda = value;
 
     this.pacientesFiltrados = this.pacientes.filter(p =>
+      String(p.idPaciente).includes(value) ||
       (p.nombreMascota || '').toLowerCase().includes(value) ||
       (p.especie || '').toLowerCase().includes(value) ||
-      (p.raza || '').toLowerCase().includes(value) ||
-      String(p.idPaciente).includes(value)
+      (p.raza || '').toLowerCase().includes(value)
     );
   }
 
-  // ✅ Seleccionar paciente
-  selectPaciente(p: Paciente) {
-    this.selectedPaciente = p;
-
-    this.form.patchValue({
-      idPaciente: String(p.idPaciente),
-    });
-
-    this.searchPacienteTerm = '';
-    this.pacientesFiltrados = [];
+  seleccionarPaciente(p: Paciente) {
+    this.form.patchValue({ idPaciente: String(p.idPaciente) });
+    this.pacienteSeleccionadoLabel = `#${p.idPaciente} - ${p.nombreMascota}`;
+    this.pacienteSelectorAbierto = false;
   }
+
 
   // ❌ Limpiar selección
   clearPacienteSelection() {

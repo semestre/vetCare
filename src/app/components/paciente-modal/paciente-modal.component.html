@@ -14,73 +14,97 @@
 
       <ion-item>
         <ion-icon name="paw-outline" slot="start"></ion-icon>
-        <ion-input
-          label="Nombre de la mascota"
-          labelPlacement="stacked"
-          [(ngModel)]="paciente.nombreMascota"
-          name="nombreMascota"
-          required>
+        <ion-input label="Nombre de la mascota" labelPlacement="stacked" [(ngModel)]="paciente.nombreMascota"
+          name="nombreMascota" required>
         </ion-input>
       </ion-item>
 
       <ion-item>
         <ion-icon name="shapes-outline" slot="start"></ion-icon>
-        <ion-input
-          label="Especie"
-          labelPlacement="stacked"
-          [(ngModel)]="paciente.especie"
-          name="especie"
-          required>
+        <ion-input label="Especie" labelPlacement="stacked" [(ngModel)]="paciente.especie" name="especie" required>
         </ion-input>
       </ion-item>
 
       <ion-item>
         <ion-icon name="id-card-outline" slot="start"></ion-icon>
-        <ion-input
-          label="Raza"
-          labelPlacement="stacked"
-          [(ngModel)]="paciente.raza"
-          name="raza">
+        <ion-input label="Raza" labelPlacement="stacked" [(ngModel)]="paciente.raza" name="raza">
         </ion-input>
       </ion-item>
 
       <ion-item>
         <ion-icon name="time-outline" slot="start"></ion-icon>
-        <ion-input
-          type="number"
-          label="Edad"
-          labelPlacement="stacked"
-          [(ngModel)]="paciente.edad"
-          name="edad">
+        <ion-input type="number" label="Edad" labelPlacement="stacked" [(ngModel)]="paciente.edad" name="edad">
         </ion-input>
       </ion-item>
 
       <ion-item>
         <ion-icon name="document-text-outline" slot="start"></ion-icon>
-        <ion-textarea
-          label="Historial Médico"
-          labelPlacement="stacked"
-          [(ngModel)]="paciente.historialMedico"
-          name="historialMedico"
-          auto-grow="true">
+        <ion-textarea label="Historial Médico" labelPlacement="stacked" [(ngModel)]="paciente.historialMedico"
+          name="historialMedico" auto-grow="true">
         </ion-textarea>
       </ion-item>
 
-      <ion-item>
-        <ion-icon name="person-outline" slot="start"></ion-icon>
-        <ion-select
-          label="Propietario"
-          labelPlacement="stacked"
-          [(ngModel)]="paciente.idPropietario"
-          name="idPropietario"
-          placeholder="Selecciona un propietario">
-          <ion-select-option *ngFor="let p of propietarios" [value]="p.idPropietario">
-            {{ p.idPropietario }} - {{ p.nombre }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
+      <!-- PROPIETARIO SELECTOR (NOT inside ion-item anymore!) -->
+      
+      
 
     </form>
+    <div class="propietario-container">
+
+        <ion-list inset="true" class="group">
+
+          <!-- Header del dropdown -->
+          <ion-item button detail="true" (click)="togglePropietarioSelector()">
+            <ion-icon name="person-outline" slot="start"></ion-icon>
+
+            <ion-label>
+              <h3>Propietario</h3>
+              <p class="paciente-placeholder">
+                {{ propietarioSeleccionadoLabel || 'Toca para seleccionar un propietario' }}
+              </p>
+            </ion-label>
+          </ion-item>
+
+          <!-- Validación -->
+          <ion-note color="danger" *ngIf="paciente.idPropietario === 0 && intentoGuardar">
+            Selecciona un propietario válido.
+          </ion-note>
+
+          <!-- Dropdown -->
+          <div *ngIf="propietarioSelectorAbierto" class="pacientes-dropdown">
+
+            <ion-searchbar placeholder="Buscar por nombre o ID…" (ionInput)="onPropietarioSearch($event)"
+              [value]="propietarioBusqueda" show-clear-button="focus">
+            </ion-searchbar>
+
+            <ion-list>
+              <ion-item button detail="false" *ngFor="let pr of propietariosFiltrados"
+                (click)="seleccionarPropietario(pr)">
+
+                <ion-avatar slot="start" class="avatar-circle">
+                  <div class="circle-content">
+                    {{ pr.nombre?.charAt(0)?.toUpperCase() }}
+                  </div>
+                </ion-avatar>
+
+                <ion-label>
+                  <h3>#{{ pr.idPropietario }} - {{ pr.nombre }}</h3>
+                  <p>{{ pr.telefono || '—' }}</p>
+                </ion-label>
+
+              </ion-item>
+
+              <ion-item *ngIf="!propietariosFiltrados.length">
+                <ion-label>Sin resultados</ion-label>
+              </ion-item>
+
+            </ion-list>
+
+          </div>
+
+        </ion-list>
+
+      </div>
   </div>
 
   <!-- Footer fijo (acciones) -->
