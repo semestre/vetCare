@@ -1,9 +1,9 @@
-<!-- Diálogo centrado (sin ion-header/footer para evitar sheet) -->
+<!-- Diálogo centrado -->
 <div class="dialog">
 
   <!-- Header -->
   <div class="dialog-header">
-    <h2>Nuevo propietario</h2>
+    <h2>{{ isEdit ? 'Editar propietario' : 'Nuevo propietario' }}</h2>
     <ion-button (click)="close()" fill="clear" aria-label="Cerrar" size="small">
       <ion-icon slot="icon-only" name="close-outline"></ion-icon>
     </ion-button>
@@ -64,7 +64,7 @@
     <ion-button fill="outline" color="medium" (click)="close()">Cancelar</ion-button>
     <ion-button type="submit" (click)="save()">
       <ion-icon slot="start" name="save-outline"></ion-icon>
-      Guardar
+      {{ isEdit ? 'Actualizar' : 'Guardar' }}
     </ion-button>
   </div>
 

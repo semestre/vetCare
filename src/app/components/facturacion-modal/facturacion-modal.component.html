@@ -3,7 +3,7 @@
 
   <!-- Header -->
   <div class="dialog-header">
-    <h2>Nueva factura</h2>
+    <h2>{{ factura ? 'Editar factura' : 'Nueva factura' }}</h2>
     <ion-button (click)="close()" fill="clear" aria-label="Cerrar" size="small">
       <ion-icon slot="icon-only" name="close-outline"></ion-icon>
     </ion-button>

@@ -221,9 +221,22 @@
                   <span>Total</span>
                   <strong>${{ factura.total | number:'1.2-2' }}</strong>
                 </div>
-              </ion-card-content>
 
-              <div class="ticket-edge bottom"></div>
+                <!-- ACCIONES -->
+                <div class="factura-actions">
+                  <ion-button size="small" fill="outline" (click)="editarFactura(factura)">
+                    <ion-icon slot="start" name="create-outline"></ion-icon>
+                    Editar
+                  </ion-button>
+
+                  <ion-button size="small" color="danger" fill="outline" (click)="eliminarFactura(factura)">
+                    <ion-icon slot="start" name="trash-outline"></ion-icon>
+                    Eliminar
+                  </ion-button>
+                </div>
+                </ion-card-content>
+
+                <div class="ticket-edge bottom"></div>
             </ion-card>
           </div>
         </ion-col>

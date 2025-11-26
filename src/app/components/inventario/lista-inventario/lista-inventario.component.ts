@@ -1,10 +1,14 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ToastController } from '@ionic/angular';
+import {
+  IonicModule,
+  ToastController,
+  ModalController,
+  AlertController
+} from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { Inventario } from 'src/app/models/inventario.model';
 import { InventarioService } from 'src/app/services/inventario/inventario.service';
-import { ModalController } from '@ionic/angular';
 import { InventarioModalComponent } from 'src/app/components/inventario-modal/inventario-modal.component';
 
 @Component({
@@ -19,26 +23,23 @@ export class ListaInventarioComponent implements OnInit {
   private invService = inject(InventarioService);
   private toast = inject(ToastController);
   private modalCtrl = inject(ModalController);
+  private alertCtrl = inject(AlertController);
 
   activarFiltroBajo = false;
   limiteBajoStock = 10; // valor por defecto
-
 
   items: Inventario[] = [
     { idItem: 1, nombreItem: 'Vacuna antirrábica', cantidad: 20,  categoria: 'Medicamento',         fechaActualizacion: '2025-10-10' },
     { idItem: 2, nombreItem: 'Guantes de látex',    cantidad: 100, categoria: 'Material quirúrgico', fechaActualizacion: '2025-10-08' }
   ];
 
-  // UI
   loading = true;
   error: string | null = null;
 
-  // búsqueda + filtro
   searchTerm = '';
   categoria = 'Todas';
   categorias: string[] = ['Todas'];
 
-  // umbral de alerta
   lowStockThreshold = 10;
 
   ngOnInit(): void {
@@ -51,18 +52,24 @@ export class ListaInventarioComponent implements OnInit {
 
     this.invService.getAllItems().subscribe({
       next: (data) => {
-        if (Array.isArray(data) && data.length) this.items = data;
+        if (Array.isArray(data) && data.length) {
+          this.items = data;
+        }
         this.refreshCategorias();
         this.loading = false;
-        event?.detail.complete();
+        event?.detail.complete?.();
       },
       error: async (err) => {
         console.error('Error al cargar inventario:', err);
         this.error = 'No se pudo cargar el inventario.';
         this.refreshCategorias();
         this.loading = false;
-        event?.detail.complete();
-        (await this.toast.create({ message: 'No se pudo cargar el inventario.', duration: 1800, color: 'danger' })).present();
+        event?.detail.complete?.();
+        (await this.toast.create({
+          message: 'No se pudo cargar el inventario.',
+          duration: 1800,
+          color: 'danger'
+        })).present();
       }
     });
   }
@@ -97,7 +104,6 @@ export class ListaInventarioComponent implements OnInit {
     });
   }
 
-
   stockPercent(i: Inventario): number {
     return Math.max(0, Math.min(100, Math.round((i.cantidad / this.maxQty) * 100)));
   }
@@ -115,6 +121,7 @@ export class ListaInventarioComponent implements OnInit {
     return 'cube-outline';
   }
 
+  // ➕ NUEVO
   async nuevoItem() {
     const modal = await this.modalCtrl.create({
       component: InventarioModalComponent,
@@ -127,5 +134,78 @@ export class ListaInventarioComponent implements OnInit {
 
     const { role } = await modal.onDidDismiss();
     if (role === 'created') this.load();
+  }
+
+  // ✏️ EDITAR
+  async editarItem(item: Inventario) {
+    const modal = await this.modalCtrl.create({
+      component: InventarioModalComponent,
+      cssClass: 'center-modal',
+      mode: 'md',
+      backdropDismiss: false,
+      animated: true,
+      componentProps: {
+        item: { ...item }
+      }
+    });
+    await modal.present();
+
+    const { role, data } = await modal.onDidDismiss();
+    if (role === 'updated' && data) {
+      const updated = data as Inventario;
+
+      this.items = this.items.map(i =>
+        i.idItem === updated.idItem ? { ...i, ...updated } : i
+      );
+      this.refreshCategorias();
+
+      (await this.toast.create({
+        message: 'Ítem actualizado.',
+        duration: 1500,
+        color: 'success'
+      })).present();
+    }
+  }
+
+  // 🗑️ ELIMINAR
+  async eliminarItem(item: Inventario) {
+    const alert = await this.alertCtrl.create({
+      header: 'Eliminar ítem',
+      subHeader: 'Esta acción no se puede deshacer',
+      message: `¿Seguro que quieres eliminar "${item.nombreItem}" (ID #${item.idItem})?`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'confirm',
+          cssClass: 'danger'
+        }
+      ]
+    });
+
+    await alert.present();
+    const { role } = await alert.onDidDismiss();
+
+    if (role === 'confirm') {
+      this.invService.deleteItem(item.idItem).subscribe({
+        next: async () => {
+          this.items = this.items.filter(i => i.idItem !== item.idItem);
+          this.refreshCategorias();
+          (await this.toast.create({
+            message: 'Ítem eliminado.',
+            duration: 1500,
+            color: 'success'
+          })).present();
+        },
+        error: async (err) => {
+          console.error('Error al eliminar ítem:', err);
+          (await this.toast.create({
+            message: 'No se pudo eliminar el ítem.',
+            duration: 2000,
+            color: 'danger'
+          })).present();
+        }
+      });
+    }
   }
 }

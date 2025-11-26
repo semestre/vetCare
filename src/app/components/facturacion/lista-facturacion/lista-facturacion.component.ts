@@ -7,11 +7,16 @@ import {
   inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ToastController } from '@ionic/angular';
+import {
+  IonicModule,
+  ToastController,
+  ModalController,
+  AlertController
+} from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { Facturacion } from 'src/app/models/facturacion.model';
 import { FacturacionService } from 'src/app/services/facturacion/facturacion.service';
-import { ModalController } from '@ionic/angular';
+import { ModalController as MC } from '@ionic/angular';
 import { FacturacionModalComponent } from 'src/app/components/facturacion-modal/facturacion-modal.component';
 import { forkJoin } from 'rxjs';
 import { PacienteService } from 'src/app/services/paciente/paciente.service';
@@ -30,30 +35,12 @@ export class ListaFacturacionComponent implements OnInit, AfterViewInit {
   private toast = inject(ToastController);
   private modalCtrl = inject(ModalController);
   private pacienteService = inject(PacienteService);
+  private alertCtrl = inject(AlertController);
 
   @ViewChild('metodoChart') metodoChartRef!: ElementRef<HTMLCanvasElement>;
   private metodoChart: Chart | null = null;
 
-  facturas: Facturacion[] = [
-    {
-      idFactura: 1,
-      idPaciente: 201,
-      servicios: 'Consulta general',
-      medicamentos: 'Vacuna antirrábica',
-      total: 500,
-      fecha: '2025-10-12',
-      metodoPago: 'Efectivo',
-    },
-    {
-      idFactura: 2,
-      idPaciente: 202,
-      servicios: 'Cirugía menor',
-      medicamentos: 'Anestesia local',
-      total: 1500,
-      fecha: '2025-10-13',
-      metodoPago: 'Tarjeta',
-    },
-  ];
+  facturas: Facturacion[] = [];
   pacientes: any[] = [];
 
   loading = true;
@@ -72,7 +59,6 @@ export class ListaFacturacionComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // cuando la vista está lista intentamos pintar la gráfica
     this.refreshChart();
   }
 
@@ -92,14 +78,12 @@ export class ListaFacturacionComponent implements OnInit, AfterViewInit {
           return {
             ...f,
             pacienteNombre: paciente ? paciente.nombreMascota : 'Desconocido',
-          };
+          } as any;
         });
 
         this.pacientes = pacientes;
         this.loading = false;
         event?.detail.complete?.();
-
-        // tras cargar datos, actualizamos gráfica
         this.refreshChart();
       },
       error: async (err) => {
@@ -122,7 +106,7 @@ export class ListaFacturacionComponent implements OnInit, AfterViewInit {
   get filtered(): Facturacion[] {
     const q = this.searchTerm.trim().toLowerCase();
 
-    return this.facturas.filter((f) => {
+    return this.facturas.filter((f: any) => {
       const byMetodo =
         this.metodo === 'Todos' ||
         (f.metodoPago ?? '').toLowerCase() === this.metodo.toLowerCase();
@@ -149,14 +133,14 @@ export class ListaFacturacionComponent implements OnInit, AfterViewInit {
 
   // 💰 total de las ventas del filtro actual
   get totalFiltrado(): number {
-    return this.filtered.reduce((sum, f) => sum + (f.total || 0), 0);
+    return this.filtered.reduce((sum: number, f: any) => sum + (f.total || 0), 0);
   }
 
   // estadísticas por método para la gráfica
   private getMetodoStats() {
     const map = new Map<string, number>();
 
-    for (const f of this.filtered) {
+    for (const f of this.filtered as any[]) {
       const key = f.metodoPago || 'Sin método';
       map.set(key, (map.get(key) || 0) + (f.total || 0));
     }
@@ -222,12 +206,11 @@ export class ListaFacturacionComponent implements OnInit, AfterViewInit {
     const { labels, data } = this.getMetodoStats();
 
     this.metodoChart.data.labels = labels;
-    this.metodoChart.data.datasets[0].data = data;
+    (this.metodoChart.data.datasets[0].data as any) = data;
     this.metodoChart.update();
   }
 
   private refreshChart() {
-    // pequeña protección por si la vista aún no está lista
     setTimeout(() => {
       if (!this.metodoChartRef?.nativeElement) return;
 
@@ -239,7 +222,6 @@ export class ListaFacturacionComponent implements OnInit, AfterViewInit {
     }, 0);
   }
 
-  // llamado cuando cambian filtros (search, método, fechas)
   onFiltersChanged() {
     if (!this.loading) {
       this.refreshChart();
@@ -262,6 +244,7 @@ export class ListaFacturacionComponent implements OnInit, AfterViewInit {
     return 'mp-generic';
   }
 
+  // ➕ NUEVO REGISTRO
   async nuevoRegistro() {
     const modal = await this.modalCtrl.create({
       component: FacturacionModalComponent,
@@ -272,7 +255,93 @@ export class ListaFacturacionComponent implements OnInit, AfterViewInit {
     });
     await modal.present();
 
-    const { role } = await modal.onDidDismiss();
-    if (role === 'created') this.load();
+    const { role, data } = await modal.onDidDismiss();
+    if (role === 'created') {
+      // recargamos todo para traer la factura desde backend
+      this.load();
+    }
+  }
+
+  // ✏️ EDITAR FACTURA
+  async editarFactura(factura: any) {
+    const modal = await this.modalCtrl.create({
+      component: FacturacionModalComponent,
+      cssClass: 'center-modal',
+      mode: 'md',
+      backdropDismiss: false,
+      animated: true,
+      componentProps: {
+        factura: { ...factura }
+      }
+    });
+
+    await modal.present();
+
+    const { role, data } = await modal.onDidDismiss();
+
+    if (role === 'updated' && data) {
+      const updated = data as Facturacion;
+
+      this.facturas = this.facturas.map((f: any) =>
+        f.idFactura === updated.idFactura
+          ? {
+              ...f,
+              ...updated
+            }
+          : f
+      );
+
+      this.refreshChart();
+
+      (await this.toast.create({
+        message: 'Factura actualizada.',
+        duration: 1500,
+        color: 'success'
+      })).present();
+    }
+  }
+
+  // 🗑️ ELIMINAR FACTURA
+  async eliminarFactura(factura: any) {
+    const alert = await this.alertCtrl.create({
+      header: 'Eliminar factura',
+      subHeader: 'Esta acción no se puede deshacer',
+      message: `¿Seguro que quieres eliminar la factura #${factura.idFactura}?`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'confirm',
+          cssClass: 'danger'
+        }
+      ]
+    });
+
+    await alert.present();
+    const { role } = await alert.onDidDismiss();
+
+    if (role === 'confirm') {
+      this.factService.deleteFactura(factura.idFactura).subscribe({
+        next: async () => {
+          this.facturas = this.facturas.filter(
+            (f: any) => f.idFactura !== factura.idFactura
+          );
+          this.refreshChart();
+          (await this.toast.create({
+            message: 'Factura eliminada.',
+            duration: 1500,
+            color: 'success'
+          })).present();
+        },
+        error: async (err) => {
+          console.error('Error al eliminar factura:', err);
+          (await this.toast.create({
+            message: 'No se pudo eliminar la factura.',
+            duration: 2000,
+            color: 'danger'
+          })).present();
+        }
+      });
+    }
   }
 }

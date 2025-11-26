@@ -1,10 +1,14 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ToastController } from '@ionic/angular';
+import {
+  IonicModule,
+  ToastController,
+  ModalController,
+  AlertController
+} from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { Tratamiento } from 'src/app/models/tratamiento.model';
 import { TratamientoService } from 'src/app/services/tratamiento/tratamiento.service';
-import { ModalController } from '@ionic/angular';
 import { TratamientoModalComponent } from 'src/app/components/tratamiento-modal/tratamiento-modal.component';
 import { forkJoin } from 'rxjs';
 import { PacienteService } from 'src/app/services/paciente/paciente.service';
@@ -21,6 +25,7 @@ export class ListaTratamientoComponent implements OnInit {
   private pacienteService = inject(PacienteService);
   private toast = inject(ToastController);
   private modalCtrl = inject(ModalController);
+  private alertCtrl = inject(AlertController);
 
   tratamientos: Tratamiento[] = [
     { idTratamiento: 301, descripcion: 'Vacuna antirrábica', tipo: 'Vacuna',  fecha: '2025-10-12', idPaciente: 201 },
@@ -28,61 +33,56 @@ export class ListaTratamientoComponent implements OnInit {
   ];
   pacientes: any[] = [];
 
-  // UI
   loading = true;
   error: string | null = null;
 
-  // búsqueda + filtro por tipo
   searchTerm = '';
-  tipoFiltro = 'Todos'; // Todos | Vacuna | Higiene | Cirugía | Desparasitación | Control | Otro
+  tipoFiltro = 'Todos';
   tipos: string[] = ['Todos'];
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void {
+    this.load();
+  }
 
   load(event?: CustomEvent) {
-  this.loading = !event;
-  this.error = null;
+    this.loading = !event;
+    this.error = null;
 
-  forkJoin({
-    tratamientos: this.service.getAllTratamientos(),
-    pacientes: this.pacienteService.getAllPacientes()
-  }).subscribe({
-    next: ({ tratamientos, pacientes }) => {
-      this.pacientes = pacientes;
+    forkJoin({
+      tratamientos: this.service.getAllTratamientos(),
+      pacientes: this.pacienteService.getAllPacientes()
+    }).subscribe({
+      next: ({ tratamientos, pacientes }) => {
+        this.pacientes = pacientes;
 
-      // Add pacienteNombre
-      this.tratamientos = tratamientos.map(t => {
-        const paciente = pacientes.find(p => p.idPaciente === t.idPaciente);
-        return {
-          ...t,
-          pacienteNombre: paciente ? paciente.nombreMascota : 'Desconocido'
-        };
-      });
+        this.tratamientos = tratamientos.map(t => {
+          const paciente = pacientes.find((p: any) => p.idPaciente === t.idPaciente);
+          return {
+            ...t,
+            pacienteNombre: paciente ? paciente.nombreMascota : 'Desconocido'
+          };
+        });
 
-      // Optional: sort by fecha DESC
-      this.tratamientos.sort((a, b) => this.dateNum(b.fecha) - this.dateNum(a.fecha));
+        // ordenar por fecha DESC
+        this.tratamientos.sort((a, b) => this.dateNum(b.fecha) - this.dateNum(a.fecha));
 
-      this.refreshTipos();
-      this.loading = false;
-      event?.detail.complete?.();
-    },
-    error: async (err) => {
-      console.error('Error al cargar tratamientos o pacientes:', err);
-      this.error = 'No se pudieron cargar los datos.';
-      this.loading = false;
-      event?.detail.complete?.();
-      (await this.toast.create({
-        message: 'No se pudieron cargar los tratamientos o pacientes.',
-        duration: 1800,
-        color: 'danger'
-      })).present();
-    }
-  });
-}
-  
-
-
-  
+        this.refreshTipos();
+        this.loading = false;
+        event?.detail.complete?.();
+      },
+      error: async (err) => {
+        console.error('Error al cargar tratamientos o pacientes:', err);
+        this.error = 'No se pudieron cargar los datos.';
+        this.loading = false;
+        event?.detail.complete?.();
+        (await this.toast.create({
+          message: 'No se pudieron cargar los tratamientos o pacientes.',
+          duration: 1800,
+          color: 'danger'
+        })).present();
+      }
+    });
+  }
 
   refreshTipos() {
     const set = new Set(this.tratamientos.map(t => t.tipo).filter(Boolean));
@@ -99,12 +99,12 @@ export class ListaTratamientoComponent implements OnInit {
         String(t.idPaciente).includes(q) ||
         (t.descripcion ?? '').toLowerCase().includes(q) ||
         (t.tipo ?? '').toLowerCase().includes(q) ||
-        (t.fecha ?? '').includes(q);
+        (t.fecha ?? '').includes(q) ||
+        (t.pacienteNombre ?? '').toLowerCase().includes(q);
       return byTipo && (!q || byText);
     });
   }
 
-  // helpers visuales
   iconForTipo(tipo?: string) {
     const k = (tipo || '').toLowerCase();
     if (k.includes('vacuna')) return 'medkit-outline';
@@ -134,23 +134,100 @@ export class ListaTratamientoComponent implements OnInit {
   }
 
   dateNum(fecha?: string): number {
-  if (!fecha) return 0;
-  const clean = fecha.replace(/-/g, '');
-  return Number(clean) || 0;
-}
+    if (!fecha) return 0;
+    const clean = fecha.replace(/-/g, '');
+    return Number(clean) || 0;
+  }
 
-
+  // ➕ Nuevo
   async nuevoTratamiento() {
-  const modal = await this.modalCtrl.create({
-    component: TratamientoModalComponent,
-    cssClass: 'center-modal',
-    mode: 'md',
-    backdropDismiss: false,
-    animated: true
-  });
-  await modal.present();
+    const modal = await this.modalCtrl.create({
+      component: TratamientoModalComponent,
+      cssClass: 'center-modal',
+      mode: 'md',
+      backdropDismiss: false,
+      animated: true
+    });
+    await modal.present();
 
-  const { role } = await modal.onDidDismiss();
-  if (role === 'created') this.load();
-}
+    const { role } = await modal.onDidDismiss();
+    if (role === 'created') this.load();
+  }
+
+  // ✏️ Editar
+  async editarTratamiento(t: Tratamiento) {
+    const modal = await this.modalCtrl.create({
+      component: TratamientoModalComponent,
+      cssClass: 'center-modal',
+      mode: 'md',
+      backdropDismiss: false,
+      animated: true,
+      componentProps: {
+        tratamiento: { ...t }
+      }
+    });
+    await modal.present();
+
+    const { role, data } = await modal.onDidDismiss();
+    if (role === 'updated' && data) {
+      const updated = data as Tratamiento;
+
+      // recalcular nombre de paciente
+      const p = this.pacientes.find((x: any) => x.idPaciente === updated.idPaciente);
+      const pacienteNombre = p ? p.nombreMascota : 'Desconocido';
+
+      this.tratamientos = this.tratamientos.map(tr =>
+        tr.idTratamiento === updated.idTratamiento
+          ? { ...tr, ...updated, pacienteNombre }
+          : tr
+      );
+
+      (await this.toast.create({
+        message: 'Tratamiento actualizado.',
+        duration: 1500,
+        color: 'success'
+      })).present();
+    }
+  }
+
+  // 🗑️ Eliminar
+  async eliminarTratamiento(t: Tratamiento) {
+    const alert = await this.alertCtrl.create({
+      header: 'Eliminar tratamiento',
+      subHeader: 'Esta acción no se puede deshacer',
+      message: `¿Seguro que quieres eliminar el tratamiento #${t.idTratamiento}?`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'confirm',
+          cssClass: 'danger'
+        }
+      ]
+    });
+
+    await alert.present();
+    const { role } = await alert.onDidDismiss();
+
+    if (role === 'confirm') {
+      this.service.deleteTratamiento(t.idTratamiento).subscribe({
+        next: async () => {
+          this.tratamientos = this.tratamientos.filter(x => x.idTratamiento !== t.idTratamiento);
+          (await this.toast.create({
+            message: 'Tratamiento eliminado.',
+            duration: 1500,
+            color: 'success'
+          })).present();
+        },
+        error: async (err) => {
+          console.error('Error al eliminar tratamiento:', err);
+          (await this.toast.create({
+            message: 'No se pudo eliminar el tratamiento.',
+            duration: 2000,
+            color: 'danger'
+          })).present();
+        }
+      });
+    }
+  }
 }

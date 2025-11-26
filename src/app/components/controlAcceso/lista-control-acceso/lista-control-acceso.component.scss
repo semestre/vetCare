@@ -143,3 +143,32 @@ ion-segment-button{
 :host ::ng-deep .header-row ion-searchbar .searchbar-input {
   border-radius: 999px !important;
 }
+
+:host ::ng-deep .user-delete-alert {
+  .alert-wrapper {
+    border-radius: 18px !important;
+  }
+
+  .alert-message {
+    text-align: center;
+    white-space: pre-line;
+  }
+
+  button.danger {
+    color: #fff !important;
+    background: var(--ion-color-danger);
+    border-radius: 999px;
+    padding-inline: 14px;
+  }
+}
+
+.user-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.role-chip {
+  margin-top: 4px;
+}

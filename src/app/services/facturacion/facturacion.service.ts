@@ -4,34 +4,46 @@ import { Observable } from 'rxjs';
 import { Facturacion } from 'src/app/models/facturacion.model';
 import { API_CONFIG } from 'src/app/config/api.config';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class FacturacionService {
+
   private apiURL = `${API_CONFIG.baseURL}/facturacion`;
 
   constructor(private http: HttpClient) {}
 
-  // GET /facturacion/getAll
+  // Obtener todas las facturas
   getAllFacturas(): Observable<Facturacion[]> {
     return this.http.get<Facturacion[]>(`${this.apiURL}/getAll`);
   }
 
-  // POST /facturacion/save con x-www-form-urlencoded: factura=<json>
+  // Crear factura
   createFactura(factura: Facturacion): Observable<{ msg: string }> {
-    // Asegura tipos correctos
-    const payload: Facturacion = {
-      idFactura: 0, // lo asigna el backend
-      idPaciente: Number(factura.idPaciente),
-      servicios: String(factura.servicios ?? ''),
-      medicamentos: String(factura.medicamentos ?? ''),
-      total: Number(factura.total),
-      fecha: String(factura.fecha),           // 'YYYY-MM-DD'
-      metodoPago: String(factura.metodoPago), // 'Efectivo'|'Tarjeta'|'Transferencia'
-    };
-
-    const json = JSON.stringify(payload);
-    const body = new HttpParams().set('facturacion', json);
+    const body = new HttpParams().set('facturacion', JSON.stringify(factura));
     const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
 
-    return this.http.post<{ msg: string }>(`${this.apiURL}/save`, body.toString(), { headers });
+    return this.http.post<{ msg: string }>(
+      `${this.apiURL}/save`,
+      body.toString(),
+      { headers }
+    );
+  }
+
+  // Actualizar factura
+  updateFactura(factura: Facturacion): Observable<{ msg: string }> {
+    const body = new HttpParams().set('facturacion', JSON.stringify(factura));
+    const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
+
+    return this.http.put<{ msg: string }>(
+      `${this.apiURL}/update`,
+      body.toString(),
+      { headers }
+    );
+  }
+
+  // Eliminar factura
+  deleteFactura(idFactura: number): Observable<{ msg: string }> {
+    return this.http.delete<{ msg: string }>(`${this.apiURL}/delete/${idFactura}`);
   }
 }

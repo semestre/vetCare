@@ -1,9 +1,8 @@
-<!-- Diálogo centrado (sin ion-header/footer para evitar “sheet”) -->
 <div class="dialog">
 
   <!-- Header -->
   <div class="dialog-header">
-    <h2>Nuevo Paciente</h2>
+    <h2>{{ paciente.idPaciente ? 'Editar Paciente' : 'Nuevo Paciente' }}</h2>
     <ion-button (click)="cerrar()" fill="clear" aria-label="Cerrar" size="small">
       <ion-icon slot="icon-only" name="close-outline"></ion-icon>
     </ion-button>
@@ -70,7 +69,7 @@
       <ion-item>
         <ion-icon name="person-outline" slot="start"></ion-icon>
         <ion-select
-          label="ID del Propietario"
+          label="Propietario"
           labelPlacement="stacked"
           [(ngModel)]="paciente.idPropietario"
           name="idPropietario"
@@ -90,7 +89,9 @@
 
     <ion-button expand="block" type="submit" (click)="guardar()" [disabled]="cargando">
       <ion-spinner *ngIf="cargando" name="crescent"></ion-spinner>
-      <span *ngIf="!cargando">Guardar Paciente</span>
+      <span *ngIf="!cargando">
+        {{ paciente.idPaciente ? 'Actualizar paciente' : 'Guardar paciente' }}
+      </span>
     </ion-button>
   </div>
 

@@ -20,7 +20,7 @@
 <!-- ===== Contenido ===== -->
 <ion-content class="ion-padding vc-content-bg content-bg" [fullscreen]="true">
 
-  <!-- 🎛️ Controles (FUERA del header) -->
+  <!-- 🎛️ Controles -->
   <div class="vc-controls container">
     <div class="filters">
       <ion-segment [(ngModel)]="tipoFiltro" value="Todos" mode="md" scrollable="true">
@@ -93,13 +93,11 @@
     <ion-row>
       <ion-col size="12" size-md="6" size-lg="4" *ngFor="let t of filtered">
         <div class="vc-card-wrap">
-          <!-- Badge consistente -->
           <div class="vc-card-badge v2">
             <ion-icon name="medical-outline"></ion-icon>
           </div>
 
           <ion-card class="vc-card t-card hover" [ngClass]="statusByFecha(t.fecha)">
-            <!-- Punto / línea temporal -->
             <div class="timeline-dot" [ngClass]="statusByFecha(t.fecha)"></div>
 
             <ion-card-header class="t-header">
@@ -127,6 +125,26 @@
                   <span class="k">ID Tratamiento</span>
                   <span class="v">#{{ t.idTratamiento }}</span>
                 </div>
+              </div>
+
+              <!-- 🔹 Acciones -->
+              <div class="t-actions">
+                <ion-button
+                  size="small"
+                  fill="outline"
+                  (click)="editarTratamiento(t); $event.stopPropagation()">
+                  <ion-icon slot="start" name="create-outline"></ion-icon>
+                  Editar
+                </ion-button>
+
+                <ion-button
+                  size="small"
+                  color="danger"
+                  fill="outline"
+                  (click)="eliminarTratamiento(t); $event.stopPropagation()">
+                  <ion-icon slot="start" name="trash-outline"></ion-icon>
+                  Eliminar
+                </ion-button>
               </div>
             </ion-card-content>
           </ion-card>

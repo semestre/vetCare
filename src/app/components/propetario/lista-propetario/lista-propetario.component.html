@@ -1,6 +1,3 @@
-<!-- ============================================
-     PÁGINA: PROPIETARIOS (mismos nombres y lógica)
-=============================================== -->
 <!-- Header blanco con buscador redondeado -->
 <ion-header class="vc-header-white no-translucent">
   <ion-toolbar color="transparent">
@@ -10,11 +7,9 @@
         Propietarios
       </ion-title>
 
-      <!-- mismo [(ngModel)] y evento -->
       <ion-searchbar
         placeholder="Buscar por nombre, teléfono, dirección o ID…"
         [(ngModel)]="searchTerm"
-        (ionInput)="($event)"
         show-clear-button="focus"
         animated="true">
       </ion-searchbar>
@@ -24,9 +19,8 @@
 
 <ion-content class="ion-padding content-bg vc-content-bg" [fullscreen]="true">
 
-  <!-- Controles fuera del header (mismo handler) -->
   <div class="vc-controls container">
-    <div class="filters"><!-- podrías poner filtros aquí si luego los agregas --></div>
+    <div class="filters"></div>
 
     <div class="actions">
       <ion-button fill="solid" color="primary" (click)="nuevoPropietario()">
@@ -36,12 +30,11 @@
     </div>
   </div>
 
-  <!-- Pull to refresh (mismo método load) -->
   <ion-refresher slot="fixed" (ionRefresh)="load($event)">
     <ion-refresher-content pullingText="Desliza para refrescar"></ion-refresher-content>
   </ion-refresher>
 
-  <!-- Skeleton (se conserva tu estructura y clases owner-card) -->
+  <!-- Skeleton -->
   <ng-container *ngIf="loading">
     <ion-grid fixed>
       <ion-row>
@@ -68,7 +61,7 @@
     </ion-grid>
   </ng-container>
 
-  <!-- Error (mismo binding error y método load) -->
+  <!-- Error -->
   <ion-card *ngIf="!loading && error" class="vc-card owner-card error-card vc-error">
     <ion-card-header>
       <ion-card-title>Ups</ion-card-title>
@@ -79,7 +72,7 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- Vacío (mismos bindings y acción) -->
+  <!-- Vacío -->
   <div *ngIf="!loading && !filtered.length" class="vc-empty empty">
     <div class="emoji">🏠</div>
     <h3>Sin propietarios</h3>
@@ -87,14 +80,16 @@
     <ion-button (click)="nuevoPropietario()">Nuevo propietario</ion-button>
   </div>
 
-  <!-- Grid de tarjetas (mismos nombres: filtered, prop, initial, telHref) -->
+  <!-- Grid -->
   <ion-grid fixed *ngIf="!loading && filtered.length">
     <ion-row>
       <ion-col size="12" size-md="6" size-lg="4" *ngFor="let prop of filtered">
         <div class="vc-card-wrap">
-          <div class="vc-card-badge v1"><ion-icon name="home-outline"></ion-icon></div>
+          <div class="vc-card-badge v1">
+            <ion-icon name="home-outline"></ion-icon>
+          </div>
 
-          <ion-card class="vc-card hover owner-card" (click)="(prop)">
+          <ion-card class="vc-card hover owner-card">
             <ion-card-header class="owner-header">
               <div class="avatar">{{ initial(prop.nombre) }}</div>
 
@@ -127,6 +122,20 @@
                   <span class="v">{{ prop.direccion || '—' }}</span>
                 </div>
               </div>
+
+              <!-- 🔹 Acciones -->
+              <div class="owner-actions">
+                <ion-button size="small" fill="outline" (click)="editarPropietario(prop); $event.stopPropagation()">
+                  <ion-icon slot="start" name="create-outline"></ion-icon>
+                  Editar
+                </ion-button>
+
+                <ion-button size="small" color="danger" fill="outline" (click)="eliminarPropietario(prop); $event.stopPropagation()">
+                  <ion-icon slot="start" name="trash-outline"></ion-icon>
+                  Eliminar
+                </ion-button>
+              </div>
+
             </ion-card-content>
           </ion-card>
         </div>

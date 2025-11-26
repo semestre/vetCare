@@ -98,13 +98,15 @@
           <ion-card class="card glass hover">
             <ion-card-header class="card-header">
               <div class="avatar" [attr.aria-label]="user.rol || 'usuario'">
-                  {{ roleEmoji(user.rol) || initial(user.nombreUsuario) }}
-                </div>
-              
+                {{ roleEmoji(user.rol) || initial(user.nombreUsuario) }}
+              </div>
+
               <div class="title-wrap">
                 <ion-card-title class="name">{{ user.nombreUsuario }}</ion-card-title>
-              
-
+                <ion-chip color="primary" outline="true" class="role-chip">
+                  <ion-icon name="ribbon-outline" slot="start"></ion-icon>
+                  <ion-label>{{ user.rol }}</ion-label>
+                </ion-chip>
               </div>
             </ion-card-header>
 
@@ -121,6 +123,19 @@
               </div>
               <div class="note">
                 Por seguridad no se muestran contraseñas en texto plano.
+              </div>
+
+              <!-- 🔹 Acciones -->
+              <div class="user-actions">
+                <ion-button size="small" fill="outline" (click)="editarUsuario(user)">
+                  <ion-icon slot="start" name="create-outline"></ion-icon>
+                  Editar
+                </ion-button>
+
+                <ion-button size="small" color="danger" fill="outline" (click)="eliminarUsuario(user)">
+                  <ion-icon slot="start" name="trash-outline"></ion-icon>
+                  Eliminar
+                </ion-button>
               </div>
             </ion-card-content>
           </ion-card>

@@ -1,9 +1,9 @@
-<!-- Diálogo centrado (sin ion-header/footer para evitar sheet) -->
+<!-- Diálogo centrado -->
 <div class="dialog">
 
   <!-- Header -->
   <div class="dialog-header">
-    <h2>Nuevo tratamiento</h2>
+    <h2>{{ isEdit ? 'Editar tratamiento' : 'Nuevo tratamiento' }}</h2>
     <ion-button (click)="close()" fill="clear" aria-label="Cerrar" size="small">
       <ion-icon slot="icon-only" name="close-outline"></ion-icon>
     </ion-button>
@@ -14,7 +14,6 @@
     <form [formGroup]="form" (ngSubmit)="save()" class="form-body" novalidate>
 
       <ion-list inset="true" class="group">
-
         <!-- Descripción -->
         <ion-item>
           <ion-icon name="medkit-outline" slot="start"></ion-icon>
@@ -37,9 +36,12 @@
             labelPlacement="stacked"
             interface="popover"
             formControlName="tipo">
-            <ion-select-option value="vacuna">Vacuna</ion-select-option>
-            <ion-select-option value="medicamento">Medicamento</ion-select-option>
-            <ion-select-option value="procedimiento">Procedimiento</ion-select-option>
+            <ion-select-option value="Vacuna">Vacuna</ion-select-option>
+            <ion-select-option value="Higiene">Higiene</ion-select-option>
+            <ion-select-option value="Cirugía">Cirugía</ion-select-option>
+            <ion-select-option value="Desparasitación">Desparasitación</ion-select-option>
+            <ion-select-option value="Control">Control</ion-select-option>
+            <ion-select-option value="Otro">Otro</ion-select-option>
           </ion-select>
         </ion-item>
 
@@ -58,10 +60,8 @@
         <!--   PACIENTE: buscador/chip -->
         <!-- ========================= -->
 
-        <!-- Contenedor único → buscador o chip, en una sola línea -->
         <div class="paciente-inline">
-
-          <!-- Modo buscador (no hay paciente seleccionado) -->
+          <!-- Modo buscador -->
           <div class="search-mode" *ngIf="!selectedPaciente">
             <ion-icon name="search-outline" class="icon"></ion-icon>
             <ion-input
@@ -73,7 +73,7 @@
             </ion-input>
           </div>
 
-          <!-- Modo chip (ya hay paciente seleccionado) -->
+          <!-- Modo seleccionado -->
           <div class="selected-mode" *ngIf="selectedPaciente" (click)="clearPacienteSelection()">
             <ion-icon name="paw-outline" class="icon"></ion-icon>
             <div class="text">
@@ -81,10 +81,9 @@
             </div>
             <ion-icon name="close-circle-outline" class="close"></ion-icon>
           </div>
-
         </div>
 
-        <!-- Resultados debajo del buscador -->
+        <!-- Resultados -->
         <div class="search-results" *ngIf="!selectedPaciente && pacientesFiltrados.length && searchPacienteTerm">
           <ion-list lines="none">
             <ion-item
@@ -128,7 +127,7 @@
     <ion-button fill="outline" color="medium" (click)="close()">Cancelar</ion-button>
     <ion-button type="submit" (click)="save()">
       <ion-icon slot="start" name="save-outline"></ion-icon>
-      Guardar
+      {{ isEdit ? 'Actualizar' : 'Guardar' }}
     </ion-button>
   </div>
 
