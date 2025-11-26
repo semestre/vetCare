@@ -45,15 +45,11 @@
       </ion-item>
 
       <!-- PROPIETARIO SELECTOR (NOT inside ion-item anymore!) -->
-      
-      
 
-    </form>
-    <div class="propietario-container">
+      <div class="propietario-container">
 
         <ion-list inset="true" class="group">
 
-          <!-- Header del dropdown -->
           <ion-item button detail="true" (click)="togglePropietarioSelector()">
             <ion-icon name="person-outline" slot="start"></ion-icon>
 
@@ -65,12 +61,10 @@
             </ion-label>
           </ion-item>
 
-          <!-- Validación -->
           <ion-note color="danger" *ngIf="paciente.idPropietario === 0 && intentoGuardar">
             Selecciona un propietario válido.
           </ion-note>
 
-          <!-- Dropdown -->
           <div *ngIf="propietarioSelectorAbierto" class="pacientes-dropdown">
 
             <ion-searchbar placeholder="Buscar por nombre o ID…" (ionInput)="onPropietarioSearch($event)"
@@ -104,7 +98,12 @@
 
         </ion-list>
 
+
       </div>
+
+
+    </form>
+
   </div>
 
   <!-- Footer fijo (acciones) -->
