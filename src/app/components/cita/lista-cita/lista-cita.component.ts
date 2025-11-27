@@ -98,9 +98,9 @@ export class ListaCitaComponent implements OnInit {
   statusFilter = signal<string>('todas');
 
   // Citas filtradas (búsqueda + estado)
-  filteredCitas = computed(() => {
+  filteredCitas() {
     const q = this.searchTerm().trim().toLowerCase();
-    const statusFilter = this.statusFilter();
+    const status = this.statusFilter();
 
     return this.citas.filter(c => {
       const matchesSearch =
@@ -111,15 +111,14 @@ export class ListaCitaComponent implements OnInit {
         (c.fecha ?? '').includes(q) ||
         (c.hora ?? '').includes(q);
 
-      const st = this.mapStatus(c.status);
-
+      const st = (c.status ?? '').toLowerCase();
       const matchesStatus =
-        statusFilter === 'todas' ||
-        st === statusFilter;
+        status === 'todas' ||
+        st === status.toLowerCase();
 
       return matchesSearch && matchesStatus;
     });
-  });
+  }
 
   ngOnInit(): void {
     this.load();
