@@ -4,8 +4,7 @@ import {
   IonicModule,
   ModalController,
   ToastController,
-  AlertController,
-  ActionSheetController
+  AlertController
 } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { Cita } from 'src/app/models/cita.model';
@@ -28,7 +27,9 @@ export class ListaCitaComponent implements OnInit {
   private modalCtrl = inject(ModalController);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
-  private actionSheetCtrl = inject(ActionSheetController);
+  statusPopoverOpen = false;
+  statusPopoverEvent: any = null;
+  selectedCitaForStatus: Cita | null = null;
 
   // 🔹 Mapeo de estados a SOLO 3 valores internos:
   //   - pendiente
@@ -269,46 +270,31 @@ export class ListaCitaComponent implements OnInit {
     }
   }
 
-  // 🔹 NUEVO: abrir ActionSheet para cambiar solo el estado
-  async openStatusSheet(cita: Cita) {
-    const current = this.mapStatus(cita.status);
-
-    const actionSheet = await this.actionSheetCtrl.create({
-      header: 'Cambiar estado',
-      subHeader: cita.motivo,
-      mode: 'md',
-      buttons: [
-        {
-          text: current === 'pendiente' ? 'Pendiente ✓' : 'Pendiente',
-          icon: 'time-outline',
-          handler: () => this.changeStatus(cita, 'pendiente')
-        },
-        {
-          text: current === 'completada' ? 'Completada ✓' : 'Completada',
-          icon: 'checkmark-circle-outline',
-          handler: () => this.changeStatus(cita, 'completada')
-        },
-        {
-          text: current === 'cancelada' ? 'Cancelada ✓' : 'Cancelada',
-          icon: 'close-circle-outline',
-          handler: () => this.changeStatus(cita, 'cancelada')
-        },
-        {
-          text: 'Cerrar',
-          role: 'cancel',
-          icon: 'close-outline'
-        }
-      ]
-    });
-
-    await actionSheet.present();
+  openStatusPopover(ev: Event, cita: Cita) {
+    this.statusPopoverEvent = ev;
+    this.selectedCitaForStatus = cita;
+    this.statusPopoverOpen = true;
   }
 
-  // 🔹 NUEVO: actualizar solo el status
-  private async changeStatus(cita: Cita, newStatus: string) {
+  onStatusPopoverDismiss() {
+    this.statusPopoverOpen = false;
+    this.selectedCitaForStatus = null;
+  }
+
+  currentStatusIs(value: string): boolean {
+    if (!this.selectedCitaForStatus) return false;
+    return this.mapStatus(this.selectedCitaForStatus.status) === value;
+  }
+
+  async changeStatusFromPopover(newStatus: string) {
+    const cita = this.selectedCitaForStatus;
+    this.statusPopoverOpen = false;
+
+    if (!cita) return;
+
     const normalized = this.mapStatus(newStatus);
 
-    // Actualización optimista en UI
+    // Actualización optimista en la lista
     const index = this.citas.findIndex(c => c.idCita === cita.idCita);
     if (index !== -1) {
       this.citas[index] = {
@@ -331,8 +317,7 @@ export class ListaCitaComponent implements OnInit {
       },
       error: async (err) => {
         console.error('Error al cambiar estado:', err);
-        // Si falla, recargamos para no dejar datos inconsistentes
-        this.load();
+        this.load(); // recarga para no dejarlo mal
         (await this.toastCtrl.create({
           message: 'No se pudo cambiar el estado.',
           duration: 2000,

@@ -124,19 +124,17 @@
                   class="status-chip"
                   [color]="getStatusColor(cita.status)"
                   outline="true"
-                  (click)="openStatusSheet(cita)"
+                  (click)="openStatusPopover($event, cita)"
                 >
                   <ion-icon name="ellipse" slot="start"></ion-icon>
                   <ion-label>{{ getStatusLabel(cita.status) }}</ion-label>
                 </ion-chip>
 
                 <div class="card-actions">
-                  <!-- Editar -->
                   <ion-button size="small" fill="clear" (click)="editarCita(cita)">
                     <ion-icon name="create-outline" slot="icon-only"></ion-icon>
                   </ion-button>
 
-                  <!-- Eliminar -->
                   <ion-button size="small" fill="clear" color="danger" (click)="eliminarCita(cita)">
                     <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
                   </ion-button>
@@ -176,4 +174,60 @@
       </ion-col>
     </ion-row>
   </ion-grid>
+
+  <!-- Popover para cambio rápido de estado -->
+  <ion-popover
+  [isOpen]="statusPopoverOpen"
+  [event]="statusPopoverEvent"
+  (didDismiss)="onStatusPopoverDismiss()"
+  cssClass="status-popover-white"
+>
+  <ng-template>
+    <div class="status-card">
+
+      <div class="status-title">Estado de la cita</div>
+
+      <button class="status-option" (click)="changeStatusFromPopover('pendiente')">
+        <div class="left">
+          <ion-icon name="time-outline" color="warning" class="icon"></ion-icon>
+          <span>Pendiente</span>
+        </div>
+        <ion-icon
+          *ngIf="currentStatusIs('pendiente')"
+          name="checkmark-outline"
+          color="success"
+          class="check">
+        </ion-icon>
+      </button>
+
+      <button class="status-option" (click)="changeStatusFromPopover('completada')">
+        <div class="left">
+          <ion-icon name="checkmark-circle-outline" color="success" class="icon"></ion-icon>
+          <span>Completada</span>
+        </div>
+        <ion-icon
+          *ngIf="currentStatusIs('completada')"
+          name="checkmark-outline"
+          color="success"
+          class="check">
+        </ion-icon>
+      </button>
+
+      <button class="status-option" (click)="changeStatusFromPopover('cancelada')">
+        <div class="left">
+          <ion-icon name="close-circle-outline" color="danger" class="icon"></ion-icon>
+          <span>Cancelada</span>
+        </div>
+        <ion-icon
+          *ngIf="currentStatusIs('cancelada')"
+          name="checkmark-outline"
+          color="danger"
+          class="check">
+        </ion-icon>
+      </button>
+
+    </div>
+  </ng-template>
+</ion-popover>
+
 </ion-content>
