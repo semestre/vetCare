@@ -331,6 +331,83 @@ ion-chip.cat ion-label {
   gap: 8px;
 }
 
+.low-stock-filter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.low-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.low-icon {
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+.low-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.low-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.low-subtitle {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.low-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.low-input-item {
+  --background: transparent;
+  --min-height: 36px;
+  padding: 0;
+  max-width: 90px;
+}
+
+.low-input-item ion-input {
+  font-size: 13px;
+}
+
+/* Chip "Poco stock" – versión base */
+.low-chip {
+  --background: #ffffff;
+  --color: var(--ion-color-warning);
+  --border-color: rgba(255, 193, 7, 0.7);
+  border-radius: 999px;
+  font-size: 11px;
+  height: 28px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Cuando el filtro rápido está activo */
+.low-chip.active {
+  --background: var(--ion-color-warning);
+  --color: #1b1b1b;
+  --border-color: transparent;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+}
+
+.low-chip ion-icon {
+  font-size: 15px;
+}
+
+
+
 /* ====== RESPONSIVE ====== */
 @media (max-width: 480px) {
   .header-row {

@@ -29,24 +29,44 @@
     </div>
 
     <div class="low-stock-filter">
+      <!-- Izquierda: icono + textos -->
+      <div class="low-left">
+        <ion-icon name="alert-circle-outline" class="low-icon"></ion-icon>
+        <div class="low-text">
+          <div class="low-title">Stock </div>
+        </div>
+      </div>
 
-      <ion-toggle
-        [(ngModel)]="activarFiltroBajo"
-        color="warning">
-      </ion-toggle>
+      <!-- Derecha: toggle + input + chip -->
+      <div class="low-right">
+        <!-- Toggle solo activa/desactiva el filtro manual -->
+        <ion-toggle
+          [(ngModel)]="activarFiltroBajo"
+          color="warning">
+        </ion-toggle>
 
-      <ion-input
-        type="number"
-        min="1"
-        placeholder="Cantidad límite"
-        [(ngModel)]="limiteBajoStock"
-        [disabled]="!activarFiltroBajo"
-        style="max-width: 120px;">
-      </ion-input>
+        <!-- Input: editable solo cuando el toggle está prendido -->
+        <ion-item lines="none" class="low-input-item">
+          <ion-input
+            type="number"
+            min="1"
+            [(ngModel)]="limiteBajoStock"
+            [disabled]="!activarFiltroBajo"
+            placeholder="Límite">
+          </ion-input>
+        </ion-item>
 
-      <span class="label">Stock &lt; {{ limiteBajoStock || 0 }}</span>
-
+        <!-- Chip "Poco stock" – filtro rápido independiente -->
+        <ion-chip
+          class="low-chip"
+          [ngClass]="{ 'active': filtroPocoStock }"
+          (click)="togglePocoStock()">
+          <ion-icon name="sparkles-outline"></ion-icon>
+          <ion-label>Poco stock</ion-label>
+        </ion-chip>
+      </div>
     </div>
+
 
     <div class="actions">
       <ion-button fill="solid" color="primary" (click)="nuevoItem()">

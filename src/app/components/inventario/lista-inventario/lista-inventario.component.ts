@@ -26,7 +26,10 @@ export class ListaInventarioComponent implements OnInit {
   private alertCtrl = inject(AlertController);
 
   activarFiltroBajo = false;
-  limiteBajoStock = 10; // valor por defecto
+  limiteBajoStock: number | null = null;
+
+  filtroPocoStock = false;
+  readonly POCO_STOCK_THRESHOLD = 20;
 
   items: Inventario[] = [
     { idItem: 1, nombreItem: 'Vacuna antirrábica', cantidad: 20,  categoria: 'Medicamento',         fechaActualizacion: '2025-10-10' },
@@ -96,14 +99,36 @@ export class ListaInventarioComponent implements OnInit {
         (i.categoria ?? '').toLowerCase().includes(q) ||
         String(i.idItem).includes(q);
 
-      const byLow =
-        !this.activarFiltroBajo ||
-        (i.cantidad ?? 0) < (this.limiteBajoStock || 0);
+      const qty = i.cantidad ?? 0;
+
+      const limit = Number(this.limiteBajoStock);
+      const hasManualLimit =
+        this.activarFiltroBajo &&
+        !Number.isNaN(limit) &&
+        limit > 0;
+
+      let byLow = true;
+
+      if (hasManualLimit) {
+        byLow = byLow && qty < limit;
+      }
+
+      // 🔹 Filtro rápido "Poco stock" (chip independiente)
+      if (this.filtroPocoStock) {
+        byLow = byLow && qty < this.POCO_STOCK_THRESHOLD;
+      }
 
       return byCat && byText && byLow;
     });
   }
 
+  togglePocoStock() {
+    this.filtroPocoStock = !this.filtroPocoStock;
+  }
+
+  setQuickLowStock(threshold: number) {
+    this.limiteBajoStock = threshold;
+  }
   stockPercent(i: Inventario): number {
     return Math.max(0, Math.min(100, Math.round((i.cantidad / this.maxQty) * 100)));
   }
