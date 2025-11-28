@@ -14,12 +14,6 @@
         </div>
 
         <h1 class="title">Inicio de sesión</h1>
-        <!-- Botón Google -->
-        <ion-button expand="block" color="light" class="google-btn" (click)="onGoogleLogin()">
-          <ion-icon slot="start" src="../../assets/icons/google.svg"></ion-icon>
-          Iniciar sesión con Google
-        </ion-button>
-
 
         <ion-item fill="outline">
           <ion-label position="floating">Usuario</ion-label>
@@ -34,6 +28,13 @@
         <ion-button expand="block" class="mt-4" (click)="login()">
           Iniciar sesión
         </ion-button>
+
+        <!-- Botón Google -->
+        <ion-button expand="block" class="google-btn" (click)="onGoogleLogin()">
+          <img src="../../assets/icon/google.png" slot="start" class="google-icon" />
+          Iniciar sesión con Google
+        </ion-button>
+
 
         <div class="aux-links">
           <a href="#">¿Olvidaste tu contraseña?</a>
