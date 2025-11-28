@@ -2,9 +2,6 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IonContent,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonButton,
   IonCard,
   IonCardHeader,
@@ -22,9 +19,6 @@ import { AuthService } from '../../services/auth.service/auth.service';
   imports: [
     CommonModule,
     IonContent,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonButton,
     IonCard,
     IonCardHeader,
@@ -33,6 +27,9 @@ import { AuthService } from '../../services/auth.service/auth.service';
   ],
 })
 export class LoginComponent {
+  username = '';
+  password = '';
+
   constructor(private authService: AuthService, private router: Router) {}
 
   async onGoogleLogin() {
@@ -43,5 +40,10 @@ export class LoginComponent {
     } catch (error) {
       console.error('Error al iniciar sesión con Google', error);
     }
+  }
+
+  login() {
+    // Implementar login normal aquí
+    console.log('Login normal:', this.username);
   }
 }

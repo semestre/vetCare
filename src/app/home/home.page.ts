@@ -1,15 +1,12 @@
 // src/app/home/home.page.ts
 import { Component, inject } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { ControlAccesoService } from 'src/app/services/controlAcceso/control-acceso.service';
 import { ControlAcceso } from 'src/app/models/controlAcceso.model';
-import { ToastController } from '@ionic/angular';
-
-// ✅ servicio de Firebase (según tu ruta actual)
 import { AuthService } from 'src/app/services/auth.service/auth.service';
 
 @Component({
@@ -28,7 +25,7 @@ export class HomePage {
   private toast = inject(ToastController);
   private authService = inject(AuthService);
 
-  // ========= LOGIN NORMAL =========
+  // ========= LOGIN NORMAL (JAVA) =========
   login() {
     this.controlAccesoService.getAllUsuarios().subscribe({
       next: (users: ControlAcceso[]) => {
@@ -67,55 +64,16 @@ export class HomePage {
     });
   }
 
-  // ========= LOGIN CON GOOGLE =========
+  // ========= LOGIN CON GOOGLE (SOLO FRONT) =========
   async onGoogleLogin() {
     try {
       const userFirebase = await this.authService.loginWithGoogle();
-      const email = userFirebase.email;
+      console.log('✅ Google login OK:', userFirebase);
 
-      if (!email) {
-        throw new Error('El usuario de Google no tiene email');
-      }
+      // Aquí solo redirigimos directo al módulo de veterinario
+      this.router.navigate(['/veterinario']);
 
-      this.controlAccesoService.loginGoogle(email).subscribe({
-        next: async (user: ControlAcceso | null) => {
-          console.log('✅ Usuario BD (Google):', user);
-
-          // Protección por si backend llegara a devolver null
-          if (!user) {
-            (
-              await this.toast.create({
-                message: 'No se pudo registrar/obtener el usuario de Google',
-                duration: 2000,
-                color: 'danger',
-              })
-            ).present();
-            return;
-          }
-
-          (
-            await this.toast.create({
-              message: `Bienvenido ${user.nombreUsuario}`,
-              duration: 1500,
-              color: 'success',
-            })
-          ).present();
-
-          this.router.navigate([`/${user.rol}`]);
-        },
-        error: async (err) => {
-          console.error('Error login-google back', err);
-          (
-            await this.toast.create({
-              message: 'No se pudo validar el usuario de Google en el servidor',
-              duration: 2000,
-              color: 'danger',
-            })
-          ).present();
-        },
-      });
-
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error al iniciar sesión con Google', error);
       (
         await this.toast.create({

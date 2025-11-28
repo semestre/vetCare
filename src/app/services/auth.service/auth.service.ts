@@ -14,13 +14,14 @@ import {
 export class AuthService {
   private auth = inject(Auth);
 
-  // 👇 TIPADO CORRECTO PARA EVITAR EL ERROR TS2571
+  // Login con Google
   async loginWithGoogle(): Promise<User> {
     const provider = new GoogleAuthProvider();
 
     const result = await signInWithPopup(this.auth, provider);
     const user = result.user;
 
+    // Guarda algo simple en localStorage
     localStorage.setItem(
       'vetcare_user',
       JSON.stringify({

@@ -85,7 +85,7 @@ export class ControlAccesoModalComponent implements OnInit {
       : this.service.createUsuario(payload).pipe(take(1));
 
     req$.subscribe({
-      next: async (res) => {
+      next: async (res: any) => {
         try { await loading.dismiss(); } catch {}
 
         (await this.toast.create({
@@ -99,7 +99,7 @@ export class ControlAccesoModalComponent implements OnInit {
         // 👇 devolvemos el usuario al padre para actualizar la lista sin recargar todo
         this.modalCtrl.dismiss(payload, isEdit ? 'updated' : 'created');
       },
-      error: async (err) => {
+      error: async (err: any) => {
         try { await loading.dismiss(); } catch {}
         console.error('create/update usuario error:', { status: err?.status, body: err?.error });
         const msg =

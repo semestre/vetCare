@@ -189,7 +189,7 @@ export class ListaControlAccesoComponent implements OnInit {
             color: 'success'
           })).present();
         },
-        error: async (err) => {
+        error: async (err: any) => {
           console.error('Error al eliminar usuario:', err);
           (await this.toast.create({
             message: 'No se pudo eliminar el usuario.',
