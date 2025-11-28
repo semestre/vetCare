@@ -190,3 +190,18 @@ ion-button {
     background: linear-gradient(180deg, #fdd9a0, #fcbf69);
   }
 }
+
+.google-btn {
+  margin-top: 12px;
+  --background: #ffffff;
+  --background-hover: #e2e8f0;
+  --color: #000;
+  border-radius: 8px;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+
+  ion-icon {
+    width: 22px;
+    height: 22px;
+  }
+}

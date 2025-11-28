@@ -17,13 +17,39 @@ export class ControlAccesoService {
   getAllUsuarios(): Observable<ControlAcceso[]> {
     return this.http.get<ControlAcceso[]>(`${this.apiURL}/getAll`);
   }
+<<<<<<< HEAD
 
   // Crear usuario
   createUsuario(usuario: ControlAcceso): Observable<{ msg: string }> {
     const body = new HttpParams().set('controlAcceso', JSON.stringify(usuario));
+=======
+
+  createUsuario(usuario: ControlAcceso): Observable<{ msg: string }> {
+    const json = JSON.stringify({
+      idUsuario: 0,
+      nombreUsuario: usuario.nombreUsuario,
+      password: usuario.password,
+      rol: usuario.rol,
+      email: usuario.email,
+      esGoogle: usuario.esGoogle ?? false
+    });
+
+    const body = new HttpParams().set('controlAcceso', json);
+>>>>>>> 1bbf81e (login con google)
     const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
 
-    return this.http.post<{ msg: string }>(`${this.apiURL}/save`, body.toString(), { headers });
+    return this.http.post<{ msg: string }>(
+      `${this.apiURL}/save`,
+      body.toString(),
+      { headers }
+    );
+  }
+
+  // 🔹 LOGIN GOOGLE → llama al endpoint nuevo
+  loginGoogle(email: string): Observable<ControlAcceso> {
+    return this.http.post<ControlAcceso>(`${this.apiURL}/login-google`, {
+      email
+    });
   }
 
   // Actualizar usuario
