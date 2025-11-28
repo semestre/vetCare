@@ -120,6 +120,15 @@
                   <span class="meta-k">Contraseña:</span>
                   <span class="meta-v">#{{ user.password }}</span>
                 </div>
+                <div class="meta-item" *ngIf="user.esGoogle">
+                  <span class="meta-k">Acceso:</span>
+                  <span class="meta-v">Google</span>
+                </div>
+
+                <div class="meta-item" *ngIf="user.email">
+                  <span class="meta-k">Email:</span>
+                  <span class="meta-v">{{ user.email }}</span>
+                </div>
               </div>
               <div class="note">
                 Por seguridad no se muestran contraseñas en texto plano.

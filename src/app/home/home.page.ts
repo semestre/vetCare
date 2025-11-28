@@ -64,17 +64,71 @@ export class HomePage {
     });
   }
 
-  // ========= LOGIN CON GOOGLE (SOLO FRONT) =========
+  // ========= LOGIN CON GOOGLE (BACK + FRONT) =========
   async onGoogleLogin() {
     try {
+      // 1️⃣ Login con Firebase (Google)
       const userFirebase = await this.authService.loginWithGoogle();
       console.log('✅ Google login OK:', userFirebase);
 
-      // Aquí solo redirigimos directo al módulo de veterinario
-      this.router.navigate(['/veterinario']);
+      // 2️⃣ Sacar el email del usuario de Google
+      const email = userFirebase?.email;
 
-    } catch (error) {
-      console.error('Error al iniciar sesión con Google', error);
+      if (!email) {
+        (await this.toast.create({
+          message: 'No se pudo obtener el email de Google.',
+          duration: 2000,
+          color: 'danger',
+        })).present();
+        return;
+      }
+
+      // 3️⃣ Llamar a tu backend para registrar / obtener al usuario
+      this.controlAccesoService.loginGoogle(email).subscribe({
+        next: async (usuarioBackend: ControlAcceso) => {
+          console.log('🟢 Usuario devuelto por backend:', usuarioBackend);
+
+          // 4️⃣ Redirigir según el rol que venga del backend
+          const rol = (usuarioBackend.rol || '').toLowerCase();
+
+          if (rol.includes('admin')) {
+            this.router.navigate(['/administrador']);
+          } else if (rol.includes('asist')) {
+            this.router.navigate(['/asistente']);
+          } else {
+            // por defecto veterinario
+            this.router.navigate(['/veterinario']);
+          }
+
+          (await this.toast.create({
+            message: `Bienvenido, ${usuarioBackend.nombreUsuario || email}`,
+            duration: 1800,
+            color: 'success',
+          })).present();
+        },
+        error: async (err) => {
+          console.error('❌ Error al registrar/login con Google en backend', err);
+          (await this.toast.create({
+            message: 'No se pudo conectar con el servidor para Google Login.',
+            duration: 2000,
+            color: 'danger',
+          })).present();
+        }
+      });
+
+    } catch (error: any) {
+      console.error('Error al iniciar sesión con Google', error?.code, error?.message);
+
+      // ⚠️ Si el popup fue cancelado o ya había otra petición, no mostramos error feo
+      if (
+        error?.code === 'auth/cancelled-popup-request' ||
+        error?.code === 'auth/popup-closed-by-user'
+      ) {
+        // El usuario cerró el popup o se disparó otro login en paralelo
+        // Puedes poner un toast suave si quieres, o simplemente no hacer nada
+        return;
+      }
+
       (
         await this.toast.create({
           message: 'No se pudo iniciar sesión con Google',

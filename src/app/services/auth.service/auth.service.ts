@@ -14,7 +14,6 @@ import {
 export class AuthService {
   private auth = inject(Auth);
 
-  // Login con Google
   async loginWithGoogle(): Promise<User> {
     const provider = new GoogleAuthProvider();
 
